@@ -146,7 +146,7 @@ namespace VacuumVille.Math
                 operatorSymbol = "-",
                 correctAnswer  = answer,
                 choices        = choices,
-                visualAssetKey = "ducks",
+                visualAssetKey = "duck",
                 visualCount    = a,
                 voiceLineKey   = "q_subtraction"
             };
@@ -176,7 +176,7 @@ namespace VacuumVille.Math
                 operatorSymbol = "×",
                 correctAnswer  = answer,
                 choices        = choices,
-                visualAssetKey = "flowers",
+                visualAssetKey = "flower",
                 visualCount    = n,
                 voiceLineKey   = "q_multiplication"
             };
@@ -206,7 +206,7 @@ namespace VacuumVille.Math
                 operatorSymbol = "÷",
                 correctAnswer  = quotient,
                 choices        = choices,
-                visualAssetKey = "boxes",
+                visualAssetKey = "box",
                 visualCount    = dividend,
                 voiceLineKey   = "q_division"
             };
@@ -310,7 +310,7 @@ namespace VacuumVille.Math
         }
 
         private static readonly string[] CountingVisuals =
-            { "stars", "socks", "pillows", "toy_cars", "apples", "ducks", "coins", "flowers" };
+            { "star", "sock", "cushion", "toy", "crumb", "duck", "blocks", "flower" };
 
         private static string PickCountingVisual()
             => CountingVisuals[Rng.Next(CountingVisuals.Length)];
