@@ -2,7 +2,9 @@
     "name": "VacuumVille.Editor",
     "rootNamespace": "",
     "references": [
-        "VacuumVille"
+        "VacuumVille",
+        "Unity.TextMeshPro",
+        "Unity.TextMeshPro.Editor"
     ],
     "includePlatforms": [
         "Editor"
