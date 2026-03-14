@@ -540,6 +540,7 @@ GameObject:
   - component: {fileID: 849951975}
   - component: {fileID: 849951974}
   - component: {fileID: 849951973}
+  - component: {fileID: 849951977}
   m_Layer: 0
   m_Name: Canvas
   m_TagString: Untagged
@@ -547,6 +548,20 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &849951977
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849951972}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33ac88ac2b85482b963cd60570e68562, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: VacuumVille::VacuumVille.UI.MinigameUnlockController
+  backButton: {fileID: 0}
+  playButton: {fileID: 0}
 --- !u!114 &849951973
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -557,7 +572,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GraphicRaycaster
   m_IgnoreReversedGraphics: 1
   m_BlockingObjects: 0

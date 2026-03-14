@@ -335,6 +335,7 @@ GameObject:
   - component: {fileID: 486410503}
   - component: {fileID: 486410502}
   - component: {fileID: 486410501}
+  - component: {fileID: 486410505}
   m_Layer: 0
   m_Name: Canvas
   m_TagString: Untagged
@@ -342,6 +343,24 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &486410505
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 486410500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddd9ea7399934ef3b1ad863317976e18, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: VacuumVille::VacuumVille.UI.SettingsController
+  musicSlider: {fileID: 0}
+  sfxSlider: {fileID: 0}
+  voiceSlider: {fileID: 0}
+  czechButton: {fileID: 0}
+  englishButton: {fileID: 0}
+  backButton: {fileID: 0}
 --- !u!114 &486410501
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -352,7 +371,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GraphicRaycaster
   m_IgnoreReversedGraphics: 1
   m_BlockingObjects: 0
