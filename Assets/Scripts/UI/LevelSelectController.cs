@@ -29,38 +29,81 @@ namespace VacuumVille.UI
             if (gm == null) { Debug.LogError("[LevelSelect] GameManager is null"); return; }
             if (gm.AllLevels == null || gm.AllLevels.Length == 0) { Debug.LogError("[LevelSelect] No levels"); return; }
 
-            int count = gm.AllLevels.Length;
-            float btnH = 110f;
-            float spacing = 14f;
-            float totalH = count * btnH + (count - 1) * spacing;
-            float startY = totalH / 2f - btnH / 2f;
+            var content = BuildScrollView();
 
-            Debug.Log($"[LevelSelect] Building {count} buttons, totalH={totalH}");
-
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < gm.AllLevels.Length; i++)
             {
                 var def = gm.GetLevel(i);
                 if (def == null) continue;
-
                 bool unlocked = gm.IsLevelUnlocked(i);
                 var lp = gm.Progress.GetOrCreateLevel(i);
-
-                float y = startY - i * (btnH + spacing);
-                BuildButton(def, lp, unlocked, i, y);
+                BuildButton(content, def, lp, unlocked, i);
             }
+
+            Debug.Log($"[LevelSelect] Built {gm.AllLevels.Length} buttons.");
         }
 
-        private void BuildButton(LevelDefinition def, LevelProgress lp, bool unlocked, int index, float y)
-        {
-            // --- root ---
-            var go = new GameObject($"Btn_{index + 1}");
-            go.transform.SetParent(transform, false);
+        // ── Layout ─────────────────────────────────────────────────────────────
 
-            var rt = go.AddComponent<RectTransform>();
-            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
-            rt.pivot = new Vector2(0.5f, 0.5f);
-            rt.sizeDelta = new Vector2(960f, 110f);
-            rt.anchoredPosition = new Vector2(0f, y);
+        private RectTransform BuildScrollView()
+        {
+            // Scroll root — anchors fill the canvas
+            var sv = new GameObject("ScrollView");
+            sv.transform.SetParent(transform, false);
+            var svRt = sv.AddComponent<RectTransform>();
+            svRt.anchorMin = new Vector2(0.04f, 0.04f);
+            svRt.anchorMax = new Vector2(0.96f, 0.96f);
+            svRt.offsetMin = svRt.offsetMax = Vector2.zero;
+
+            var sr = sv.AddComponent<ScrollRect>();
+            sr.horizontal = false;
+            sr.inertia = true;
+            sr.decelerationRate = 0.135f;
+            sr.scrollSensitivity = 25f;
+
+            // Viewport — RectMask2D clips without needing Image+Mask
+            var vp = new GameObject("Viewport");
+            vp.transform.SetParent(sv.transform, false);
+            var vpRt = vp.AddComponent<RectTransform>();
+            vpRt.anchorMin = Vector2.zero;
+            vpRt.anchorMax = Vector2.one;
+            vpRt.offsetMin = vpRt.offsetMax = Vector2.zero;
+            vp.AddComponent<RectMask2D>();
+            sr.viewport = vpRt;
+
+            // Content — anchored top, grows downward
+            var ct = new GameObject("Content");
+            ct.transform.SetParent(vp.transform, false);
+            var ctRt = ct.AddComponent<RectTransform>();
+            ctRt.anchorMin = new Vector2(0f, 1f);
+            ctRt.anchorMax = new Vector2(1f, 1f);
+            ctRt.pivot    = new Vector2(0.5f, 1f);
+            ctRt.offsetMin = ctRt.offsetMax = Vector2.zero;
+
+            var vlg = ct.AddComponent<VerticalLayoutGroup>();
+            vlg.spacing = 12f;
+            vlg.padding = new RectOffset(0, 0, 8, 8);
+            vlg.childControlWidth  = true;
+            vlg.childControlHeight = true;
+            vlg.childForceExpandWidth  = true;
+            vlg.childForceExpandHeight = false;
+
+            var csf = ct.AddComponent<ContentSizeFitter>();
+            csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            sr.content = ctRt;
+            return ctRt;
+        }
+
+        private void BuildButton(RectTransform parent, LevelDefinition def,
+            LevelProgress lp, bool unlocked, int index)
+        {
+            var go = new GameObject($"Btn_{index + 1}");
+            go.transform.SetParent(parent, false);
+
+            var le = go.AddComponent<LayoutElement>();
+            le.preferredHeight = 100f;
+            le.minHeight = 80f;
 
             Color base_ = ButtonColors[index % ButtonColors.Length];
             float a = unlocked ? 1f : 0.35f;
@@ -71,10 +114,9 @@ namespace VacuumVille.UI
             btn.targetGraphic = img;
             btn.interactable = unlocked;
 
-            // --- label ---
+            // Label
             var lGo = new GameObject("Label");
             lGo.transform.SetParent(go.transform, false);
-
             var lRt = lGo.AddComponent<RectTransform>();
             lRt.anchorMin = Vector2.zero;
             lRt.anchorMax = Vector2.one;
@@ -82,24 +124,45 @@ namespace VacuumVille.UI
             lRt.offsetMax = new Vector2(-24f, 0f);
 
             var tmp = lGo.AddComponent<TextMeshProUGUI>();
-
-            string name_ = LocalizationManager.Instance != null
+            string levelName = LocalizationManager.Instance != null
                 ? LocalizationManager.Instance.Get(def.levelNameKey)
                 : def.levelNameKey;
-            tmp.SetText($"{def.levelIndex + 1}.  {name_}");
-            tmp.fontSize = 44f;
+            tmp.SetText($"{def.levelIndex + 1}.  {levelName}");
+            tmp.fontSize = 38f;
             tmp.color = new Color(1f, 1f, 1f, unlocked ? 1f : 0.5f);
             tmp.alignment = TextAlignmentOptions.MidlineLeft;
             tmp.enableWordWrapping = false;
             tmp.overflowMode = TextOverflowModes.Ellipsis;
 
-            // --- click ---
+            if (lp.stars > 0)
+                AddStars(go.transform, lp.stars);
+
             if (unlocked)
             {
                 var cap = def;
                 btn.onClick.AddListener(() => OnSelected(cap));
             }
         }
+
+        private void AddStars(Transform parent, int stars)
+        {
+            var sg = new GameObject("Stars");
+            sg.transform.SetParent(parent, false);
+            var sr = sg.AddComponent<RectTransform>();
+            sr.anchorMin = new Vector2(1f, 0f);
+            sr.anchorMax = new Vector2(1f, 1f);
+            sr.pivot     = new Vector2(1f, 0.5f);
+            sr.offsetMin = new Vector2(-150f, 0f);
+            sr.offsetMax = new Vector2(-16f,  0f);
+
+            var t = sg.AddComponent<TextMeshProUGUI>();
+            t.SetText(new string('★', stars) + new string('☆', 3 - stars));
+            t.fontSize  = 28f;
+            t.color     = new Color(1f, 0.85f, 0.1f);
+            t.alignment = TextAlignmentOptions.MidlineRight;
+        }
+
+        // ── Navigation ─────────────────────────────────────────────────────────
 
         private void OnSelected(LevelDefinition def)
         {

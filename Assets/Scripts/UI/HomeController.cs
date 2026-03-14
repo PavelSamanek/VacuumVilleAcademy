@@ -11,11 +11,6 @@ namespace VacuumVille.UI
 
         private void Start()
         {
-            // Language was already loaded by LanguageSelectController on first run.
-            // On subsequent runs, restore the saved language.
-            var lang = (Language)PlayerPrefs.GetInt("lang", (int)Language.Czech);
-            LocalizationManager.Instance?.SetLanguage(lang);
-
             _breakMonitor = gameObject.AddComponent<SessionBreakMonitor>();
 
             WireButton("PlayButton",       () => GameManager.Instance.TransitionTo(GameState.LevelSelect));
