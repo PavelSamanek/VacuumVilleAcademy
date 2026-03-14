@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0f571bcdd921024e80caf36c3db6728, type: 3}
+  m_Name: Xixi
+  m_EditorClassIdentifier: Assembly-CSharp::VacuumVille.Data.CharacterDefinition
+  characterType: 1
+  nameKey: char_xixi_name
+  catchphraseKey: char_xixi_catchphrase
+  brandName: Xiaomi Mi Robot
+  skill: 1
+  skillDescriptionKey: char_xixi_skill
+  unlockAfterLevelIndex: 0
+  animatorController: {fileID: 0}
+  thumbnailSprite: {fileID: 0}
+  voiceLines: []

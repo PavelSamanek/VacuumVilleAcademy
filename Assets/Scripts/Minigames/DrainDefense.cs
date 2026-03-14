@@ -1,0 +1,167 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using TMPro;
+using VacuumVille.Core;
+
+namespace VacuumVille.Minigames
+{
+    /// <summary>
+    /// Level 4 Minigame: Rubber ducks float toward 5 drains.
+    /// Player swipes/tilts Bubbles to block drains. Each duck has a point value.
+    /// 60 seconds. Score = points saved.
+    /// </summary>
+    public class DrainDefense : BaseMinigame
+    {
+        [Header("Drain Defense")]
+        [SerializeField] private Transform[] drainPositions;    // 5 drains
+        [SerializeField] private Transform vacuumTransform;
+        [SerializeField] private GameObject duckPrefab;
+        [SerializeField] private float duckSpawnInterval = 1.5f;
+        [SerializeField] private float duckSpeed = 1.5f;
+        [SerializeField] private TextMeshProUGUI savedPointsLabel;
+
+        private int _savedPoints;
+        private int _drainedPoints;
+        private List<DuckInstance> _activeDucks = new();
+        private Camera _cam;
+
+        protected override float TimeLimit => 60f;
+        protected override int MaxScore   => 50;
+
+        private class DuckInstance
+        {
+            public GameObject Go;
+            public int Points;
+            public int TargetDrain;
+            public bool Blocked;
+        }
+
+        protected override void OnMinigameBegin()
+        {
+            _cam = Camera.main;
+            StartCoroutine(SpawnDucks());
+        }
+
+        private IEnumerator SpawnDucks()
+        {
+            while (GameActive)
+            {
+                SpawnDuck();
+                yield return new WaitForSeconds(duckSpawnInterval);
+            }
+        }
+
+        private void SpawnDuck()
+        {
+            int drain    = Random.Range(0, drainPositions.Length);
+            int points   = Random.Range(1, 6);
+            float spawnX = drainPositions[drain].position.x;
+            float spawnY = drainPositions[drain].position.y + 5f;
+
+            var go  = Instantiate(duckPrefab, new Vector3(spawnX, spawnY, 0), Quaternion.identity);
+            var lbl = go.GetComponentInChildren<TextMeshProUGUI>();
+            if (lbl) lbl.text = points.ToString();
+
+            _activeDucks.Add(new DuckInstance { Go = go, Points = points, TargetDrain = drain });
+        }
+
+        private void Update()
+        {
+            if (!GameActive) return;
+
+            HandleVacuumInput();
+            MoveDucks();
+            CheckBlocking();
+        }
+
+        private void HandleVacuumInput()
+        {
+            Vector3 target = vacuumTransform.position;
+
+#if UNITY_EDITOR || UNITY_STANDALONE
+            if (Input.GetMouseButton(0))
+            {
+                target = _cam.ScreenToWorldPoint(Input.mousePosition);
+                target.z = 0;
+                target.y = vacuumTransform.position.y; // constrain to drain row
+            }
+#else
+            if (Input.touchCount > 0)
+            {
+                target = _cam.ScreenToWorldPoint(Input.GetTouch(0).position);
+                target.z = 0;
+                target.y = vacuumTransform.position.y;
+            }
+            else
+            {
+                // Tilt support
+                float tilt = Input.acceleration.x;
+                target.x += tilt * 5f * Time.deltaTime;
+            }
+#endif
+
+            float minX = drainPositions[0].position.x - 0.5f;
+            float maxX = drainPositions[drainPositions.Length - 1].position.x + 0.5f;
+            target.x = Mathf.Clamp(target.x, minX, maxX);
+            vacuumTransform.position = Vector3.Lerp(vacuumTransform.position, target, Time.deltaTime * 10f);
+        }
+
+        private void MoveDucks()
+        {
+            for (int i = _activeDucks.Count - 1; i >= 0; i--)
+            {
+                var duck = _activeDucks[i];
+                if (duck.Blocked || duck.Go == null) continue;
+
+                duck.Go.transform.position += Vector3.down * duckSpeed * Time.deltaTime;
+
+                // Reached drain
+                if (duck.Go.transform.position.y <= drainPositions[duck.TargetDrain].position.y)
+                {
+                    DuckDrained(duck);
+                    _activeDucks.RemoveAt(i);
+                }
+            }
+        }
+
+        private void CheckBlocking()
+        {
+            for (int i = _activeDucks.Count - 1; i >= 0; i--)
+            {
+                var duck = _activeDucks[i];
+                if (duck.Blocked) continue;
+
+                float dist = Vector3.Distance(vacuumTransform.position, duck.Go.transform.position);
+                if (dist < 0.8f)
+                {
+                    DuckBlocked(duck);
+                    _activeDucks.RemoveAt(i);
+                }
+            }
+        }
+
+        private void DuckBlocked(DuckInstance duck)
+        {
+            _savedPoints += duck.Points;
+            AddScore(duck.Points);
+            AudioManager.Instance.PlayCorrect();
+            if (savedPointsLabel)
+                savedPointsLabel.text = LocalizationManager.Instance.Get("saved_points", _savedPoints);
+            if (duck.Go) Destroy(duck.Go);
+        }
+
+        private void DuckDrained(DuckInstance duck)
+        {
+            _drainedPoints += duck.Points;
+            AudioManager.Instance.PlayWrong();
+            if (duck.Go) Destroy(duck.Go);
+        }
+
+        protected override void OnMinigameEnd()
+        {
+            foreach (var d in _activeDucks)
+                if (d.Go) Destroy(d.Go);
+        }
+    }
+}

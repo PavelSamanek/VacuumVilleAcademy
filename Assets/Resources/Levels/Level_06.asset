@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2921b7a84591e714da07e612f1d648da, type: 3}
+  m_Name: Level_06
+  m_EditorClassIdentifier: Assembly-CSharp::VacuumVille.Data.LevelDefinition
+  levelIndex: 6
+  levelNameKey: level_7_name
+  roomNameKey: room_backyard
+  narrativeIntroKey: 
+  mathTopic: 6
+  startingDifficulty: 1
+  tasksRequiredToUnlockMinigame: 12
+  minigameType: 6
+  minigameNameKey: minigame_flowerbedfrenzy_name
+  minigameDescriptionKey: minigame_flowerbedfrenzy_desc
+  assignedCharacter: 6
+  unlockAfterLevel: 5
+  starThreshold2: 70
+  starThreshold3: 90
+  stickerSpriteKey: sticker_level_6

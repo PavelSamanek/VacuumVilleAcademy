@@ -1,0 +1,10 @@
+{
+  "entries": [
+    { "key": "coins_earned",  "one": "You earned {0} coin",    "few": "You earned {0} coins",    "many": "You earned {0} coins" },
+    { "key": "stars_total",   "one": "{0} star",               "few": "{0} stars",               "many": "{0} stars" },
+    { "key": "hints_left",    "one": "{0} hint left",          "few": "{0} hints left",          "many": "{0} hints left" },
+    { "key": "tasks_done",    "one": "{0} task done",          "few": "{0} tasks done",          "many": "{0} tasks done" },
+    { "key": "points_saved",  "one": "{0} point saved",        "few": "{0} points saved",        "many": "{0} points saved" },
+    { "key": "minutes_played","one": "{0} minute",             "few": "{0} minutes",             "many": "{0} minutes" }
+  ]
+}

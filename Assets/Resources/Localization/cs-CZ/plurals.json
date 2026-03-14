@@ -1,0 +1,10 @@
+{
+  "entries": [
+    { "key": "coins_earned",  "one": "Získal(a) jsi {0} minci",    "few": "Získal(a) jsi {0} mince",    "many": "Získal(a) jsi {0} mincí" },
+    { "key": "stars_total",   "one": "{0} hvězdička",               "few": "{0} hvězdičky",               "many": "{0} hvězdiček" },
+    { "key": "hints_left",    "one": "zbývá {0} nápověda",          "few": "zbývají {0} nápovědy",        "many": "zbývá {0} nápověd" },
+    { "key": "tasks_done",    "one": "{0} úkol splněn",             "few": "{0} úkoly splněny",           "many": "{0} úkolů splněno" },
+    { "key": "points_saved",  "one": "{0} bod zachráněn",           "few": "{0} body zachráněny",         "many": "{0} bodů zachráněno" },
+    { "key": "minutes_played","one": "{0} minuta",                  "few": "{0} minuty",                  "many": "{0} minut" }
+  ]
+}

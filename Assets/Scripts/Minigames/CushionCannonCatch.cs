@@ -1,0 +1,181 @@
+using System.Collections;
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using VacuumVille.Core;
+
+namespace VacuumVille.Minigames
+{
+    /// <summary>
+    /// Level 3 Minigame: Two streams of cushions merge into one pile.
+    /// Player taps the correct sum before the pile lands on Rocky.
+    /// 5 rounds, increasing speed each round.
+    /// </summary>
+    public class CushionCannonCatch : BaseMinigame
+    {
+        [Header("Cannon Catch")]
+        [SerializeField] private Transform cannonLeft;
+        [SerializeField] private Transform cannonRight;
+        [SerializeField] private Transform mergePoint;
+        [SerializeField] private Transform landingPoint;
+        [SerializeField] private GameObject cushionPrefab;
+        [SerializeField] private Button[] answerButtons;   // 3 buttons
+        [SerializeField] private TextMeshProUGUI[] answerLabels;
+        [SerializeField] private Animator vacuumAnimator;
+        [SerializeField] private float initialFallSpeed = 2f;
+
+        private int _round;
+        private int _a, _b, _correct;
+        private float _currentSpeed;
+        private bool _awaitingAnswer;
+        private GameObject _flyingPile;
+
+        protected override float TimeLimit => 120f;
+        protected override int MaxScore   => 5;
+
+        protected override void OnMinigameBegin()
+        {
+            _currentSpeed = initialFallSpeed;
+            StartNextRound();
+        }
+
+        private void StartNextRound()
+        {
+            if (_round >= 5) { CompleteEarly(); return; }
+            _round++;
+            _currentSpeed += 0.3f;
+
+            _a = Random.Range(1, 6);
+            _b = Random.Range(1, 6);
+            _correct = _a + _b;
+
+            SetupAnswerButtons();
+            StartCoroutine(AnimateCushions());
+        }
+
+        private void SetupAnswerButtons()
+        {
+            var choices = GenerateChoices(_correct, 2, 10);
+            for (int i = 0; i < answerButtons.Length; i++)
+            {
+                int val = choices[i];
+                int idx = i;
+                answerLabels[i].text = val.ToString();
+                answerButtons[i].interactable = true;
+                answerButtons[i].onClick.RemoveAllListeners();
+                answerButtons[i].onClick.AddListener(() => OnAnswerTapped(val));
+                var img = answerButtons[i].GetComponent<Image>();
+                if (img) img.color = Color.white;
+            }
+        }
+
+        private IEnumerator AnimateCushions()
+        {
+            _awaitingAnswer = false;
+
+            // Spawn left group
+            var leftPile = Instantiate(cushionPrefab, cannonLeft.position, Quaternion.identity);
+            var leftLbl  = leftPile.GetComponentInChildren<TextMeshProUGUI>();
+            if (leftLbl) leftLbl.text = _a.ToString();
+
+            // Spawn right group
+            var rightPile = Instantiate(cushionPrefab, cannonRight.position, Quaternion.identity);
+            var rightLbl  = rightPile.GetComponentInChildren<TextMeshProUGUI>();
+            if (rightLbl) rightLbl.text = _b.ToString();
+
+            // Move both toward merge point
+            yield return StartCoroutine(MovePair(leftPile.transform, rightPile.transform, mergePoint.position));
+
+            Destroy(leftPile);
+            Destroy(rightPile);
+
+            // Merged pile falls toward landing
+            _flyingPile = Instantiate(cushionPrefab, mergePoint.position, Quaternion.identity);
+            var mergeLbl = _flyingPile.GetComponentInChildren<TextMeshProUGUI>();
+            if (mergeLbl) mergeLbl.text = "?";
+
+            _awaitingAnswer = true;
+            AudioManager.Instance.PlayVoice($"q_addition_sum_{_a}_{_b}");
+
+            float elapsed = 0f;
+            float duration = 3f / _currentSpeed;
+            while (elapsed < duration && _awaitingAnswer)
+            {
+                float t = elapsed / duration;
+                _flyingPile.transform.position = Vector3.Lerp(mergePoint.position, landingPoint.position, t);
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            if (_awaitingAnswer)
+            {
+                // Pile landed — wrong by timeout
+                Destroy(_flyingPile);
+                vacuumAnimator?.SetTrigger("Dodge");
+                AudioManager.Instance.PlayWrong();
+                yield return new WaitForSeconds(0.8f);
+                StartNextRound();
+            }
+        }
+
+        private IEnumerator MovePair(Transform a, Transform b, Vector3 target)
+        {
+            float duration = 1.5f / _currentSpeed;
+            float elapsed  = 0f;
+            Vector3 startA = a.position, startB = b.position;
+            while (elapsed < duration)
+            {
+                float t = elapsed / duration;
+                a.position = Vector3.Lerp(startA, target, t);
+                b.position = Vector3.Lerp(startB, target, t);
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+        }
+
+        private void OnAnswerTapped(int answer)
+        {
+            if (!_awaitingAnswer) return;
+            _awaitingAnswer = false;
+
+            if (_flyingPile) Destroy(_flyingPile);
+
+            if (answer == _correct)
+            {
+                AddScore(1);
+                AudioManager.Instance.PlayCorrect();
+                vacuumAnimator?.SetTrigger("Cheer");
+            }
+            else
+            {
+                AudioManager.Instance.PlayWrong();
+                vacuumAnimator?.SetTrigger("Oops");
+            }
+
+            StartCoroutine(DelayedNextRound(0.6f));
+        }
+
+        private IEnumerator DelayedNextRound(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            StartNextRound();
+        }
+
+        private static int[] GenerateChoices(int correct, int min, int max)
+        {
+            var set = new System.Collections.Generic.HashSet<int> { correct };
+            int attempts = 0;
+            while (set.Count < 3 && attempts++ < 30)
+            {
+                int w = correct + (Random.Range(0, 2) == 0 ? 1 : -1) * Random.Range(1, 3);
+                if (w >= min && w <= max && w != correct) set.Add(w);
+            }
+            int pad = min;
+            while (set.Count < 3) { if (!set.Contains(pad)) set.Add(pad); pad++; }
+            var arr = new System.Collections.Generic.List<int>(set);
+            for (int i = arr.Count - 1; i > 0; i--)
+            { int j = Random.Range(0, i + 1); (arr[i], arr[j]) = (arr[j], arr[i]); }
+            return arr.ToArray();
+        }
+    }
+}
