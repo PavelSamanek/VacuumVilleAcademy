@@ -141,6 +141,7 @@ namespace VacuumVille.UI
             for (int i = 0; i < p.visualCount; i++)
             {
                 var img = Instantiate(visualObjectPrefab, visualObjectContainer.transform);
+                img.gameObject.SetActive(true);
                 img.sprite = sprite;
             }
         }
