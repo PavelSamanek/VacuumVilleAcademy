@@ -223,14 +223,8 @@ namespace VacuumVille.Core
 
         private void LoadScene(string sceneName)
         {
-            if (Application.CanStreamedLevelBeLoaded(sceneName))
-            {
-                SceneManager.LoadSceneAsync(sceneName);
-            }
-            else
-            {
-                Debug.LogError($"[GameManager] Scene '{sceneName}' is not in the Build Settings. Add it via File > Build Profiles.");
-            }
+            Debug.Log($"[GameManager] Loading scene: {sceneName}");
+            SceneManager.LoadSceneAsync(sceneName);
         }
 
         private IEnumerator TrackSessionTime()
