@@ -95,10 +95,10 @@ namespace VacuumVille.Math
                 default:
                     a = Rng.Next(maxSum / 2, maxSum); b = Rng.Next(0, maxSum - a + 1); break;
             }
-            int answer = a + b;
-            var choices = GenerateChoices(answer, 0, maxSum + 2);
-
+            int sum = a + b;
             bool isMissing = diff == Difficulty.Hard && Rng.Next(2) == 0;
+            int correct = isMissing ? a : sum;
+            var choices = GenerateChoices(correct, 0, maxSum);
 
             return new MathProblem
             {
@@ -106,10 +106,10 @@ namespace VacuumVille.Math
                 difficulty     = diff,
                 format         = isMissing ? ProblemFormat.FillBlank : ProblemFormat.MultipleChoice,
                 questionTextKey = isMissing ? "q_missing_addition" : "q_addition",
-                questionTextFallback = isMissing ? $"___ + {b} = {answer}" : $"{a} + {b} = ___",
+                questionTextFallback = isMissing ? $"___ + {b} = {sum}" : $"{a} + {b} = ___",
                 operands       = new[] { a, b },
                 operatorSymbol = "+",
-                correctAnswer  = answer,
+                correctAnswer  = correct,
                 choices        = choices,
                 visualAssetKey = "blocks",
                 visualCount    = a,

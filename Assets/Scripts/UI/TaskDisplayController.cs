@@ -103,7 +103,7 @@ namespace VacuumVille.UI
             {
                 operandAText.text  = p.operands[0].ToString();
                 operatorText.text  = p.operatorSymbol;
-                operandBText.text  = p.operands.Length > 1 ? "___" : p.operands[1].ToString();
+                operandBText.text  = p.operands[1].ToString();
             }
 
             // Visual objects
