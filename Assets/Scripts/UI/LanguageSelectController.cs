@@ -20,15 +20,11 @@ namespace VacuumVille.UI
 
         private void Start()
         {
-            // If language was already chosen before, skip straight to Home
-            if (PlayerPrefs.HasKey("language_chosen"))
-            {
-                var lang = (Language)PlayerPrefs.GetInt("lang", (int)Language.Czech);
-                ApplyLanguage(lang, skipScreen: true);
-                return;
-            }
+            // Pre-highlight previously chosen language, but always require the user to confirm
+            var saved = (Language)PlayerPrefs.GetInt("lang", (int)Language.Czech);
+            _selected = saved;
+            SetHighlight(saved);
 
-            SetHighlight(Language.Czech);
             czechButton.onClick.AddListener(() => SelectLanguage(Language.Czech));
             englishButton.onClick.AddListener(() => SelectLanguage(Language.English));
         }
@@ -38,10 +34,10 @@ namespace VacuumVille.UI
             _selected = lang;
             SetHighlight(lang);
             AudioManager.Instance.PlayButton();
-            ApplyLanguage(lang, skipScreen: false);
+            ApplyLanguage(lang);
         }
 
-        private void ApplyLanguage(Language lang, bool skipScreen)
+        private void ApplyLanguage(Language lang)
         {
             LocalizationManager.Instance.SetLanguage(lang);
             GameManager.Instance.Progress.selectedLanguage = lang;
