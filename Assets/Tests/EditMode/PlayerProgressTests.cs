@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using UnityEngine;
 using VacuumVille.Data;
 
 namespace VacuumVille.Tests
@@ -128,25 +129,30 @@ namespace VacuumVille.Tests
         public void IsLevelUnlocked_LevelZero_AlwaysTrue()
         {
             var p = new PlayerProgress();
-            // Level 0 has no prerequisites
-            var level0 = new LevelDefinition();
+            var level0 = ScriptableObject.CreateInstance<LevelDefinition>();
             level0.levelIndex = 0;
             level0.unlockAfterLevel = -1;
             Assert.IsTrue(p.IsLevelUnlocked(0, new[] { level0 }));
+            Object.DestroyImmediate(level0);
         }
 
         [Test]
         public void IsLevelUnlocked_Level1_LockedUntilLevel0Completed()
         {
             var p = new PlayerProgress();
-            var level0 = new LevelDefinition { levelIndex = 0, unlockAfterLevel = -1 };
-            var level1 = new LevelDefinition { levelIndex = 1, unlockAfterLevel = 0 };
+            var level0 = ScriptableObject.CreateInstance<LevelDefinition>();
+            level0.levelIndex = 0; level0.unlockAfterLevel = -1;
+            var level1 = ScriptableObject.CreateInstance<LevelDefinition>();
+            level1.levelIndex = 1; level1.unlockAfterLevel = 0;
             var allLevels = new[] { level0, level1 };
 
             Assert.IsFalse(p.IsLevelUnlocked(1, allLevels), "Level 1 should be locked before level 0 completed");
 
             p.GetOrCreateLevel(0).completed = true;
             Assert.IsTrue(p.IsLevelUnlocked(1, allLevels), "Level 1 should unlock after level 0 completed");
+
+            Object.DestroyImmediate(level0);
+            Object.DestroyImmediate(level1);
         }
 
         [Test]

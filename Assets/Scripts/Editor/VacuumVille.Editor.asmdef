@@ -1,9 +1,7 @@
 {
-    "name": "VacuumVille.Tests.EditMode",
-    "rootNamespace": "VacuumVille.Tests",
+    "name": "VacuumVille.Editor",
+    "rootNamespace": "",
     "references": [
-        "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner",
         "VacuumVille"
     ],
     "includePlatforms": [
@@ -12,6 +10,7 @@
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
+    "precompiledReferences": [],
     "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [],
