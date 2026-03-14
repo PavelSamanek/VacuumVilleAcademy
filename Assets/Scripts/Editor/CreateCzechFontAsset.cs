@@ -4,86 +4,146 @@ using TMPro;
 
 namespace VacuumVille.Editor
 {
-    /// <summary>
-    /// One-time utility: creates a TMP Font Asset from Arial with Czech + Emoji
-    /// character support and sets it as the TMP default font.
-    ///
-    /// Usage: VacuumVille menu → Setup Czech TMP Font
-    /// </summary>
     public static class CreateCzechFontAsset
     {
-        // All characters needed: Basic Latin + Czech diacritics + common UI symbols
         private const string CzechCharset =
             " !\"#$%&'()*+,-./0123456789:;<=>?@" +
             "ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`" +
             "abcdefghijklmnopqrstuvwxyz{|}~" +
-            "ÁČĎÉĚÍŇÓŘŠŤÚŮÝŽáčďéěíňóřšťúůýž" +  // Czech
-            "←→↑↓★☆✓✗•…–—" +                      // UI symbols
-            "\u2190\u2192\u25B6\u2605\u2606";       // arrows / star
+            "ÁČĎÉĚÍŇÓŘŠŤÚŮÝŽáčďéěíňóřšťúůýž" +
+            "←→↑↓★☆✓✗•…–—";
+
+        // ── Reset (run this first if buttons show blank text) ───────────────────
+
+        [MenuItem("VacuumVille/Reset TMP Font to Default (fix blank text)")]
+        public static void ResetTmpFont()
+        {
+            TMP_Settings tmpSettings = Resources.Load<TMP_Settings>("TMP Settings");
+            if (tmpSettings == null)
+            {
+                EditorUtility.DisplayDialog("VacuumVille", "TMP Settings asset not found.", "OK");
+                return;
+            }
+
+            // Load the built-in LiberationSans SDF from TMP package
+            TMP_FontAsset liberation = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(
+                "Packages/com.unity.textmeshpro/Resources/Fonts & Materials/LiberationSans SDF.asset");
+
+            if (liberation == null)
+            {
+                // Try alternate path used in older TMP versions
+                liberation = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(
+                    "Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF.asset");
+            }
+
+            if (liberation == null)
+            {
+                EditorUtility.DisplayDialog("VacuumVille",
+                    "Could not find LiberationSans SDF.asset.\n" +
+                    "Open Window > TextMeshPro > Import TMP Essential Resources first.",
+                    "OK");
+                return;
+            }
+
+            SerializedObject so = new SerializedObject(tmpSettings);
+            SerializedProperty prop = so.FindProperty("m_defaultFontAsset");
+            if (prop != null)
+            {
+                prop.objectReferenceValue = liberation;
+                so.ApplyModifiedProperties();
+                EditorUtility.SetDirty(tmpSettings);
+                AssetDatabase.SaveAssets();
+            }
+
+            Debug.Log("[VacuumVille] TMP default font reset to LiberationSans SDF.");
+            EditorUtility.DisplayDialog("VacuumVille",
+                "TMP default font reset to LiberationSans SDF.\n\nRestart Play mode — buttons should now show text.",
+                "Done");
+        }
+
+        // ── Create Czech font (run after Reset if you want Czech characters) ───
 
         [MenuItem("VacuumVille/Setup Czech TMP Font")]
         public static void CreateFont()
         {
-            // Find Arial on this machine
             Font arialFont = null;
-
             string[] arialPaths =
             {
                 @"C:\Windows\Fonts\arial.ttf",
                 @"C:\Windows\Fonts\Arial.ttf",
-                "/Library/Fonts/Arial.ttf",          // macOS
-                "/usr/share/fonts/truetype/msttcorefonts/Arial.ttf"  // Linux
+                "/Library/Fonts/Arial.ttf",
+                "/usr/share/fonts/truetype/msttcorefonts/Arial.ttf"
             };
 
             foreach (var path in arialPaths)
             {
-                if (System.IO.File.Exists(path))
+                if (!System.IO.File.Exists(path)) continue;
+
+                arialFont = AssetDatabase.LoadAssetAtPath<Font>(path);
+                if (arialFont == null)
                 {
-                    arialFont = AssetDatabase.LoadAssetAtPath<Font>(path);
-                    if (arialFont == null)
-                    {
-                        // Not yet imported — copy into project
-                        string destDir  = "Assets/Fonts";
-                        string destPath = destDir + "/Arial.ttf";
-                        if (!AssetDatabase.IsValidFolder(destDir))
-                            AssetDatabase.CreateFolder("Assets", "Fonts");
-                        if (!System.IO.File.Exists(Application.dataPath + "/Fonts/Arial.ttf"))
-                            System.IO.File.Copy(path, Application.dataPath + "/Fonts/Arial.ttf");
-                        AssetDatabase.Refresh();
-                        arialFont = AssetDatabase.LoadAssetAtPath<Font>(destPath);
-                    }
-                    break;
+                    string destDir = "Assets/Fonts";
+                    string destPath = destDir + "/Arial.ttf";
+                    if (!AssetDatabase.IsValidFolder(destDir))
+                        AssetDatabase.CreateFolder("Assets", "Fonts");
+                    if (!System.IO.File.Exists(Application.dataPath + "/Fonts/Arial.ttf"))
+                        System.IO.File.Copy(path, Application.dataPath + "/Fonts/Arial.ttf");
+                    AssetDatabase.Refresh();
+                    arialFont = AssetDatabase.LoadAssetAtPath<Font>(destPath);
                 }
+                break;
             }
 
             if (arialFont == null)
             {
                 EditorUtility.DisplayDialog("VacuumVille",
-                    "Arial font not found on this machine.\n" +
-                    "Please copy arial.ttf into Assets/Fonts/ manually, then re-run this tool.",
-                    "OK");
+                    "Arial font not found. Copy arial.ttf into Assets/Fonts/ then re-run.", "OK");
                 return;
             }
 
-            // Create TMP Font Asset (uses SDFAA 1024x1024 defaults)
             string savePath = "Assets/Fonts/Arial_Czech_SDF.asset";
 
-            TMP_FontAsset fontAsset = TMP_FontAsset.CreateFontAsset(arialFont);
+            // Delete old broken asset if present
+            if (AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(savePath) != null)
+                AssetDatabase.DeleteAsset(savePath);
 
+            TMP_FontAsset fontAsset = TMP_FontAsset.CreateFontAsset(arialFont);
             if (fontAsset == null)
             {
                 Debug.LogError("[VacuumVille] Failed to create TMP Font Asset.");
                 return;
             }
 
-            // Pre-warm with Czech characters
+            fontAsset.name = "Arial_Czech_SDF";
             fontAsset.TryAddCharacters(CzechCharset);
 
+            // Save main asset
             AssetDatabase.CreateAsset(fontAsset, savePath);
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
 
-            // Set as TMP default font
+            // Embed atlas texture(s) and material as sub-assets — this is the critical step
+            if (fontAsset.atlasTextures != null)
+            {
+                for (int i = 0; i < fontAsset.atlasTextures.Length; i++)
+                {
+                    var tex = fontAsset.atlasTextures[i];
+                    if (tex != null)
+                    {
+                        tex.name = i == 0 ? "Atlas" : $"Atlas {i}";
+                        AssetDatabase.AddObjectToAsset(tex, fontAsset);
+                    }
+                }
+            }
+
+            if (fontAsset.material != null)
+            {
+                fontAsset.material.name = "Arial_Czech_SDF Material";
+                AssetDatabase.AddObjectToAsset(fontAsset.material, fontAsset);
+            }
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.ImportAsset(savePath, ImportAssetOptions.ForceUpdate);
+
+            // Set as TMP default
             TMP_Settings tmpSettings = Resources.Load<TMP_Settings>("TMP Settings");
             if (tmpSettings != null)
             {
@@ -98,11 +158,9 @@ namespace VacuumVille.Editor
                 }
             }
 
-            Debug.Log($"[VacuumVille] Czech TMP font created at {savePath} and set as default.");
+            Debug.Log($"[VacuumVille] Czech TMP font created at {savePath}");
             EditorUtility.DisplayDialog("VacuumVille",
-                "Czech TMP font created at:\n" + savePath +
-                "\n\nIt has been set as the TMP default font.",
-                "Done");
+                "Czech font created and set as TMP default.\n\n" + savePath, "Done");
         }
     }
 }
