@@ -91,6 +91,7 @@
     { "key": "btn_take_break",          "value": "Take a Break" },
 
     { "key": "reteach_Counting1To10",        "value": "Let's count objects together!" },
+    { "key": "reteach_Counting1To20",        "value": "Let's count bigger numbers together!" },
     { "key": "reteach_AdditionTo10",         "value": "Let's try adding two groups." },
     { "key": "reteach_SubtractionWithin10",  "value": "Subtracting — how many are left?" },
     { "key": "reteach_AdditionTo20",         "value": "Let's add bigger numbers together." },

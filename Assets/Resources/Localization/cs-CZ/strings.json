@@ -91,6 +91,7 @@
     { "key": "btn_take_break",          "value": "Udělat přestávku" },
 
     { "key": "reteach_Counting1To10",        "value": "Pojďme si spolu spočítat předměty!" },
+    { "key": "reteach_Counting1To20",        "value": "Pojďme si spolu spočítat větší čísla!" },
     { "key": "reteach_AdditionTo10",         "value": "Zkusíme sečíst dvě skupiny." },
     { "key": "reteach_SubtractionWithin10",  "value": "Odečítáme — kolik zbylo?" },
     { "key": "reteach_AdditionTo20",         "value": "Sečteme větší čísla dohromady." },

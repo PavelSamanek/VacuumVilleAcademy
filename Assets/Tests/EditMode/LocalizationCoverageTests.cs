@@ -94,7 +94,7 @@ namespace VacuumVille.Tests
         {
             // MixedReview has no reteach panel — all other topics must have one
             string[] topics = {
-                "Counting1To10", "AdditionTo10", "SubtractionWithin10",
+                "Counting1To10", "Counting1To20", "AdditionTo10", "SubtractionWithin10",
                 "AdditionTo20",  "SubtractionWithin20", "Multiplication2x5x",
                 "DivisionBy2_3_5", "NumberOrdering", "ShapeCounting"
             };

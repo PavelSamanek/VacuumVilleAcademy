@@ -36,6 +36,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Settings.unity
     guid: b4e547750679e184aa39afef2c6f81d9
   - enabled: 1
+    path: Assets/Scenes/Achievements.unity
+    guid: b0419b8dcf9b4eb9af33dfbdca74c091
+  - enabled: 1
     path: Assets/Scenes/Minigame_SockSortSweep.unity
     guid: 5612867adb1fe594b911a77f24ec8bee
   - enabled: 1
