@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 using VacuumVille.Core;
 
@@ -9,20 +10,25 @@ namespace VacuumVille.Minigames
     /// <summary>
     /// Level 1 Minigame: Socks numbered 1-10 are scattered on the floor.
     /// Player drags the vacuum (Rumble) to collect them in ascending order.
+    /// All objects live inside the Screen Space Overlay Canvas, so positions
+    /// are compared in screen-pixel space.
     /// </summary>
     public class SockSortSweep : BaseMinigame
     {
         [Header("Sock Sort")]
-        [SerializeField] private Transform vacuumTransform;
+        [SerializeField] private RectTransform vacuumTransform;
         [SerializeField] private GameObject sockPrefab;
-        [SerializeField] private Transform[] sockSpawnPoints;
+        [SerializeField] private RectTransform[] sockSpawnPoints;
         [SerializeField] private TextMeshProUGUI nextNumberLabel;
         [SerializeField] private ParticleSystem collectParticles;
 
         private List<SockItem> _socks = new();
         private int _nextExpected = 1;
-        private bool _dragging;
-        private Camera _cam;
+        private Canvas _canvas;
+
+        // Collection radius in screen pixels — works at any resolution because
+        // both the vacuum and the spawn transforms use transform.position (screen px).
+        private const float CollectRadius = 80f;
 
         protected override float TimeLimit => 90f;
         protected override int MaxScore   => 10;
@@ -39,7 +45,7 @@ namespace VacuumVille.Minigames
 
         protected override void OnMinigameBegin()
         {
-            _cam = Camera.main;
+            _canvas = vacuumTransform.GetComponentInParent<Canvas>();
             SpawnSocks();
             UpdateNextLabel();
         }
@@ -56,9 +62,10 @@ namespace VacuumVille.Minigames
                 (positions[i], positions[j]) = (positions[j], positions[i]);
             }
 
+            Transform parent = _canvas != null ? _canvas.transform : transform;
             for (int n = 1; n <= 10; n++)
             {
-                var go  = Instantiate(sockPrefab, positions[n - 1], Quaternion.identity);
+                var go  = Instantiate(sockPrefab, positions[n - 1], Quaternion.identity, parent);
                 var lbl = go.GetComponentInChildren<TextMeshProUGUI>();
                 if (lbl) lbl.text = n.ToString();
                 _socks.Add(new SockItem { Number = n, Go = go });
@@ -69,30 +76,31 @@ namespace VacuumVille.Minigames
         {
             if (!GameActive) return;
 
-            // Move vacuum to touch/mouse position
-            Vector3 worldPos = Vector3.zero;
-            bool input = false;
+            // Input position is already in screen-pixel space — same coordinate
+            // system as RectTransform.position for Screen Space Overlay canvas.
+            Vector3 inputPos = Vector3.zero;
+            bool hasInput = false;
 
 #if UNITY_EDITOR || UNITY_STANDALONE
             if (Input.GetMouseButton(0))
             {
-                worldPos = _cam.ScreenToWorldPoint(Input.mousePosition);
-                worldPos.z = 0;
-                input = true;
+                inputPos = Input.mousePosition;
+                inputPos.z = 0;
+                hasInput = true;
             }
 #else
             if (Input.touchCount > 0)
             {
-                worldPos = _cam.ScreenToWorldPoint(Input.GetTouch(0).position);
-                worldPos.z = 0;
-                input = true;
+                inputPos = Input.GetTouch(0).position;
+                inputPos.z = 0;
+                hasInput = true;
             }
 #endif
 
-            if (input)
+            if (hasInput)
             {
                 vacuumTransform.position = Vector3.Lerp(
-                    vacuumTransform.position, worldPos, Time.deltaTime * 12f);
+                    vacuumTransform.position, inputPos, Time.deltaTime * 14f);
                 CheckCollection();
             }
         }
@@ -101,16 +109,13 @@ namespace VacuumVille.Minigames
         {
             foreach (var sock in _socks)
             {
-                if (sock.Collected) continue;
-                if (Vector3.Distance(vacuumTransform.position, sock.Go.transform.position) < 0.6f)
+                if (sock.Collected || sock.Go == null) continue;
+                if (Vector3.Distance(vacuumTransform.position, sock.Go.transform.position) < CollectRadius)
                 {
                     if (sock.Number == _nextExpected)
-                    {
                         CollectSock(sock);
-                    }
                     else
                     {
-                        // Wrong order: bounce
                         StartCoroutine(BounceSock(sock.Go.transform));
                         AudioManager.Instance.PlayWrong();
                     }
@@ -147,12 +152,13 @@ namespace VacuumVille.Minigames
 
         private IEnumerator BounceSock(Transform t)
         {
+            if (t == null) yield break;
             Vector3 origin = t.position;
             float duration = 0.3f;
             float elapsed  = 0f;
             while (elapsed < duration)
             {
-                float y = Mathf.Abs(Mathf.Sin(elapsed / duration * Mathf.PI)) * 0.5f;
+                float y = Mathf.Abs(Mathf.Sin(elapsed / duration * Mathf.PI)) * 40f;
                 t.position = origin + new Vector3(0, y, 0);
                 elapsed += Time.deltaTime;
                 yield return null;
