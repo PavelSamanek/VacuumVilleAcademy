@@ -111,8 +111,6 @@ namespace VacuumVille.Math
                 operatorSymbol = "+",
                 correctAnswer  = correct,
                 choices        = choices,
-                visualAssetKey = "blocks",
-                visualCount    = a,
                 voiceLineKey   = "q_addition"
             };
         }
@@ -146,8 +144,6 @@ namespace VacuumVille.Math
                 operatorSymbol = "-",
                 correctAnswer  = answer,
                 choices        = choices,
-                visualAssetKey = "duck",
-                visualCount    = a,
                 voiceLineKey   = "q_subtraction"
             };
         }
@@ -176,8 +172,6 @@ namespace VacuumVille.Math
                 operatorSymbol = "×",
                 correctAnswer  = answer,
                 choices        = choices,
-                visualAssetKey = "flower",
-                visualCount    = n,
                 voiceLineKey   = "q_multiplication"
             };
         }
@@ -206,8 +200,6 @@ namespace VacuumVille.Math
                 operatorSymbol = "÷",
                 correctAnswer  = quotient,
                 choices        = choices,
-                visualAssetKey = "box",
-                visualCount    = dividend,
                 voiceLineKey   = "q_division"
             };
         }
