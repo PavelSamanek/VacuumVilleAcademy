@@ -42,8 +42,8 @@ namespace VacuumVille.UI
 
         private void OnLevelSelected(LevelDefinition level)
         {
-            AudioManager.Instance.PlayButton();
-            GameManager.Instance.StartLevel(level);
+            AudioManager.Instance?.PlayButton();
+            GameManager.Instance?.StartLevel(level);
         }
     }
 

@@ -14,6 +14,9 @@ namespace VacuumVille.Core
     {
         public static GameManager Instance { get; private set; }
 
+        /// <summary>Set by Bootstrapper before AddComponent so Start() skips auto-navigation.</summary>
+        internal static bool IsBootstrapped = false;
+
         // ── State ───────────────────────────────────────────────────────────────
         public GameState CurrentState { get; private set; } = GameState.Boot;
         public event Action<GameState, GameState> OnStateChanged; // (from, to)
@@ -63,7 +66,11 @@ namespace VacuumVille.Core
         {
             _sessionStart = DateTime.Now;
             _sessionTimerCoroutine = StartCoroutine(TrackSessionTime());
-            TransitionTo(GameState.LanguageSelect);
+
+            // IsBootstrapped = true when Bootstrapper created us mid-scene (editor testing).
+            // In that case, stay in the current scene instead of redirecting to LanguageSelect.
+            if (!IsBootstrapped)
+                TransitionTo(GameState.LanguageSelect);
         }
 
         private void OnApplicationPause(bool paused)

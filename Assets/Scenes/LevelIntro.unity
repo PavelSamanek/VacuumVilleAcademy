@@ -540,6 +540,7 @@ GameObject:
   - component: {fileID: 849951975}
   - component: {fileID: 849951974}
   - component: {fileID: 849951973}
+  - component: {fileID: 849951970}
   m_Layer: 0
   m_Name: Canvas
   m_TagString: Untagged
@@ -768,6 +769,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1937121261}
   m_CullTransparentMesh: 1
+--- !u!114 &849951970
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849951972}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3f8c21d4b6e7a9c1d2e3f4a5b6c7d8e, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::VacuumVille.UI.LevelIntroController
+  titleLabel: {fileID: 0}
+  startButton: {fileID: 0}
+  backButton: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
