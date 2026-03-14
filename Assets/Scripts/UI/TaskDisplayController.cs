@@ -62,7 +62,7 @@ namespace VacuumVille.UI
         // Wrong answer exclusion for hint
         private readonly HashSet<int> _excludedChoices = new();
 
-        private static readonly Color ColorDefault  = Color.white;
+        private static readonly Color ColorDefault  = new Color(0.13f, 0.59f, 0.95f);  // #2196F3 blue
         private static readonly Color ColorCorrect  = new Color(0.41f, 0.94f, 0.67f);  // #69F0AE
         private static readonly Color ColorWrong    = new Color(1f,   0.57f, 0f);      // #FF9100
 
