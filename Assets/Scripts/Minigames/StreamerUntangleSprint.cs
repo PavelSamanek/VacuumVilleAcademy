@@ -33,6 +33,9 @@ namespace VacuumVille.Minigames
         protected override float TimeLimit => 200f;
         protected override int MaxScore   => 15;
 
+        protected override bool IsSetupComplete() =>
+            knotAnswerButtons != null && knotAnswerButtons.Length > 0;
+
         protected override void OnMinigameBegin()
         {
             missesLabel.text = $"✗ 0/{MaxMisses}";

@@ -47,6 +47,8 @@ namespace VacuumVille.Minigames
             public bool WaitingForPlacement;
         }
 
+        protected override bool IsSetupComplete() => shapeTilePrefab != null;
+
         protected override void OnMinigameBegin()
         {
             _totalTiles = 0;

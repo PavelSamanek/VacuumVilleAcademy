@@ -38,6 +38,9 @@ namespace VacuumVille.Minigames
             public bool activated;
         }
 
+        protected override bool IsSetupComplete() =>
+            sprinklerHeads != null && sprinklerHeads.Length > 0;
+
         protected override void OnMinigameBegin()
         {
             StartCoroutine(RoundLoop());

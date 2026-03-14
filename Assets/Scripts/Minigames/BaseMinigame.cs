@@ -48,11 +48,25 @@ namespace VacuumVille.Minigames
         protected void BeginMinigame()
         {
             if (instructionPanel) instructionPanel.SetActive(false);
+
+            if (!IsSetupComplete())
+            {
+                Debug.LogWarning($"[{GetType().Name}] Scene not fully configured — auto-completing as placeholder.");
+                AddScore(50);
+                FinishMinigame();
+                return;
+            }
+
             GameActive = true;
             _timeRemaining = TimeLimit;
             _timerCoroutine = StartCoroutine(TimerLoop());
             OnMinigameBegin();
         }
+
+        /// <summary>
+        /// Override to validate required scene references. Return false to auto-complete (placeholder mode).
+        /// </summary>
+        protected virtual bool IsSetupComplete() => true;
 
         protected abstract void OnMinigameBegin();
 

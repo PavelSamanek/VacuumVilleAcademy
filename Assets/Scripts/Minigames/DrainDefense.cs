@@ -37,6 +37,9 @@ namespace VacuumVille.Minigames
             public bool Blocked;
         }
 
+        protected override bool IsSetupComplete() =>
+            duckPrefab != null && drainPositions != null && drainPositions.Length > 0;
+
         protected override void OnMinigameBegin()
         {
             _cam = Camera.main;

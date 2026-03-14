@@ -35,6 +35,8 @@ namespace VacuumVille.Minigames
         protected override float TimeLimit => 120f;
         protected override int MaxScore   => 10;
 
+        protected override bool IsSetupComplete() => flowerCellPrefab != null;
+
         protected override void OnMinigameBegin()
         {
             StartCoroutine(RowLoop());

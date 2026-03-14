@@ -43,6 +43,9 @@ namespace VacuumVille.Minigames
             public bool Collected;
         }
 
+        protected override bool IsSetupComplete() =>
+            boxPrefab != null && spawnLine != null;
+
         protected override void OnMinigameBegin()
         {
             NewTargetSum();

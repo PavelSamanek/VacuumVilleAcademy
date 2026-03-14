@@ -26,6 +26,9 @@ namespace VacuumVille.Minigames
         protected override float TimeLimit => 120f;
         protected override int MaxScore   => 20;
 
+        protected override bool IsSetupComplete() =>
+            crumbPilePrefab != null && gridSlots != null && gridSlots.Length > 0;
+
         protected override void OnMinigameBegin()
         {
             _cam = Camera.main;

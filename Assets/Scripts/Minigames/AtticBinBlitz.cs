@@ -49,6 +49,8 @@ namespace VacuumVille.Minigames
             public bool TouchActive;
         }
 
+        protected override bool IsSetupComplete() => itemPrefab != null;
+
         protected override void OnMinigameBegin()
         {
             SetupDivisionProblem();

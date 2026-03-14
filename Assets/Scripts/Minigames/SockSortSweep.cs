@@ -34,6 +34,9 @@ namespace VacuumVille.Minigames
             public bool Collected;
         }
 
+        protected override bool IsSetupComplete() =>
+            sockPrefab != null && sockSpawnPoints != null && sockSpawnPoints.Length >= 10;
+
         protected override void OnMinigameBegin()
         {
             _cam = Camera.main;

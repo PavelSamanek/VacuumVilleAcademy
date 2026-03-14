@@ -33,6 +33,9 @@ namespace VacuumVille.Minigames
         protected override float TimeLimit => 120f;
         protected override int MaxScore   => 5;
 
+        protected override bool IsSetupComplete() =>
+            cushionPrefab != null && answerButtons != null && answerButtons.Length > 0;
+
         protected override void OnMinigameBegin()
         {
             _currentSpeed = initialFallSpeed;

@@ -50,6 +50,9 @@ namespace VacuumVille.Minigames
             public Image solvedOverlay;
         }
 
+        protected override bool IsSetupComplete() =>
+            panels != null && panels.Length > 0;
+
         protected override void OnMinigameBegin()
         {
             foreach (var p in panels)
