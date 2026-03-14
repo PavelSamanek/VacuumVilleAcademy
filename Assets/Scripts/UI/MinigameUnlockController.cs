@@ -35,7 +35,15 @@ namespace VacuumVille.UI
         private void OnBack()
         {
             AudioManager.Instance?.PlayButton();
-            GameManager.Instance.TransitionTo(GameState.LevelSelect);
+            // Reaching this screen means math tasks are done — mark level complete before leaving
+            var gm = GameManager.Instance;
+            var lp = gm.Progress.GetOrCreateLevel(gm.ActiveLevel.levelIndex);
+            if (!lp.completed)
+            {
+                lp.completed = true;
+                VacuumVille.Core.SaveSystem.Save(gm.Progress);
+            }
+            gm.TransitionTo(GameState.LevelSelect);
         }
 
         private void OnPlay()
