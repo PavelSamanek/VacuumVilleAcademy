@@ -98,7 +98,10 @@ namespace VacuumVille.UI
                 qText = LocalizationManager.Instance.Get(p.questionTextKey);
             questionText.text = qText;
 
-            // Operator display
+            // Operator display — always clear first so stale values don't linger
+            if (operandAText) operandAText.text = "";
+            if (operatorText) operatorText.text = "";
+            if (operandBText) operandBText.text = "";
             if (p.operands != null && p.operands.Length >= 2)
             {
                 operandAText.text  = p.operands[0].ToString();
