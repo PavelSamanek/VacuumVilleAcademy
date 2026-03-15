@@ -38,6 +38,7 @@ namespace VacuumVille.Minigames
 
         protected override void OnMinigameBegin()
         {
+            AudioManager.Instance?.PlaySFX("Audio/SFX/shared/vacuum_start");
             if (missesLabel == null) missesLabel = CreateHUDLabel("MissesLabel", new Vector2(0, 340), 42f);
             if (knotAnswerButtons != null && knotAnswerButtons.Length < 3)
                 EnsureThirdAnswerButton();
@@ -88,10 +89,13 @@ namespace VacuumVille.Minigames
             while (GameActive && _knotsResolved < totalKnots && _misses < MaxMisses)
             {
                 vacuumAnimator?.SetBool("Running", true);
+                AudioManager.Instance?.PlaySFX("Audio/SFX/streamer/running");
                 yield return new WaitForSeconds(Random.Range(1f, 2f)); // running between knots
                 vacuumAnimator?.SetBool("Running", false);
                 yield return StartCoroutine(KnotEncounter());
             }
+            if (_knotsResolved >= totalKnots)
+                AudioManager.Instance?.PlaySFX("Audio/SFX/streamer/streamer_free");
             CompleteEarly();
         }
 
@@ -123,6 +127,7 @@ namespace VacuumVille.Minigames
                 _misses++;
                 UpdateMissesLabel();
                 AudioManager.Instance.PlayWrong();
+                AudioManager.Instance?.PlaySFX("Audio/SFX/streamer/bump");
                 vacuumAnimator?.SetTrigger("Bump");
                 yield return new WaitForSeconds(0.5f);
             }
@@ -165,6 +170,7 @@ namespace VacuumVille.Minigames
                 _knotsResolved++;
                 AddScore(1);
                 AudioManager.Instance.PlayCorrect();
+                AudioManager.Instance?.PlaySFX("Audio/SFX/streamer/knot_snap");
                 vacuumAnimator?.SetTrigger("Cheer");
                 Vector3 knotPos = knotProblemText != null ? knotProblemText.transform.position : transform.position;
                 MinigameVFX.PulseRing(this, knotPos, new Color(0.412f, 0.941f, 0.682f));
@@ -175,6 +181,7 @@ namespace VacuumVille.Minigames
                 _misses++;
                 UpdateMissesLabel();
                 AudioManager.Instance.PlayWrong();
+                AudioManager.Instance?.PlaySFX("Audio/SFX/streamer/bump");
                 vacuumAnimator?.SetTrigger("Oops");
                 if (missesLabel != null) MinigameVFX.ShakeRect(this, (RectTransform)missesLabel.transform);
 

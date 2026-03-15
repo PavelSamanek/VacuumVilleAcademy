@@ -42,6 +42,7 @@ namespace VacuumVille.Core
 
         private Coroutine _musicFadeCoroutine;
         private Dictionary<string, AudioClip> _voiceCache = new();
+        private Dictionary<string, AudioClip> _sfxCache = new();
 
         private void Awake()
         {
@@ -129,6 +130,16 @@ namespace VacuumVille.Core
 
         public void PlaySFX(AudioClip clip)
         {
+            if (clip != null) sfxSource.PlayOneShot(clip);
+        }
+
+        public void PlaySFX(string resourcePath)
+        {
+            if (!_sfxCache.TryGetValue(resourcePath, out AudioClip clip))
+            {
+                clip = Resources.Load<AudioClip>(resourcePath);
+                if (clip != null) _sfxCache[resourcePath] = clip;
+            }
             if (clip != null) sfxSource.PlayOneShot(clip);
         }
 

@@ -38,6 +38,7 @@ namespace VacuumVille.Minigames
 
         protected override void OnMinigameBegin()
         {
+            AudioManager.Instance?.PlaySFX("Audio/SFX/shared/vacuum_start");
             _currentSpeed = initialFallSpeed;
             EnsurePositions();
             StartNextRound();
@@ -110,11 +111,13 @@ namespace VacuumVille.Minigames
             if (rightLbl) rightLbl.text = _b.ToString();
             MinigameVFX.SpawnPop(this, rightPile.transform);
 
+            AudioManager.Instance?.PlaySFX("Audio/SFX/cushioncannon/cannon_launch");
             // Move both toward merge point
             yield return StartCoroutine(MovePair(leftPile.transform, rightPile.transform, mergePoint.position));
 
             Destroy(leftPile);
             Destroy(rightPile);
+            AudioManager.Instance?.PlaySFX("Audio/SFX/cushioncannon/cushion_merge");
 
             // Merged pile falls toward landing
             _flyingPile = Instantiate(cushionPrefab, transform);
@@ -173,6 +176,7 @@ namespace VacuumVille.Minigames
             {
                 AddScore(1);
                 AudioManager.Instance.PlayCorrect();
+                AudioManager.Instance?.PlaySFX("Audio/SFX/cushioncannon/cushion_land");
                 vacuumAnimator?.SetTrigger("Cheer");
                 MinigameVFX.PulseRing(this, mergePoint.position, new Color(0.412f, 0.941f, 0.682f));
                 MinigameVFX.FloatingText(this, "+1", mergePoint.position, new Color(0.412f, 0.941f, 0.682f));

@@ -55,6 +55,7 @@ namespace VacuumVille.Minigames
 
         protected override void OnMinigameBegin()
         {
+            AudioManager.Instance?.PlaySFX("Audio/SFX/shared/vacuum_start");
             foreach (var p in panels)
                 if (p.solvedOverlay) p.solvedOverlay.gameObject.SetActive(false);
 
@@ -72,6 +73,7 @@ namespace VacuumVille.Minigames
             // All panels solved — shutdown!
             if (shutdownParticles) shutdownParticles.Play();
             scramblerAnimator?.SetTrigger("Shutdown");
+            AudioManager.Instance?.PlaySFX("Audio/SFX/scrambler/shutdown");
             AudioManager.Instance.PlayLevelComplete();
             MinigameVFX.ScreenFlash(this, new Color(0.412f, 0.941f, 0.682f), 0.5f, 0.6f);
             yield return new WaitForSeconds(1.5f);
@@ -89,6 +91,7 @@ namespace VacuumVille.Minigames
                 ? LocalizationManager.Instance.Get(problem.questionTextKey)
                 : problem.questionTextFallback;
 
+            AudioManager.Instance?.PlaySFX("Audio/SFX/scrambler/panel_hum");
             AudioManager.Instance.PlayVoice(problem.voiceLineKey);
 
             // Setup answer buttons
@@ -131,6 +134,7 @@ namespace VacuumVille.Minigames
                 // Timeout - panel stays unsolved but continue
                 _panelActive = false;
                 AudioManager.Instance.PlayWrong();
+                AudioManager.Instance?.PlaySFX("Audio/SFX/scrambler/panel_wrong");
                 scramblerAnimator?.SetTrigger("Laugh");
                 yield return new WaitForSeconds(0.8f);
             }
@@ -156,6 +160,7 @@ namespace VacuumVille.Minigames
 
                 AddScore(1);
                 AudioManager.Instance.PlayCorrect();
+                AudioManager.Instance?.PlaySFX("Audio/SFX/scrambler/panel_solve");
                 scramblerAnimator?.SetTrigger("Shocked");
                 MinigameVFX.PulseRing(this, pressedButton.transform.position, new Color(0.412f, 0.941f, 0.682f));
                 MinigameVFX.FloatingText(this, "+1", pressedButton.transform.position, new Color(0.412f, 0.941f, 0.682f));
@@ -164,6 +169,7 @@ namespace VacuumVille.Minigames
             {
                 if (img) img.color = new Color(1f, 0.57f, 0f);
                 AudioManager.Instance.PlayWrong();
+                AudioManager.Instance?.PlaySFX("Audio/SFX/scrambler/panel_wrong");
                 scramblerAnimator?.SetTrigger("Laugh");
                 MinigameVFX.ShakeRect(this, (RectTransform)pressedButton.transform);
             }

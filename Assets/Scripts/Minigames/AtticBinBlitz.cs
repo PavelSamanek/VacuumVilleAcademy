@@ -53,6 +53,7 @@ namespace VacuumVille.Minigames
 
         protected override void OnMinigameBegin()
         {
+            AudioManager.Instance?.PlaySFX("Audio/SFX/shared/vacuum_start");
             SetupDivisionProblem();
             StartCoroutine(SpawnLoop());
         }
@@ -89,6 +90,7 @@ namespace VacuumVille.Minigames
             var go = Instantiate(itemPrefab, transform); // parent to Canvas so UI renders
             go.transform.position = conveyorSpawn.position;
             MinigameVFX.SpawnPop(this, go.transform);
+            AudioManager.Instance?.PlaySFX("Audio/SFX/atticbin/item_swipe");
             _activeItems.Add(new ConveyorItem { Go = go });
         }
 
@@ -195,6 +197,7 @@ namespace VacuumVille.Minigames
                 bin.currentCount = 0;
                 bin.currentLabel.text = "0";
                 AudioManager.Instance.PlayWrong();
+                AudioManager.Instance?.PlaySFX("Audio/SFX/atticbin/bin_overflow");
                 StartCoroutine(FlashBin(bin, Color.red));
                 if (bin.transform != null) MinigameVFX.ShakeRect(this, (RectTransform)bin.transform);
             }
@@ -203,6 +206,7 @@ namespace VacuumVille.Minigames
                 _sortedCorrectly++;
                 AddScore(1);
                 AudioManager.Instance.PlayCorrect();
+                AudioManager.Instance?.PlaySFX("Audio/SFX/atticbin/bin_land");
                 StartCoroutine(FlashBin(bin, new Color(0.4f, 0.9f, 0.4f)));
                 if (bin.transform != null)
                 {

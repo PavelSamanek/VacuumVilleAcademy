@@ -43,6 +43,7 @@ namespace VacuumVille.Minigames
 
         protected override void OnMinigameBegin()
         {
+            AudioManager.Instance?.PlaySFX("Audio/SFX/shared/vacuum_start");
             _cam = Camera.main;
             if (savedPointsLabel == null) savedPointsLabel = CreateHUDLabel();
             StartCoroutine(SpawnDucks());
@@ -95,6 +96,7 @@ namespace VacuumVille.Minigames
             MinigameVFX.SpawnPop(this, go.transform);
 
             _activeDucks.Add(new DuckInstance { Go = go, Points = points, TargetDrain = drain });
+            AudioManager.Instance?.PlaySFX("Audio/SFX/draindefense/duck_quack");
         }
 
         private void Update()
@@ -175,6 +177,7 @@ namespace VacuumVille.Minigames
             _savedPoints += duck.Points;
             AddScore(duck.Points);
             AudioManager.Instance.PlayCorrect();
+            AudioManager.Instance?.PlaySFX("Audio/SFX/draindefense/duck_splash");
             if (savedPointsLabel)
                 savedPointsLabel.text = LocalizationManager.Instance.Get("saved_points", _savedPoints);
 
@@ -192,6 +195,7 @@ namespace VacuumVille.Minigames
         {
             _drainedPoints += duck.Points;
             AudioManager.Instance.PlayWrong();
+            AudioManager.Instance?.PlaySFX("Audio/SFX/draindefense/duck_drain");
             if (duck.Go != null)
             {
                 MinigameVFX.PulseRing(this, duck.Go.transform.position, new Color(1f, 0.569f, 0f));

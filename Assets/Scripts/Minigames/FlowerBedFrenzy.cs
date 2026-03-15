@@ -39,6 +39,7 @@ namespace VacuumVille.Minigames
 
         protected override void OnMinigameBegin()
         {
+            AudioManager.Instance?.PlaySFX("Audio/SFX/shared/vacuum_start");
             StartCoroutine(RowLoop());
         }
 
@@ -67,6 +68,7 @@ namespace VacuumVille.Minigames
                 var cell = Instantiate(flowerCellPrefab, gardenGrid.transform);
                 _gridCells.Add(cell);
                 MinigameVFX.SpawnPop(this, cell.transform);
+                AudioManager.Instance?.PlaySFX("Audio/SFX/flowerbed/flower_drop");
                 yield return new WaitForSeconds(0.05f);
             }
 
@@ -92,6 +94,7 @@ namespace VacuumVille.Minigames
                 _awaitingAnswer = false;
                 ShowWilted();
                 AudioManager.Instance.PlayWrong();
+                AudioManager.Instance?.PlaySFX("Audio/SFX/flowerbed/wilt");
                 yield return new WaitForSeconds(0.8f);
             }
         }
@@ -121,6 +124,7 @@ namespace VacuumVille.Minigames
                 _rowsAnswered++;
                 AddScore(1);
                 AudioManager.Instance.PlayCorrect();
+                AudioManager.Instance?.PlaySFX("Audio/SFX/flowerbed/water_spray");
                 if (waterParticles) waterParticles.Play();
                 TintGrid(new Color(0.4f, 0.9f, 0.4f));
                 Vector3 gridPos = gardenGrid != null ? gardenGrid.transform.position : transform.position;
@@ -131,6 +135,7 @@ namespace VacuumVille.Minigames
             else
             {
                 AudioManager.Instance.PlayWrong();
+                AudioManager.Instance?.PlaySFX("Audio/SFX/flowerbed/wilt");
                 ShowWilted();
                 if (answerButtons != null && answerButtons.Length > 0)
                     MinigameVFX.ShakeRect(this, (RectTransform)answerButtons[0].transform);

@@ -51,6 +51,7 @@ namespace VacuumVille.Minigames
 
         protected override void OnMinigameBegin()
         {
+            AudioManager.Instance?.PlaySFX("Audio/SFX/shared/vacuum_start");
             _totalTiles = 0;
             foreach (var r in mosaicRegions) _totalTiles += r.totalSlots;
 
@@ -133,6 +134,7 @@ namespace VacuumVille.Minigames
             AudioManager.Instance.PlayVoice($"shape_{region.shapeKey}");
 
             MinigameVFX.SpawnPop(this, go.transform);
+            AudioManager.Instance?.PlaySFX("Audio/SFX/grandhall/tile_whoosh");
             _currentTile = new FallingTile
             {
                 ShapeKey           = region.shapeKey,
@@ -165,6 +167,7 @@ namespace VacuumVille.Minigames
             else
             {
                 AudioManager.Instance.PlayWrong();
+                AudioManager.Instance?.PlaySFX("Audio/SFX/grandhall/tile_bounce");
                 MinigameVFX.ShakeRect(this, (RectTransform)region.button.transform);
                 StartCoroutine(BounceAway(_currentTile.Go.transform));
             }
@@ -179,6 +182,7 @@ namespace VacuumVille.Minigames
             if (region.fillImage) region.fillImage.fillAmount = fillAmount;
 
             AudioManager.Instance.PlayCorrect();
+            AudioManager.Instance?.PlaySFX("Audio/SFX/grandhall/tile_snap");
             AddScore(1);
             _tilesPlaced++;
 

@@ -45,6 +45,7 @@ namespace VacuumVille.Minigames
 
         protected override void OnMinigameBegin()
         {
+            AudioManager.Instance?.PlaySFX("Audio/SFX/shared/vacuum_start");
             _canvas = vacuumTransform.GetComponentInParent<Canvas>();
             SpawnSocks();
             UpdateNextLabel();
@@ -120,6 +121,7 @@ namespace VacuumVille.Minigames
                         MinigameVFX.ShakeRect(this, vacuumTransform);
                         StartCoroutine(BounceSock(sock.Go.transform));
                         AudioManager.Instance.PlayWrong();
+                        AudioManager.Instance?.PlaySFX("Audio/SFX/socksortsweep/sock_wrong");
                     }
                 }
             }
@@ -142,6 +144,7 @@ namespace VacuumVille.Minigames
             sock.Go = null;
 
             AudioManager.Instance.PlayCorrect();
+            AudioManager.Instance?.PlaySFX("Audio/SFX/socksortsweep/sock_collect");
             AddScore(1);
             _nextExpected++;
             UpdateNextLabel();

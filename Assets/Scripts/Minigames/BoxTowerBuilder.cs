@@ -48,6 +48,7 @@ namespace VacuumVille.Minigames
 
         protected override void OnMinigameBegin()
         {
+            AudioManager.Instance?.PlaySFX("Audio/SFX/shared/vacuum_start");
             if (targetSumLabel == null) targetSumLabel = CreateTargetLabel();
             NewTargetSum();
             _spawnCoroutine = StartCoroutine(SpawnLoop());
@@ -153,6 +154,7 @@ namespace VacuumVille.Minigames
                 box.Selected = true;
                 HighlightBox(box, true);
                 AudioManager.Instance.PlayButton();
+                AudioManager.Instance?.PlaySFX("Audio/SFX/boxtower/box_select");
             }
             else if (box == _firstSelectedBox)
             {
@@ -172,6 +174,7 @@ namespace VacuumVille.Minigames
                 else
                 {
                     AudioManager.Instance.PlayWrong();
+                    AudioManager.Instance?.PlaySFX("Audio/SFX/boxtower/box_fall_land");
                     if (box.Go != null) MinigameVFX.ShakeRect(this, (RectTransform)box.Go.transform);
                     HighlightBox(_firstSelectedBox, false);
                     _firstSelectedBox.Selected = false;
@@ -202,6 +205,7 @@ namespace VacuumVille.Minigames
             if (b.Go != null) { MinigameVFX.CollectBurst(this, b.Go, new Color(0.412f, 0.941f, 0.682f)); b.Go = null; }
 
             AudioManager.Instance.PlayCorrect();
+            AudioManager.Instance?.PlaySFX("Audio/SFX/boxtower/box_vacuum");
             AddScore(1);
             _correctPairs++;
             _firstSelectedBox = null;

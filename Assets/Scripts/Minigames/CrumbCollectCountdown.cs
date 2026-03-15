@@ -31,6 +31,7 @@ namespace VacuumVille.Minigames
 
         protected override void OnMinigameBegin()
         {
+            AudioManager.Instance?.PlaySFX("Audio/SFX/shared/vacuum_start");
             _cam = Camera.main;
             UpdateTargetLabel();
             StartCoroutine(SpawnLoop());
@@ -77,6 +78,7 @@ namespace VacuumVille.Minigames
             {
                 Destroy(_activeCrumbs[number]);
                 _activeCrumbs.Remove(number);
+                AudioManager.Instance?.PlaySFX("Audio/SFX/crumbcollect/crumb_despawn");
                 // Respawn soon
                 yield return new WaitForSeconds(0.5f);
                 if (GameActive && number >= _targetNumber) SpawnCrumb(number);
@@ -153,6 +155,7 @@ namespace VacuumVille.Minigames
             MinigameVFX.PulseRing(this, pos, new Color(0.412f, 0.941f, 0.682f));
             MinigameVFX.FloatingText(this, "+1", pos, new Color(0.412f, 0.941f, 0.682f));
             AudioManager.Instance.PlayCorrect();
+            AudioManager.Instance?.PlaySFX("Audio/SFX/crumbcollect/crumb_collect");
             AddScore(1);
             _targetNumber++;
             UpdateTargetLabel();

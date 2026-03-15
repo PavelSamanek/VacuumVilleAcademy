@@ -43,6 +43,7 @@ namespace VacuumVille.Minigames
 
         protected override void OnMinigameBegin()
         {
+            AudioManager.Instance?.PlaySFX("Audio/SFX/shared/vacuum_start");
             if (sequenceHintLabel == null) sequenceHintLabel = CreateHintLabel();
             StartCoroutine(RoundLoop());
         }
@@ -155,6 +156,7 @@ namespace VacuumVille.Minigames
                 if (head.indicator) head.indicator.color = new Color(0.4f, 0.9f, 0.4f);
 
                 AudioManager.Instance.PlayCorrect();
+                AudioManager.Instance?.PlaySFX("Audio/SFX/sprinkler/water_burst");
                 MoveVacuumTo(head.button.transform.position);
                 MinigameVFX.PulseRing(this, head.button.transform.position, new Color(0.412f, 0.941f, 0.682f));
                 _nextIndex++;
@@ -162,6 +164,7 @@ namespace VacuumVille.Minigames
             else
             {
                 AudioManager.Instance.PlayWrong();
+                AudioManager.Instance?.PlaySFX("Audio/SFX/sprinkler/wrong_splash");
                 if (splashParticles)
                 {
                     splashParticles.transform.position = vacuumTransform.position;
