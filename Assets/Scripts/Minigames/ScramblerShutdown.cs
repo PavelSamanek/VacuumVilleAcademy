@@ -73,6 +73,7 @@ namespace VacuumVille.Minigames
             if (shutdownParticles) shutdownParticles.Play();
             scramblerAnimator?.SetTrigger("Shutdown");
             AudioManager.Instance.PlayLevelComplete();
+            MinigameVFX.ScreenFlash(this, new Color(0.412f, 0.941f, 0.682f), 0.5f, 0.6f);
             yield return new WaitForSeconds(1.5f);
             CompleteEarly();
         }
@@ -156,12 +157,15 @@ namespace VacuumVille.Minigames
                 AddScore(1);
                 AudioManager.Instance.PlayCorrect();
                 scramblerAnimator?.SetTrigger("Shocked");
+                MinigameVFX.PulseRing(this, pressedButton.transform.position, new Color(0.412f, 0.941f, 0.682f));
+                MinigameVFX.FloatingText(this, "+1", pressedButton.transform.position, new Color(0.412f, 0.941f, 0.682f));
             }
             else
             {
                 if (img) img.color = new Color(1f, 0.57f, 0f);
                 AudioManager.Instance.PlayWrong();
                 scramblerAnimator?.SetTrigger("Laugh");
+                MinigameVFX.ShakeRect(this, (RectTransform)pressedButton.transform);
             }
         }
     }

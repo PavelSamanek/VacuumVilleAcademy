@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: ProfessorPebble
   m_EditorClassIdentifier: Assembly-CSharp::VacuumVille.Data.CharacterDefinition
   characterType: 7
-  nameKey: char_professorpebble_name
-  catchphraseKey: char_professorpebble_catchphrase
+  nameKey: char_pebble_name
+  catchphraseKey: char_pebble_catchphrase
   brandName: Xiaomi X10 Ultra
   skill: 7
-  skillDescriptionKey: char_professorpebble_skill
+  skillDescriptionKey: char_pebble_skill
   unlockAfterLevelIndex: 6
   animatorController: {fileID: 0}
   thumbnailSprite: {fileID: 0}

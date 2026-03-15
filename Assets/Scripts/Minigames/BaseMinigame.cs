@@ -75,7 +75,14 @@ namespace VacuumVille.Minigames
             while (_timeRemaining > 0 && GameActive)
             {
                 _timeRemaining -= Time.deltaTime;
-                if (timerBar)  timerBar.value = _timeRemaining / TimeLimit;
+                float fraction = _timeRemaining / TimeLimit;
+                if (timerBar)
+                {
+                    timerBar.value = fraction;
+                    MinigameVFX.TimerUrgencyUpdate(
+                        timerBar.fillRect != null ? timerBar.fillRect.GetComponent<Image>() : null,
+                        fraction);
+                }
                 if (timerText) timerText.text = Mathf.CeilToInt(_timeRemaining).ToString();
                 yield return null;
             }

@@ -69,6 +69,7 @@ namespace VacuumVille.Minigames
                 var lbl = go.GetComponentInChildren<TextMeshProUGUI>();
                 if (lbl) lbl.text = n.ToString();
                 _socks.Add(new SockItem { Number = n, Go = go });
+                MinigameVFX.SpawnPop(this, go.transform);
             }
         }
 
@@ -116,6 +117,7 @@ namespace VacuumVille.Minigames
                         CollectSock(sock);
                     else
                     {
+                        MinigameVFX.ShakeRect(this, vacuumTransform);
                         StartCoroutine(BounceSock(sock.Go.transform));
                         AudioManager.Instance.PlayWrong();
                     }
@@ -126,13 +128,18 @@ namespace VacuumVille.Minigames
         private void CollectSock(SockItem sock)
         {
             sock.Collected = true;
-            sock.Go.SetActive(false);
+            Vector3 pos = sock.Go.transform.position;
 
             if (collectParticles)
             {
-                collectParticles.transform.position = sock.Go.transform.position;
+                collectParticles.transform.position = pos;
                 collectParticles.Play();
             }
+
+            MinigameVFX.PulseRing(this, pos, new Color(0.412f, 0.941f, 0.682f));
+            MinigameVFX.FloatingText(this, "+1", pos, new Color(0.412f, 0.941f, 0.682f));
+            MinigameVFX.CollectBurst(this, sock.Go, new Color(0.412f, 0.941f, 0.682f));
+            sock.Go = null;
 
             AudioManager.Instance.PlayCorrect();
             AddScore(1);

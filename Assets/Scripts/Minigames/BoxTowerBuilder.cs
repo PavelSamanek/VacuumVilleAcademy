@@ -119,6 +119,7 @@ namespace VacuumVille.Minigames
             var item = new BoxItem { Number = num, Go = go };
             if (btn) btn.onClick.AddListener(() => OnBoxTapped(item));
 
+            MinigameVFX.SpawnPop(this, go.transform);
             _fallingBoxes.Add(item);
         }
 
@@ -171,6 +172,7 @@ namespace VacuumVille.Minigames
                 else
                 {
                     AudioManager.Instance.PlayWrong();
+                    if (box.Go != null) MinigameVFX.ShakeRect(this, (RectTransform)box.Go.transform);
                     HighlightBox(_firstSelectedBox, false);
                     _firstSelectedBox.Selected = false;
                     _firstSelectedBox = null;
@@ -185,14 +187,19 @@ namespace VacuumVille.Minigames
             _fallingBoxes.Remove(a);
             _fallingBoxes.Remove(b);
 
+            Vector3 midPos = a.Go != null ? a.Go.transform.position : b.Go.transform.position;
+
             if (vacuumParticles)
             {
-                vacuumParticles.transform.position = a.Go.transform.position;
+                vacuumParticles.transform.position = midPos;
                 vacuumParticles.Play();
             }
 
-            Destroy(a.Go);
-            Destroy(b.Go);
+            MinigameVFX.PulseRing(this, midPos, new Color(0.412f, 0.941f, 0.682f));
+            MinigameVFX.FloatingText(this, "+1", midPos, new Color(0.412f, 0.941f, 0.682f));
+
+            if (a.Go != null) { MinigameVFX.CollectBurst(this, a.Go, new Color(0.412f, 0.941f, 0.682f)); a.Go = null; }
+            if (b.Go != null) { MinigameVFX.CollectBurst(this, b.Go, new Color(0.412f, 0.941f, 0.682f)); b.Go = null; }
 
             AudioManager.Instance.PlayCorrect();
             AddScore(1);

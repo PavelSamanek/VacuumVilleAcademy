@@ -105,7 +105,11 @@ namespace VacuumVille.Minigames
 
             while (elapsed < knotTimerDuration && !answered)
             {
-                knotTimerBar.value = 1f - (elapsed / knotTimerDuration);
+                float frac = 1f - (elapsed / knotTimerDuration);
+                knotTimerBar.value = frac;
+                MinigameVFX.TimerUrgencyUpdate(
+                    knotTimerBar.fillRect != null ? knotTimerBar.fillRect.GetComponent<Image>() : null,
+                    frac);
                 elapsed += Time.deltaTime;
                 yield return null;
 
@@ -162,6 +166,9 @@ namespace VacuumVille.Minigames
                 AddScore(1);
                 AudioManager.Instance.PlayCorrect();
                 vacuumAnimator?.SetTrigger("Cheer");
+                Vector3 knotPos = knotProblemText != null ? knotProblemText.transform.position : transform.position;
+                MinigameVFX.PulseRing(this, knotPos, new Color(0.412f, 0.941f, 0.682f));
+                MinigameVFX.FloatingText(this, "+1", knotPos, new Color(0.412f, 0.941f, 0.682f));
             }
             else
             {
@@ -169,6 +176,7 @@ namespace VacuumVille.Minigames
                 UpdateMissesLabel();
                 AudioManager.Instance.PlayWrong();
                 vacuumAnimator?.SetTrigger("Oops");
+                if (missesLabel != null) MinigameVFX.ShakeRect(this, (RectTransform)missesLabel.transform);
 
                 if (_misses >= MaxMisses) CompleteEarly();
             }

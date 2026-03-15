@@ -101,12 +101,14 @@ namespace VacuumVille.Minigames
             leftPile.transform.position = cannonLeft.position;
             var leftLbl  = leftPile.GetComponentInChildren<TextMeshProUGUI>();
             if (leftLbl) leftLbl.text = _a.ToString();
+            MinigameVFX.SpawnPop(this, leftPile.transform);
 
             // Spawn right group
             var rightPile = Instantiate(cushionPrefab, transform);
             rightPile.transform.position = cannonRight.position;
             var rightLbl  = rightPile.GetComponentInChildren<TextMeshProUGUI>();
             if (rightLbl) rightLbl.text = _b.ToString();
+            MinigameVFX.SpawnPop(this, rightPile.transform);
 
             // Move both toward merge point
             yield return StartCoroutine(MovePair(leftPile.transform, rightPile.transform, mergePoint.position));
@@ -119,6 +121,7 @@ namespace VacuumVille.Minigames
             _flyingPile.transform.position = mergePoint.position;
             var mergeLbl = _flyingPile.GetComponentInChildren<TextMeshProUGUI>();
             if (mergeLbl) mergeLbl.text = "?";
+            MinigameVFX.SpawnPop(this, _flyingPile.transform);
 
             _awaitingAnswer = true;
             AudioManager.Instance.PlayVoice($"q_addition_sum_{_a}_{_b}");
@@ -171,11 +174,15 @@ namespace VacuumVille.Minigames
                 AddScore(1);
                 AudioManager.Instance.PlayCorrect();
                 vacuumAnimator?.SetTrigger("Cheer");
+                MinigameVFX.PulseRing(this, mergePoint.position, new Color(0.412f, 0.941f, 0.682f));
+                MinigameVFX.FloatingText(this, "+1", mergePoint.position, new Color(0.412f, 0.941f, 0.682f));
+                MinigameVFX.ScreenFlash(this, new Color(0.412f, 0.941f, 0.682f));
             }
             else
             {
                 AudioManager.Instance.PlayWrong();
                 vacuumAnimator?.SetTrigger("Oops");
+                MinigameVFX.ScreenFlash(this, new Color(1f, 0.569f, 0f));
             }
 
             StartCoroutine(DelayedNextRound(0.6f));

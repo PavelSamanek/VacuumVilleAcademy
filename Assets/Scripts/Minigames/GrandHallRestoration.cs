@@ -132,6 +132,7 @@ namespace VacuumVille.Minigames
 
             AudioManager.Instance.PlayVoice($"shape_{region.shapeKey}");
 
+            MinigameVFX.SpawnPop(this, go.transform);
             _currentTile = new FallingTile
             {
                 ShapeKey           = region.shapeKey,
@@ -164,6 +165,7 @@ namespace VacuumVille.Minigames
             else
             {
                 AudioManager.Instance.PlayWrong();
+                MinigameVFX.ShakeRect(this, (RectTransform)region.button.transform);
                 StartCoroutine(BounceAway(_currentTile.Go.transform));
             }
         }
@@ -180,12 +182,17 @@ namespace VacuumVille.Minigames
             AddScore(1);
             _tilesPlaced++;
 
-            StartCoroutine(SnapTileToRegion(_currentTile.Go.transform, region.button.transform.position));
+            Vector3 regionPos = region.button.transform.position;
+            MinigameVFX.PulseRing(this, regionPos, new Color(0.412f, 0.941f, 0.682f));
+            MinigameVFX.FloatingText(this, "+1", regionPos, new Color(0.412f, 0.941f, 0.682f));
+
+            StartCoroutine(SnapTileToRegion(_currentTile.Go.transform, regionPos));
             _currentTile = null;
 
             if (_tilesPlaced >= _totalTiles)
             {
                 if (celebrationParticles) celebrationParticles.Play();
+                MinigameVFX.ScreenFlash(this, new Color(0.412f, 0.941f, 0.682f), 0.4f, 0.5f);
                 CompleteEarly();
             }
         }

@@ -88,6 +88,7 @@ namespace VacuumVille.Minigames
         {
             var go = Instantiate(itemPrefab, transform); // parent to Canvas so UI renders
             go.transform.position = conveyorSpawn.position;
+            MinigameVFX.SpawnPop(this, go.transform);
             _activeItems.Add(new ConveyorItem { Go = go });
         }
 
@@ -195,6 +196,7 @@ namespace VacuumVille.Minigames
                 bin.currentLabel.text = "0";
                 AudioManager.Instance.PlayWrong();
                 StartCoroutine(FlashBin(bin, Color.red));
+                if (bin.transform != null) MinigameVFX.ShakeRect(this, (RectTransform)bin.transform);
             }
             else
             {
@@ -202,6 +204,11 @@ namespace VacuumVille.Minigames
                 AddScore(1);
                 AudioManager.Instance.PlayCorrect();
                 StartCoroutine(FlashBin(bin, new Color(0.4f, 0.9f, 0.4f)));
+                if (bin.transform != null)
+                {
+                    MinigameVFX.PulseRing(this, bin.transform.position, new Color(0.412f, 0.941f, 0.682f));
+                    MinigameVFX.FloatingText(this, "+1", bin.transform.position, new Color(0.412f, 0.941f, 0.682f));
+                }
 
                 if (_sortedCorrectly >= _dividend) CompleteEarly();
             }

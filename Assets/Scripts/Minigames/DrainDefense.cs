@@ -92,6 +92,7 @@ namespace VacuumVille.Minigames
             go.transform.position = new Vector3(spawnX, spawnY, 0);
             var lbl = go.GetComponentInChildren<TextMeshProUGUI>();
             if (lbl) lbl.text = points.ToString();
+            MinigameVFX.SpawnPop(this, go.transform);
 
             _activeDucks.Add(new DuckInstance { Go = go, Points = points, TargetDrain = drain });
         }
@@ -176,14 +177,28 @@ namespace VacuumVille.Minigames
             AudioManager.Instance.PlayCorrect();
             if (savedPointsLabel)
                 savedPointsLabel.text = LocalizationManager.Instance.Get("saved_points", _savedPoints);
-            if (duck.Go) Destroy(duck.Go);
+
+            if (duck.Go != null)
+            {
+                Vector3 pos = duck.Go.transform.position;
+                MinigameVFX.PulseRing(this, pos, new Color(0.412f, 0.941f, 0.682f));
+                MinigameVFX.FloatingText(this, "+" + duck.Points, pos, new Color(0.412f, 0.941f, 0.682f));
+                MinigameVFX.CollectBurst(this, duck.Go, new Color(0.412f, 0.941f, 0.682f));
+                duck.Go = null;
+            }
         }
 
         private void DuckDrained(DuckInstance duck)
         {
             _drainedPoints += duck.Points;
             AudioManager.Instance.PlayWrong();
-            if (duck.Go) Destroy(duck.Go);
+            if (duck.Go != null)
+            {
+                MinigameVFX.PulseRing(this, duck.Go.transform.position, new Color(1f, 0.569f, 0f));
+                MinigameVFX.ShakeRect(this, (RectTransform)vacuumTransform);
+                MinigameVFX.CollectBurst(this, duck.Go, new Color(1f, 0.569f, 0f));
+                duck.Go = null;
+            }
         }
 
         protected override void OnMinigameEnd()

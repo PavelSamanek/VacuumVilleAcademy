@@ -66,6 +66,7 @@ namespace VacuumVille.Minigames
             {
                 var cell = Instantiate(flowerCellPrefab, gardenGrid.transform);
                 _gridCells.Add(cell);
+                MinigameVFX.SpawnPop(this, cell.transform);
                 yield return new WaitForSeconds(0.05f);
             }
 
@@ -122,11 +123,17 @@ namespace VacuumVille.Minigames
                 AudioManager.Instance.PlayCorrect();
                 if (waterParticles) waterParticles.Play();
                 TintGrid(new Color(0.4f, 0.9f, 0.4f));
+                Vector3 gridPos = gardenGrid != null ? gardenGrid.transform.position : transform.position;
+                MinigameVFX.PulseRing(this, gridPos, new Color(0.412f, 0.941f, 0.682f));
+                MinigameVFX.FloatingText(this, "+1", gridPos, new Color(0.412f, 0.941f, 0.682f));
+                MinigameVFX.ScreenFlash(this, new Color(0.412f, 0.941f, 0.682f), 0.2f, 0.3f);
             }
             else
             {
                 AudioManager.Instance.PlayWrong();
                 ShowWilted();
+                if (answerButtons != null && answerButtons.Length > 0)
+                    MinigameVFX.ShakeRect(this, (RectTransform)answerButtons[0].transform);
             }
         }
 

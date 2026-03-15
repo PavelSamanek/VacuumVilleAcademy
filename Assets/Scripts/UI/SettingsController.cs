@@ -4,6 +4,7 @@ using TMPro;
 using VacuumVille.Core;
 using VacuumVille.Data;
 
+
 namespace VacuumVille.UI
 {
     public class SettingsController : MonoBehaviour
@@ -53,6 +54,13 @@ namespace VacuumVille.UI
                 backButton.onClick.AddListener(OnBack);
             else
                 Debug.LogWarning("[SettingsController] BackButton not found — assign it in the Inspector or name the GameObject 'BackButton'.");
+
+            var loc = LocalizationManager.Instance;
+            if (loc != null && backButton != null)
+            {
+                var tmp = backButton.GetComponentInChildren<TextMeshProUGUI>();
+                if (tmp != null) tmp.text = loc.Get("btn_back");
+            }
         }
 
         private void SetLanguage(Language lang)

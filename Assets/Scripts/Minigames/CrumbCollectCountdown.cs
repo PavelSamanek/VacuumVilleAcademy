@@ -66,6 +66,7 @@ namespace VacuumVille.Minigames
             if (lbl) lbl.text = number.ToString();
 
             _activeCrumbs[number] = go;
+            MinigameVFX.SpawnPop(this, go.transform);
             StartCoroutine(DespawnAfter(number, crumbVisibleTime));
         }
 
@@ -131,6 +132,7 @@ namespace VacuumVille.Minigames
                     }
                     else
                     {
+                        MinigameVFX.ShakeRect(this, (RectTransform)vacuumTransform);
                         AudioManager.Instance.PlayWrong();
                     }
                     return;
@@ -140,12 +142,16 @@ namespace VacuumVille.Minigames
 
         private void CollectCrumb(int number)
         {
+            Vector3 pos = Vector3.zero;
             if (_activeCrumbs.TryGetValue(number, out var go))
             {
-                Destroy(go);
+                pos = go.transform.position;
+                MinigameVFX.CollectBurst(this, go, new Color(0.412f, 0.941f, 0.682f));
                 _activeCrumbs.Remove(number);
             }
 
+            MinigameVFX.PulseRing(this, pos, new Color(0.412f, 0.941f, 0.682f));
+            MinigameVFX.FloatingText(this, "+1", pos, new Color(0.412f, 0.941f, 0.682f));
             AudioManager.Instance.PlayCorrect();
             AddScore(1);
             _targetNumber++;

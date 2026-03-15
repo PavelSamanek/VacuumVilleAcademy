@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using VacuumVille.Core;
 using VacuumVille.Data;
 
@@ -24,6 +25,31 @@ namespace VacuumVille.UI
 
             if (playButton != null)
                 playButton.onClick.AddListener(OnPlay);
+
+            var loc = LocalizationManager.Instance;
+            if (loc != null)
+            {
+                if (backButton != null)
+                {
+                    var tmp = backButton.GetComponentInChildren<TextMeshProUGUI>();
+                    if (tmp != null) tmp.text = loc.Get("btn_back");
+                }
+                if (playButton != null)
+                {
+                    var tmp = playButton.GetComponentInChildren<TextMeshProUGUI>();
+                    if (tmp != null) tmp.text = loc.Get("btn_play");
+                }
+                LocalizeLabel("Title",        loc.Get("minigame_unlocked"));
+                LocalizeLabel("TitleLabel",   loc.Get("minigame_unlocked"));
+            }
+        }
+
+        private static void LocalizeLabel(string goName, string text)
+        {
+            var go = GameObject.Find(goName);
+            if (go == null) return;
+            var tmp = go.GetComponent<TextMeshProUGUI>();
+            if (tmp != null) tmp.text = text;
         }
 
         private void Update()

@@ -89,6 +89,8 @@ namespace VacuumVille.Minigames
                     AddScore(1);
                     if (rainbowParticles) rainbowParticles.Play();
                     AudioManager.Instance.PlayCorrect();
+                    MinigameVFX.FloatingText(this, "+1", transform.position, new Color(0.412f, 0.941f, 0.682f));
+                    MinigameVFX.ScreenFlash(this, new Color(0.412f, 0.941f, 0.682f), 0.3f, 0.4f);
                     yield return new WaitForSeconds(1f);
                 }
             }
@@ -154,6 +156,7 @@ namespace VacuumVille.Minigames
 
                 AudioManager.Instance.PlayCorrect();
                 MoveVacuumTo(head.button.transform.position);
+                MinigameVFX.PulseRing(this, head.button.transform.position, new Color(0.412f, 0.941f, 0.682f));
                 _nextIndex++;
             }
             else
@@ -164,6 +167,7 @@ namespace VacuumVille.Minigames
                     splashParticles.transform.position = vacuumTransform.position;
                     splashParticles.Play();
                 }
+                MinigameVFX.ShakeRect(this, (RectTransform)head.button.transform);
                 // Flash wrong button red briefly
                 StartCoroutine(FlashWrong(head));
             }
