@@ -135,12 +135,20 @@ namespace VacuumVille.Core
 
         public void PlaySFX(string resourcePath)
         {
-            if (!_sfxCache.TryGetValue(resourcePath, out AudioClip clip))
+            // Always re-check: Unity may unload the native clip between scenes
+            // even though the C# wrapper stays in the cache (UnloadUnusedAssets).
+            if (!_sfxCache.TryGetValue(resourcePath, out AudioClip clip) || clip == null)
             {
                 clip = Resources.Load<AudioClip>(resourcePath);
-                if (clip != null) _sfxCache[resourcePath] = clip;
+                if (clip != null)
+                    _sfxCache[resourcePath] = clip;
+                else
+                {
+                    Debug.LogWarning($"[AudioManager] SFX not found: {resourcePath}");
+                    return;
+                }
             }
-            if (clip != null) sfxSource.PlayOneShot(clip);
+            sfxSource.PlayOneShot(clip);
         }
 
         // ── Voice ───────────────────────────────────────────────────────────────
@@ -151,22 +159,21 @@ namespace VacuumVille.Core
                 ? "cs-CZ" : "en-US";
             string path = $"Audio/Voice/{locale}/{voiceLineKey}";
 
-            if (!_voiceCache.TryGetValue(path, out AudioClip clip))
+            if (!_voiceCache.TryGetValue(path, out AudioClip clip) || clip == null)
             {
                 clip = Resources.Load<AudioClip>(path);
-                if (clip != null) _voiceCache[path] = clip;
+                if (clip != null)
+                    _voiceCache[path] = clip;
+                else
+                {
+                    Debug.LogWarning($"[AudioManager] Voice clip not found: {path}");
+                    return;
+                }
             }
 
-            if (clip != null)
-            {
-                voiceSource.Stop();
-                voiceSource.clip = clip;
-                voiceSource.Play();
-            }
-            else
-            {
-                Debug.LogWarning($"[AudioManager] Voice clip not found: {path}");
-            }
+            voiceSource.Stop();
+            voiceSource.clip = clip;
+            voiceSource.Play();
         }
 
         public void StopVoice() => voiceSource.Stop();
