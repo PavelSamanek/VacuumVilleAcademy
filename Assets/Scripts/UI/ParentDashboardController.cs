@@ -75,15 +75,6 @@ namespace VacuumVille.UI
             pinGatePanel.SetActive(false);
             dashboardPanel.SetActive(true);
             BuildDashboard();
-            StartCoroutine(ScrollToTop());
-        }
-
-        private IEnumerator ScrollToTop()
-        {
-            // Wait one frame for layout to rebuild before resetting scroll position
-            yield return null;
-            var sr = dashboardPanel.GetComponentInChildren<ScrollRect>();
-            if (sr != null) sr.verticalNormalizedPosition = 1f;
         }
 
         private void BuildDashboard()
@@ -92,16 +83,13 @@ namespace VacuumVille.UI
             foreach (Transform child in dashboardPanel.transform)
                 Destroy(child.gameObject);
 
-            var rt = dashboardPanel.GetComponent<RectTransform>();
-
-            // ── Scroll view ─────────────────────────────────────────────────────
+            // ── Scroll view fills the whole panel ───────────────────────────────
             var sv = new GameObject("ScrollView");
             sv.transform.SetParent(dashboardPanel.transform, false);
             var svRt = sv.AddComponent<RectTransform>();
             svRt.anchorMin = Vector2.zero;
             svRt.anchorMax = Vector2.one;
-            svRt.offsetMin = new Vector2(0, 80);   // leave room for close button
-            svRt.offsetMax = Vector2.zero;
+            svRt.offsetMin = svRt.offsetMax = Vector2.zero;
 
             var scrollRect = sv.AddComponent<ScrollRect>();
             scrollRect.horizontal = false;
@@ -191,22 +179,15 @@ namespace VacuumVille.UI
                 loc?.Get("reset_progress") ?? "Smazat postup",
                 new Color(0.85f, 0.3f, 0.3f), 80f, OnResetProgress);
 
-            // ── Close button (pinned to bottom) ─────────────────────────────────
-            var closeGo = new GameObject("CloseButton");
-            closeGo.transform.SetParent(dashboardPanel.transform, false);
-            var closeRt = closeGo.AddComponent<RectTransform>();
-            closeRt.anchorMin = new Vector2(0, 0);
-            closeRt.anchorMax = new Vector2(1, 0);
-            closeRt.offsetMin = new Vector2(24, 8);
-            closeRt.offsetMax = new Vector2(-24, 76);
+            // ── Close button (inside scroll content at the very bottom) ──────────
+            AddButton(content.transform,
+                loc?.Get("back_button") ?? "← Zpět",
+                new Color(0, 0.75f, 0.65f), 80f, GoBack);
 
-            var closeImg = closeGo.AddComponent<Image>();
-            closeImg.color = new Color(0, 0.75f, 0.65f);
-            var closeBtn = closeGo.AddComponent<Button>();
-            closeBtn.targetGraphic = closeImg;
-            closeBtn.onClick.AddListener(GoBack);
-            AddLabelToButton(closeGo.transform,
-                loc?.Get("back_button") ?? "← Zpět", 36f);
+            // Force layout rebuild then scroll to top
+            Canvas.ForceUpdateCanvases();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(contentRt);
+            scrollRect.verticalNormalizedPosition = 1f;
         }
 
         // ── UI builder helpers ──────────────────────────────────────────────────
