@@ -404,6 +404,238 @@ for (const [lang, dir] of [['en-US', LOC_EN], ['cs-CZ', LOC_CS]]) {
   });
 }
 
+// ─── HELPERS for new sections ─────────────────────────────────────────────────
+
+/** Read a C# script by filename (searches Assets/Scripts recursively) */
+function readScript(filename) {
+  const all = allScripts();
+  const found = all.find(p => path.basename(p) === filename);
+  if (!found) throw new Error(`Script not found: ${filename}`);
+  return readText(found);
+}
+
+/** Extract a numeric const value from C# source, e.g. `private const int Foo = 42;` */
+function extractConst(content, name) {
+  const m = content.match(new RegExp(`const\\s+(?:int|float)\\s+${name}\\s*=\\s*([\\d.]+)`));
+  return m ? parseFloat(m[1]) : null;
+}
+
+// ─── 11. NumberBadge3D — 3D coin API contract ─────────────────────────────────
+section('11. NumberBadge3D — 3D coin API contract');
+
+const badge3dSrc = readScript('NumberBadge3D.cs');
+
+test('NumberBadge3D.cs: exposes SetNumber(), SetColor(), ExplodeCorrect()', () => {
+  assert(badge3dSrc.includes('public void SetNumber('),    'Missing public void SetNumber()');
+  assert(badge3dSrc.includes('public void SetColor('),    'Missing public void SetColor()');
+  assert(badge3dSrc.includes('public void ExplodeCorrect()'), 'Missing public void ExplodeCorrect()');
+});
+
+test('NumberBadge3D.cs: depth slab count is at least 5', () => {
+  const v = extractConst(badge3dSrc, 'DepthSlabs');
+  assert(v !== null, 'DepthSlabs constant not found');
+  assert(v >= 5, `DepthSlabs = ${v}, expected >= 5`);
+});
+
+test('NumberBadge3D.cs: tilt loop coroutine exists (3D parallax animation)', () => {
+  assert(badge3dSrc.includes('TiltLoop'), 'TiltLoop coroutine not found');
+});
+
+test('NumberBadge3D.cs: specular sweep coroutine exists', () => {
+  assert(badge3dSrc.includes('SpecularSweep'), 'SpecularSweep coroutine not found');
+});
+
+test('NumberBadge3D.cs: appear bounce animation exists', () => {
+  assert(badge3dSrc.includes('AppearBounce'), 'AppearBounce coroutine not found');
+});
+
+test('NumberBadge3D.cs: explosion spawns reticle + chip + star particles', () => {
+  const rc = extractConst(badge3dSrc, 'ReticleCount');
+  const cc = extractConst(badge3dSrc, 'ChipCount');
+  const sc = extractConst(badge3dSrc, 'StarCount');
+  assert(rc !== null && rc > 0, `ReticleCount = ${rc}, must be > 0`);
+  assert(cc !== null && cc > 0, `ChipCount = ${cc}, must be > 0`);
+  assert(sc !== null && sc > 0, `StarCount = ${sc}, must be > 0`);
+});
+
+test('NumberBadge3D.cs: loads all four required sprites', () => {
+  assert(badge3dSrc.includes('"Sprites/badge_3d"'),    'Missing Sprites/badge_3d reference');
+  assert(badge3dSrc.includes('"Sprites/chip_particle"'), 'Missing Sprites/chip_particle reference');
+  assert(badge3dSrc.includes('"Sprites/star_particle"'), 'Missing Sprites/star_particle reference');
+  assert(badge3dSrc.includes('"Sprites/circle"'),       'Missing Sprites/circle reference');
+});
+
+test('NumberBadge3D.cs: chromatic aberration label layers exist', () => {
+  assert(badge3dSrc.includes('LabelChromR') || badge3dSrc.includes('ChromR') ||
+         badge3dSrc.includes('labelChromR') || badge3dSrc.includes('_labelChromR'),
+    'No chromatic aberration red-channel label found');
+  assert(badge3dSrc.includes('LabelChromB') || badge3dSrc.includes('ChromB') ||
+         badge3dSrc.includes('labelChromB') || badge3dSrc.includes('_labelChromB'),
+    'No chromatic aberration blue-channel label found');
+});
+
+// ─── 12. EquationExplosionVFX — explosion contract ───────────────────────────
+section('12. EquationExplosionVFX — explosion contract');
+
+const eqVfxPath = path.join(SCRIPTS, 'UI', 'EquationExplosionVFX.cs');
+test('EquationExplosionVFX.cs: file exists', () => {
+  assert(fs.existsSync(eqVfxPath), 'EquationExplosionVFX.cs not found in Assets/Scripts/UI/');
+});
+
+const eqVfxSrc = fs.existsSync(eqVfxPath) ? readText(eqVfxPath) : '';
+
+test('EquationExplosionVFX.cs: Explode() public method with sourceRect + text + streak', () => {
+  assert(eqVfxSrc.includes('public void Explode('), 'Missing public void Explode()');
+  assert(eqVfxSrc.includes('RectTransform'),         'Explode() should accept a RectTransform');
+  assert(eqVfxSrc.includes('streak'),                'Explode() should accept a streak parameter');
+});
+
+test('EquationExplosionVFX.cs: Time.timeScale is always restored to 1 after slowdown', () => {
+  // Count slow assignments vs. restore-to-1 assignments
+  const slows    = [...eqVfxSrc.matchAll(/Time\.timeScale\s*=\s*0\./g)].length;
+  const restores = [...eqVfxSrc.matchAll(/Time\.timeScale\s*=\s*1f/g)].length;
+  assert(slows > 0,          'No time-scale slowdown found — anticipation effect missing');
+  assert(restores >= slows,  `${slows} slowdown(s) but only ${restores} restore(s) to 1f`);
+});
+
+test('EquationExplosionVFX.cs: particle counts are positive', () => {
+  const rc = extractConst(eqVfxSrc, 'ReticleCount');
+  const cc = extractConst(eqVfxSrc, 'ChipCount');
+  const sc = extractConst(eqVfxSrc, 'StarCount');
+  assert(rc !== null && rc > 0, `ReticleCount = ${rc}`);
+  assert(cc !== null && cc > 0, `ChipCount = ${cc}`);
+  assert(sc !== null && sc > 0, `StarCount = ${sc}`);
+});
+
+test('EquationExplosionVFX.cs: streak multiplier is > 1.0', () => {
+  const v = extractConst(eqVfxSrc, 'StreakMultiplier');
+  assert(v !== null, 'StreakMultiplier constant not found');
+  assert(v > 1.0, `StreakMultiplier = ${v}, must be > 1.0`);
+});
+
+test('EquationExplosionVFX.cs: spawns character fragments from equation text', () => {
+  assert(eqVfxSrc.includes('SpawnCharFragments') || eqVfxSrc.includes('CharFragment'),
+    'No character-fragment spawning found');
+});
+
+test('EquationExplosionVFX.cs: shockwave ring effect exists', () => {
+  assert(eqVfxSrc.includes('ShockwaveRing') || eqVfxSrc.includes('Shockwave'),
+    'No shockwave ring effect found');
+});
+
+test('EquationExplosionVFX.cs: screen flash effect exists', () => {
+  assert(eqVfxSrc.includes('ScreenFlash') || eqVfxSrc.includes('Flash'),
+    'No screen flash effect found');
+});
+
+test('EquationExplosionVFX.cs: canvas shake effect exists', () => {
+  assert(eqVfxSrc.includes('ShakeCanvas') || eqVfxSrc.includes('Shake'),
+    'No canvas shake effect found');
+});
+
+test('EquationExplosionVFX.cs: gravity constant is negative (particles fall down)', () => {
+  const g = extractConst(eqVfxSrc, 'Gravity');
+  // Gravity may appear as positive const applied with subtraction, or directly negative
+  const negGravity = eqVfxSrc.match(/Gravity\s*=\s*-[\d.]+/);
+  const posApplied = eqVfxSrc.match(/vel\.y\s*[+-]=\s*-?\s*Gravity/);
+  assert(negGravity || (g !== null && posApplied),
+    `Gravity should be negative or subtracted from vel.y (found: ${g})`);
+});
+
+test('EquationExplosionVFX.cs: particles batch-yield to avoid single-frame spike', () => {
+  assert(eqVfxSrc.includes('yield return null'),
+    'No yield return null inside particle loop — risk of frame spike');
+});
+
+// ─── 13. TaskDisplayController — explosion integration ───────────────────────
+section('13. TaskDisplayController — explosion integration');
+
+const tdcSrc = readScript('TaskDisplayController.cs');
+
+test('TaskDisplayController.cs: declares EquationExplosionVFX field', () => {
+  assert(tdcSrc.includes('EquationExplosionVFX'),
+    'EquationExplosionVFX type not referenced in TaskDisplayController');
+});
+
+test('TaskDisplayController.cs: auto-adds EquationExplosionVFX component in Start', () => {
+  assert(tdcSrc.includes('AddComponent<EquationExplosionVFX>()'),
+    'AddComponent<EquationExplosionVFX>() not found — VFX will never run');
+});
+
+test('TaskDisplayController.cs: calls Explode() on correct answer', () => {
+  assert(tdcSrc.includes('_explosionVFX') && tdcSrc.includes('.Explode('),
+    '_explosionVFX.Explode() call not found in HandleCorrect path');
+});
+
+test('TaskDisplayController.cs: reveals solved equation before explosion (? → answer)', () => {
+  assert(tdcSrc.includes('.Replace("?",'),
+    'Equation text is never solved before explosion — kid sees "5+5=?" explode, not "5+5=10"');
+});
+
+test('TaskDisplayController.cs: correct-answer next-problem delay is >= 1.0 s', () => {
+  // Find all NextAfterDelay(N) calls in HandleCorrect area.
+  // We scan the whole file for literal numeric args; all must be >= 1.0 if they
+  // appear in HandleCorrect context, but we conservatively just check the minimum
+  // non-reveal delay is >= 1.0 (was 0.8 before this feature).
+  const delays = [...tdcSrc.matchAll(/NextAfterDelay\(\s*([\d.]+)f?\s*\)/g)]
+    .map(m => parseFloat(m[1]));
+  assert(delays.length > 0, 'No NextAfterDelay() calls found');
+  const minDelay = Math.min(...delays);
+  assert(minDelay >= 1.0,
+    `Shortest NextAfterDelay = ${minDelay}s — explosion needs at least 1.0 s to play`);
+});
+
+// ─── 14. LevelSelectController — 3D badge integration ────────────────────────
+section('14. LevelSelectController — 3D badge integration');
+
+const lscSrc = readScript('LevelSelectController.cs');
+
+test('LevelSelectController.cs: creates NumberBadge3D per level button', () => {
+  assert(lscSrc.includes('AddComponent<NumberBadge3D>()'),
+    'AddComponent<NumberBadge3D>() not found — level numbers will be flat');
+});
+
+test('LevelSelectController.cs: calls SetNumber() on each badge', () => {
+  assert(lscSrc.includes('SetNumber('),
+    'SetNumber() not called — badge will show no number');
+});
+
+test('LevelSelectController.cs: calls SetColor() on each badge', () => {
+  assert(lscSrc.includes('SetColor('),
+    'SetColor() not called — badge will use default blue for all levels');
+});
+
+test('LevelSelectController.cs: badge is anchored left inside button', () => {
+  // The badge RectTransform should have a left-side anchor (anchorMin.x == 0)
+  assert(lscSrc.includes('anchorMin') && lscSrc.includes('BadgeSize'),
+    'Badge anchor or BadgeSize constant not found — badge may overlap label text');
+});
+
+test('LevelSelectController.cs: level label offset clears the badge', () => {
+  // Text label left-offset must reference BadgeSize so text does not overlap badge
+  assert(lscSrc.includes('BadgeSize') && lscSrc.includes('labelLeft'),
+    'Label left-offset does not account for BadgeSize — text and badge may overlap');
+});
+
+// ─── 15. Sprite resources — VFX assets exist on disk ─────────────────────────
+section('15. Sprite resources — VFX assets exist on disk');
+
+const SPRITES = path.join(ROOT, 'Assets', 'Resources', 'Sprites');
+
+for (const filename of ['badge_3d.png', 'chip_particle.png', 'star_particle.png', 'circle.png']) {
+  test(`Sprites/${filename} exists`, () => {
+    assert(fs.existsSync(path.join(SPRITES, filename)),
+      `${filename} missing — Resources.Load("Sprites/${filename.replace('.png','')}) will return null at runtime`);
+  });
+}
+
+for (const filename of ['badge_3d.png', 'chip_particle.png', 'star_particle.png']) {
+  test(`Sprites/${filename} has a .meta file`, () => {
+    assert(fs.existsSync(path.join(SPRITES, filename + '.meta')),
+      `${filename}.meta missing — Unity will not import the sprite`);
+  });
+}
+
 // ─── SUMMARY ──────────────────────────────────────────────────────────────────
 console.log('\n' + '─'.repeat(60));
 const total = passed + failed;
