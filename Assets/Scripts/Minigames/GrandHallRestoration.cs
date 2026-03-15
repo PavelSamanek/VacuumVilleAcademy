@@ -47,7 +47,8 @@ namespace VacuumVille.Minigames
             public bool WaitingForPlacement;
         }
 
-        protected override bool IsSetupComplete() => shapeTilePrefab != null;
+        protected override bool IsSetupComplete() =>
+            mosaicRegions != null && mosaicRegions.Length > 0;
 
         protected override void OnMinigameBegin()
         {
@@ -85,11 +86,42 @@ namespace VacuumVille.Minigames
 
         private void SetupRegionButtons()
         {
-            foreach (var region in mosaicRegions)
+            // Reposition regions to bottom strip (4 equal columns)
+            float xStep = 1f / Mathf.Max(1, mosaicRegions.Length);
+            const float xPad = 0.01f;
+            for (int i = 0; i < mosaicRegions.Length; i++)
             {
-                var r = region;
-                region.button.onClick.RemoveAllListeners();
-                region.button.onClick.AddListener(() => OnRegionTapped(r));
+                var rt = (RectTransform)mosaicRegions[i].button.transform;
+                if (rt.parent != transform) rt.SetParent(transform, false);
+                rt.anchorMin = new Vector2(i * xStep + xPad, 0.04f);
+                rt.anchorMax = new Vector2((i + 1) * xStep - xPad, 0.19f);
+                rt.offsetMin = rt.offsetMax = Vector2.zero;
+
+                // Style the region button
+                var img = mosaicRegions[i].button.GetComponent<Image>();
+                Color[] regionColors = {
+                    new Color(0.27f, 0.51f, 0.93f),  // blue
+                    new Color(0.55f, 0.76f, 0.29f),  // green
+                    new Color(0.96f, 0.73f, 0.16f),  // yellow
+                    new Color(0.91f, 0.35f, 0.35f),  // red
+                };
+                if (img) img.color = regionColors[Mathf.Min(i, regionColors.Length - 1)];
+
+                // Shape label inside button
+                var lbl = mosaicRegions[i].button.GetComponentInChildren<TextMeshProUGUI>();
+                if (lbl)
+                {
+                    lbl.text = LocalizationManager.Instance.Get($"shape_{mosaicRegions[i].shapeKey}");
+                    lbl.color = Color.white;
+                    lbl.fontSize = 36f;
+                    lbl.fontStyle = FontStyles.Bold;
+                    lbl.alignment = TextAlignmentOptions.Center;
+                    lbl.enableWordWrapping = false;
+                }
+
+                var r = mosaicRegions[i];
+                mosaicRegions[i].button.onClick.RemoveAllListeners();
+                mosaicRegions[i].button.onClick.AddListener(() => OnRegionTapped(r));
             }
         }
 
@@ -115,9 +147,44 @@ namespace VacuumVille.Minigames
             var region = incomplete[Random.Range(0, incomplete.Count)];
 
             // Canvas is Screen Space Overlay — positions are in screen pixels
-            float xPos = Random.Range(tileSpawnLine.position.x - 280f, tileSpawnLine.position.x + 280f);
-            var go  = Instantiate(shapeTilePrefab, transform); // parent to Canvas so UI renders
-            go.transform.position = new Vector3(xPos, tileSpawnLine.position.y, 0);
+            float spawnY  = tileSpawnLine != null ? tileSpawnLine.position.y : Screen.height;
+            float spawnX  = tileSpawnLine != null
+                ? Random.Range(tileSpawnLine.position.x - 280f, tileSpawnLine.position.x + 280f)
+                : Random.Range(Screen.width * 0.1f, Screen.width * 0.9f);
+
+            GameObject go;
+            if (shapeTilePrefab != null)
+            {
+                go = Instantiate(shapeTilePrefab, transform);
+            }
+            else
+            {
+                // Build a simple tile at runtime — rounded coloured square with a label
+                go = new GameObject("Tile");
+                go.transform.SetParent(transform, false);
+                var rt2 = go.AddComponent<RectTransform>();
+                rt2.sizeDelta = new Vector2(160, 160);
+                var tileImg = go.AddComponent<UnityEngine.UI.Image>();
+                Color[] tileColors = {
+                    new Color(0.27f, 0.51f, 0.93f),
+                    new Color(0.55f, 0.76f, 0.29f),
+                    new Color(0.96f, 0.73f, 0.16f),
+                    new Color(0.91f, 0.35f, 0.35f),
+                };
+                int colorIdx = System.Array.FindIndex(mosaicRegions, r2 => r2.shapeKey == region.shapeKey);
+                tileImg.color = tileColors[Mathf.Max(0, colorIdx) % tileColors.Length];
+                var lblGo = new GameObject("Label");
+                lblGo.transform.SetParent(go.transform, false);
+                var lblRt = lblGo.AddComponent<RectTransform>();
+                lblRt.anchorMin = Vector2.zero; lblRt.anchorMax = Vector2.one;
+                lblRt.offsetMin = lblRt.offsetMax = Vector2.zero;
+                var tmp = lblGo.AddComponent<TextMeshProUGUI>();
+                tmp.fontSize = 52f; tmp.fontStyle = FontStyles.Bold;
+                tmp.color = Color.white; tmp.alignment = TextAlignmentOptions.Center;
+                tmp.enableWordWrapping = false;
+            }
+
+            go.transform.position = new Vector3(spawnX, spawnY, 0);
             // Load the correct shape sprite (triangle, square, circle, etc.)
             var img = go.GetComponent<UnityEngine.UI.Image>();
             if (img != null)
@@ -126,7 +193,7 @@ namespace VacuumVille.Minigames
                 if (spr != null) img.sprite = spr;
             }
             var lbl = go.GetComponentInChildren<TextMeshProUGUI>();
-            if (lbl) { lbl.text = LocalizationManager.Instance.Get($"shape_{region.shapeKey}"); lbl.color = new Color(0.1f, 0.1f, 0.2f); }
+            if (lbl) { lbl.text = LocalizationManager.Instance.Get($"shape_{region.shapeKey}"); lbl.color = Color.white; }
 
             if (shapeNameLabel)
                 shapeNameLabel.text = LocalizationManager.Instance.Get($"tap_region_{region.shapeKey}");

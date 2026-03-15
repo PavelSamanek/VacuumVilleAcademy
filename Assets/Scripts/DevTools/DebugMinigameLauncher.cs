@@ -86,7 +86,7 @@ namespace VacuumVille.DevTools
             var cBtn = closeRt.gameObject.AddComponent<Button>();
             cBtn.targetGraphic = cImg;
             cBtn.onClick.AddListener(TogglePanel);
-            MakeLabel(closeRt, "✕", 20f);
+            MakeLabel(closeRt, "X", 20f);
 
             // Scrollable minigame list
             var listRt = MakeRect("List", panel.transform,

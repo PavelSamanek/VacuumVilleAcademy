@@ -8,71 +8,61 @@ using VacuumVille.Core;
 namespace VacuumVille.Minigames
 {
     /// <summary>
-    /// Level 8 Minigame: Items on a conveyor belt must be swiped left/right
-    /// into bins with target counts. 90 seconds, 3 bins, items divided equally.
+    /// Level 8 Minigame: Division tap-the-answer.
+    /// A division equation appears at the top. Three coloured bins each show a number.
+    /// Tap the bin with the correct quotient. 5 rounds, 60 seconds.
     /// </summary>
     public class AtticBinBlitz : BaseMinigame
     {
         [Header("Bin Blitz")]
-        [SerializeField] private Transform conveyorSpawn;
-        [SerializeField] private Transform conveyorEnd;
-        [SerializeField] private GameObject itemPrefab;
-        [SerializeField] private BinSlot[] bins;               // 2 or 3 bins
-        [SerializeField] private float conveyorSpeed = 2.5f;
-        [SerializeField] private float spawnInterval = 1.2f;
+        [SerializeField] private BinSlot[] bins;
         [SerializeField] private TextMeshProUGUI problemLabel;
 
-        private int _totalItems;
-        private int _sortedCorrectly;
-        private int _divisor;
-        private int _dividend;
-        private int _correctPerBin;
-        private List<ConveyorItem> _activeItems = new();
+        private int _round;
+        private int _correctAnswer;
+        private bool _answerPending;
 
-        protected override float TimeLimit => 90f;
-        protected override int MaxScore   => 30;
+        private const int TotalRounds = 5;
 
+        protected override float TimeLimit => 60f;
+        protected override int MaxScore   => TotalRounds;
+
+        // Keeps original field names so the existing scene YAML deserialises correctly.
         [System.Serializable]
         public class BinSlot
         {
             public Transform transform;
-            public TextMeshProUGUI targetLabel;
-            public TextMeshProUGUI currentLabel;
+            public TextMeshProUGUI targetLabel;   // repurposed as the answer label
+            public TextMeshProUGUI currentLabel;  // hidden
             public int targetCount;
             public int currentCount;
-            [System.NonSerialized] public Color baseColor = Color.white;
+            [System.NonSerialized] public Button  button;
+            [System.NonSerialized] public Color   baseColor = Color.white;
+            [System.NonSerialized] public int     displayedValue;
         }
 
-        private class ConveyorItem
-        {
-            public GameObject Go;
-            public bool Swiped;
-            public Vector2 SwipeStart;
-            public bool TouchActive;
-        }
-
-        protected override bool IsSetupComplete() => itemPrefab != null;
+        protected override bool IsSetupComplete() =>
+            bins != null && bins.Length >= 2;
 
         protected override void OnMinigameBegin()
         {
             AudioManager.Instance?.PlaySFX("Audio/SFX/shared/vacuum_start");
             EnsureLayout();
-            SetupDivisionProblem();
-            StartCoroutine(SpawnLoop());
+            StartCoroutine(RoundLoop());
         }
 
         private void EnsureLayout()
         {
-            // Division equation label — top strip
+            // Problem label — top strip
             if (problemLabel == null)
             {
-                var go = new GameObject("ProblemLabel");
+                var go  = new GameObject("ProblemLabel");
                 go.transform.SetParent(transform, false);
-                var rt = go.AddComponent<RectTransform>();
+                var rt  = go.AddComponent<RectTransform>();
                 rt.anchorMin = new Vector2(0f, 0.84f);
                 rt.anchorMax = new Vector2(1f, 0.94f);
                 rt.offsetMin = rt.offsetMax = Vector2.zero;
-                var bg = go.AddComponent<Image>();
+                var bg  = go.AddComponent<Image>();
                 bg.color = new Color(0f, 0f, 0f, 0.4f);
                 bg.raycastTarget = false;
                 var txtGo = new GameObject("Text");
@@ -80,22 +70,21 @@ namespace VacuumVille.Minigames
                 var trt = txtGo.AddComponent<RectTransform>();
                 trt.anchorMin = Vector2.zero; trt.anchorMax = Vector2.one;
                 trt.offsetMin = trt.offsetMax = Vector2.zero;
-                problemLabel = txtGo.AddComponent<TextMeshProUGUI>();
-                problemLabel.fontSize = 60f;
+                problemLabel  = txtGo.AddComponent<TextMeshProUGUI>();
+                problemLabel.fontSize  = 72f;
                 problemLabel.fontStyle = FontStyles.Bold;
-                problemLabel.color = Color.white;
+                problemLabel.color     = Color.white;
                 problemLabel.alignment = TextAlignmentOptions.Center;
             }
 
             Color[] binColors =
             {
-                new Color(0.20f, 0.50f, 0.90f), // blue — left swipe
-                new Color(0.58f, 0.28f, 0.80f), // purple — centre
-                new Color(0.18f, 0.72f, 0.40f)  // green — right swipe
+                new Color(0.20f, 0.50f, 0.90f), // blue
+                new Color(0.58f, 0.28f, 0.80f), // purple
+                new Color(0.18f, 0.72f, 0.40f)  // green
             };
-            string[] arrows = bins.Length >= 3
-                ? new[] { "←", "↕", "→" }
-                : new[] { "←", "→" };
+
+            float xStep = 1f / bins.Length;
 
             for (int i = 0; i < bins.Length; i++)
             {
@@ -103,254 +92,149 @@ namespace VacuumVille.Minigames
                 var binT = bin.transform;
                 if (binT == null) continue;
 
-                Color col = binColors[Mathf.Min(i, binColors.Length - 1)];
+                Color col  = binColors[Mathf.Min(i, binColors.Length - 1)];
                 bin.baseColor = col;
 
-                // Colour the bin's own Image (add one if somehow missing)
+                // Position bin as a large tap target across the lower canvas
+                var rt = binT as RectTransform ?? (RectTransform)binT;
+                if (rt != null)
+                {
+                    if (rt.parent != transform) rt.SetParent(transform, false);
+                    rt.anchorMin   = new Vector2(i * xStep + 0.01f, 0.28f);
+                    rt.anchorMax   = new Vector2((i + 1) * xStep - 0.01f, 0.72f);
+                    rt.offsetMin   = rt.offsetMax = Vector2.zero;
+                }
+
+                // Ensure an Image for colour
                 var img = binT.GetComponent<Image>();
                 if (img == null) img = binT.gameObject.AddComponent<Image>();
                 img.color = col;
 
-                // The scene places targetLabel / currentLabel as SIBLINGS of the bin,
-                // which means the bin's Image renders on top and hides them.
-                // Fix: reparent labels INTO the bin so they render above its Image.
-                if (bin.targetLabel != null && bin.targetLabel.transform.parent != binT)
+                // Ensure a Button for tap detection (add once if missing)
+                bin.button = binT.GetComponent<Button>();
+                if (bin.button == null) bin.button = binT.gameObject.AddComponent<Button>();
+                bin.button.targetGraphic = img;
+
+                // Style the answer label (reuse targetLabel)
+                if (bin.targetLabel != null)
                 {
-                    bin.targetLabel.transform.SetParent(binT, false);
+                    if (bin.targetLabel.transform.parent != binT)
+                        bin.targetLabel.transform.SetParent(binT, false);
                     var lrt = bin.targetLabel.GetComponent<RectTransform>();
-                    lrt.anchorMin = new Vector2(0.05f, 0.1f);
-                    lrt.anchorMax = new Vector2(0.95f, 0.9f);
-                    lrt.offsetMin = lrt.offsetMax = Vector2.zero;
-                    bin.targetLabel.fontSize      = 52f;
-                    bin.targetLabel.fontStyle     = FontStyles.Bold;
-                    bin.targetLabel.color         = Color.white;
-                    bin.targetLabel.alignment     = TextAlignmentOptions.Center;
+                    lrt.anchorMin  = Vector2.zero; lrt.anchorMax = Vector2.one;
+                    lrt.offsetMin  = lrt.offsetMax = Vector2.zero;
+                    bin.targetLabel.fontSize  = 96f;
+                    bin.targetLabel.fontStyle = FontStyles.Bold;
+                    bin.targetLabel.color     = Color.white;
+                    bin.targetLabel.alignment = TextAlignmentOptions.Center;
                     bin.targetLabel.enableWordWrapping = false;
                 }
 
-                // currentLabel no longer needed — hide it
+                // Hide unused label
                 if (bin.currentLabel != null)
                     bin.currentLabel.gameObject.SetActive(false);
-
-                // Direction arrow above the bin (created once)
-                if (binT.Find("DirectionArrow") == null)
-                {
-                    var arrowGo = new GameObject("DirectionArrow");
-                    arrowGo.transform.SetParent(binT, false);
-                    var rt = arrowGo.AddComponent<RectTransform>();
-                    rt.anchorMin = new Vector2(0f, 1f);
-                    rt.anchorMax = new Vector2(1f, 1f);
-                    rt.offsetMin = Vector2.zero;
-                    rt.offsetMax = new Vector2(0f, 70f);
-                    var tmp = arrowGo.AddComponent<TextMeshProUGUI>();
-                    tmp.text      = arrows[Mathf.Min(i, arrows.Length - 1)];
-                    tmp.fontSize  = 56f;
-                    tmp.fontStyle = FontStyles.Bold;
-                    tmp.color     = Color.white;
-                    tmp.alignment = TextAlignmentOptions.Center;
-                }
             }
         }
 
-        private void SetupDivisionProblem()
+        private IEnumerator RoundLoop()
         {
-            _divisor   = Mathf.Max(1, bins.Length);
+            while (GameActive && _round < TotalRounds)
+            {
+                _round++;
+                GenerateQuestion();
+                _answerPending = true;
+                yield return new WaitUntil(() => !_answerPending || !GameActive);
+                yield return new WaitForSeconds(0.6f);
+            }
+            CompleteEarly();
+        }
+
+        private void GenerateQuestion()
+        {
+            int divisor = bins.Length;
             int[] facts = { 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-            _correctPerBin = facts[Random.Range(0, facts.Length)];
-            _dividend  = _divisor * _correctPerBin;
+            _correctAnswer = facts[Random.Range(0, facts.Length)];
+            int dividend   = divisor * _correctAnswer;
 
-            // Show division equation above the conveyor
             if (problemLabel != null)
-                problemLabel.text = $"{_dividend} ÷ {_divisor} = ?";
+                problemLabel.text = $"{dividend} ÷ {divisor} = ?";
 
-            foreach (var bin in bins)
+            AudioManager.Instance.PlayVoice($"q_division_{dividend}_{divisor}");
+
+            int correctBin = Random.Range(0, bins.Length);
+            var wrongs     = GenerateWrongAnswers(_correctAnswer);
+            int wrongIdx   = 0;
+
+            for (int i = 0; i < bins.Length; i++)
             {
-                bin.targetCount  = _correctPerBin;
-                bin.currentCount = 0;
+                var bin = bins[i];
+                bin.displayedValue = (i == correctBin) ? _correctAnswer : wrongs[wrongIdx++];
+
                 if (bin.targetLabel != null)
+                    bin.targetLabel.text = bin.displayedValue.ToString();
+
+                var img = bin.button?.GetComponent<Image>();
+                if (img) img.color = bin.baseColor;
+
+                if (bin.button != null)
                 {
-                    bin.targetLabel.text  = $"0 / {_correctPerBin}";
-                    bin.targetLabel.color = Color.white;
+                    bin.button.interactable = true;
+                    int idx = i;
+                    bin.button.onClick.RemoveAllListeners();
+                    bin.button.onClick.AddListener(() => OnBinTapped(idx));
                 }
             }
         }
 
-        private IEnumerator SpawnLoop()
+        private void OnBinTapped(int idx)
         {
-            int spawned = 0;
-            while (GameActive && spawned < _dividend)
+            if (!_answerPending || !GameActive) return;
+            _answerPending = false;
+
+            foreach (var b in bins)
+                if (b.button != null) b.button.interactable = false;
+
+            var bin     = bins[idx];
+            bool correct = bin.displayedValue == _correctAnswer;
+
+            if (correct)
             {
-                SpawnItem();
-                spawned++;
-                yield return new WaitForSeconds(spawnInterval);
-            }
-        }
-
-        private void SpawnItem()
-        {
-            var go = Instantiate(itemPrefab, transform); // parent to Canvas so UI renders
-            go.transform.position = conveyorSpawn.position;
-            go.transform.localRotation = Quaternion.Euler(0f, 0f, 180f); // sprite is inverted
-            MinigameVFX.SpawnPop(this, go.transform);
-            AudioManager.Instance?.PlaySFX("Audio/SFX/atticbin/item_swipe");
-            _activeItems.Add(new ConveyorItem { Go = go });
-        }
-
-        private void Update()
-        {
-            if (!GameActive) return;
-
-            MoveItems();
-            HandleSwipeInput();
-        }
-
-        private void MoveItems()
-        {
-            for (int i = _activeItems.Count - 1; i >= 0; i--)
-            {
-                var item = _activeItems[i];
-                if (item.Swiped || item.Go == null) continue;
-
-                item.Go.transform.position = Vector3.MoveTowards(
-                    item.Go.transform.position, conveyorEnd.position,
-                    conveyorSpeed * Time.deltaTime);
-
-                if (Vector3.Distance(item.Go.transform.position, conveyorEnd.position) < 20f)
-                {
-                    Destroy(item.Go);
-                    _activeItems.RemoveAt(i);
-                }
-            }
-        }
-
-        private void HandleSwipeInput()
-        {
-#if UNITY_EDITOR || UNITY_STANDALONE
-            if (Input.GetMouseButtonDown(0))
-            {
-                foreach (var item in _activeItems)
-                {
-                    if (item.Swiped) continue;
-                    // Canvas is Screen Space Overlay — screen pixels match UI world position
-                    Vector3 sp = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0);
-                    if (Vector3.Distance(sp, item.Go.transform.position) < 60f)
-                    {
-                        item.TouchActive = true;
-                        item.SwipeStart  = Input.mousePosition;
-                    }
-                }
-            }
-            if (Input.GetMouseButtonUp(0))
-            {
-                Vector2 delta = (Vector2)Input.mousePosition;
-                foreach (var item in _activeItems)
-                {
-                    if (!item.TouchActive) continue;
-                    item.TouchActive = false;
-                    float dx = delta.x - item.SwipeStart.x;
-                    int binIdx = dx < 0 ? 0 : bins.Length - 1;
-                    if (bins.Length == 3) binIdx = dx < -50 ? 0 : dx > 50 ? 2 : 1;
-                    SortItemToBin(item, binIdx);
-                }
-            }
-#else
-            foreach (Touch touch in Input.touches)
-            {
-                Vector3 wp = new Vector3(touch.position.x, touch.position.y, 0);
-
-                if (touch.phase == TouchPhase.Began)
-                {
-                    foreach (var item in _activeItems)
-                    {
-                        if (!item.Swiped && Vector3.Distance(wp, item.Go.transform.position) < 60f)
-                        { item.TouchActive = true; item.SwipeStart = touch.position; }
-                    }
-                }
-                if (touch.phase == TouchPhase.Ended)
-                {
-                    foreach (var item in _activeItems)
-                    {
-                        if (!item.TouchActive) continue;
-                        item.TouchActive = false;
-                        float dx = touch.position.x - item.SwipeStart.x;
-                        int binIdx = dx < 0 ? 0 : bins.Length - 1;
-                        if (bins.Length == 3) binIdx = dx < -50 ? 0 : dx > 50 ? 2 : 1;
-                        SortItemToBin(item, binIdx);
-                    }
-                }
-            }
-#endif
-        }
-
-        private void SortItemToBin(ConveyorItem item, int binIdx)
-        {
-            if (item.Swiped || binIdx >= bins.Length) return;
-            item.Swiped = true;
-
-            var bin = bins[binIdx];
-            bin.currentCount++;
-            if (bin.targetLabel != null)
-            {
-                bin.targetLabel.text  = $"{bin.currentCount} / {bin.targetCount}";
-                bin.targetLabel.color = Color.white;
-            }
-
-            bool overflowed = bin.currentCount > bin.targetCount;
-
-            if (overflowed)
-            {
-                // Overflow: reset bin
-                bin.currentCount = 0;
-                if (bin.targetLabel != null)
-                {
-                    bin.targetLabel.text  = $"0 / {bin.targetCount}";
-                    bin.targetLabel.color = Color.white;
-                }
-                AudioManager.Instance.PlayWrong();
-                AudioManager.Instance?.PlaySFX("Audio/SFX/atticbin/bin_overflow");
-                StartCoroutine(FlashBin(bin, Color.red));
-                if (bin.transform != null) MinigameVFX.ShakeRect(this, (RectTransform)bin.transform);
-            }
-            else
-            {
-                _sortedCorrectly++;
                 AddScore(1);
                 AudioManager.Instance.PlayCorrect();
                 AudioManager.Instance?.PlaySFX("Audio/SFX/atticbin/bin_land");
                 StartCoroutine(FlashBin(bin, new Color(0.4f, 0.9f, 0.4f)));
-                if (bin.transform != null)
-                {
-                    MinigameVFX.PulseRing(this, bin.transform.position, new Color(0.412f, 0.941f, 0.682f));
-                    MinigameVFX.FloatingText(this, "+1", bin.transform.position, new Color(0.412f, 0.941f, 0.682f));
-                }
-
-                if (_sortedCorrectly >= _dividend) CompleteEarly();
+                MinigameVFX.PulseRing(this, bin.button.transform.position, new Color(0.412f, 0.941f, 0.682f));
+                MinigameVFX.FloatingText(this, "+1", bin.button.transform.position, new Color(0.412f, 0.941f, 0.682f));
             }
-
-            StartCoroutine(MoveItemToBin(item.Go.transform, bin.transform.position));
-        }
-
-        private IEnumerator MoveItemToBin(Transform item, Vector3 target)
-        {
-            float duration = 0.3f;
-            float elapsed  = 0f;
-            Vector3 start  = item.position;
-            while (elapsed < duration)
+            else
             {
-                item.position = Vector3.Lerp(start, target, elapsed / duration);
-                elapsed += Time.deltaTime;
-                yield return null;
+                AudioManager.Instance.PlayWrong();
+                AudioManager.Instance?.PlaySFX("Audio/SFX/atticbin/bin_overflow");
+                StartCoroutine(FlashBin(bin, new Color(1f, 0.57f, 0f)));
+                MinigameVFX.ShakeRect(this, (RectTransform)bin.button.transform);
             }
-            Destroy(item.gameObject);
         }
 
         private IEnumerator FlashBin(BinSlot bin, Color flashColor)
         {
-            var img = bin.transform?.GetComponent<Image>();
+            var img = bin.button?.GetComponent<Image>();
             if (!img) yield break;
             img.color = flashColor;
-            yield return new WaitForSeconds(0.3f);
-            img.color = bin.baseColor; // restore themed colour, not white
+            yield return new WaitForSeconds(0.4f);
+            img.color = bin.baseColor;
+        }
+
+        private int[] GenerateWrongAnswers(int correct)
+        {
+            var set = new HashSet<int> { correct };
+            int attempts = 0;
+            while (set.Count < bins.Length && attempts++ < 50)
+            {
+                int w = correct + (Random.Range(0, 2) == 0 ? 1 : -1) * Random.Range(1, 5);
+                if (w > 0 && w != correct) set.Add(w);
+            }
+            set.Remove(correct);
+            return new List<int>(set).ToArray();
         }
     }
 }

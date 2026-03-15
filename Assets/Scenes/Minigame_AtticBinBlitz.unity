@@ -1602,9 +1602,6 @@ MonoBehaviour:
   - {fileID: 218772536}
   - {fileID: 668273828}
   starFilled: {fileID: 0}
-  conveyorSpawn: {fileID: 370000010}
-  conveyorEnd: {fileID: 370000030}
-  itemPrefab: {fileID: 100000, guid: f678901234567890123456789fffffff, type: 3}
   bins:
   - transform: {fileID: 370000170}
     targetLabel: {fileID: 370000120}
@@ -1621,8 +1618,6 @@ MonoBehaviour:
     currentLabel: {fileID: 370000350}
     targetCount: 0
     currentCount: 0
-  conveyorSpeed: 250
-  spawnInterval: 1.2
 --- !u!1 &898758525
 GameObject:
   m_ObjectHideFlags: 0

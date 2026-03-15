@@ -1,164 +1,587 @@
 {
   "entries": [
-    { "key": "app_name",                  "value": "Robot Academy" },
-    { "key": "select_language",           "value": "Select Language" },
-    { "key": "btn_play",                  "value": "Play" },
-    { "key": "btn_next",                  "value": "Next" },
-    { "key": "btn_back",                  "value": "Back" },
-    { "key": "btn_home",                  "value": "Home" },
-    { "key": "btn_replay",                "value": "Play Again" },
-    { "key": "btn_settings",              "value": "Settings" },
-    { "key": "btn_ready",                 "value": "Ready?" },
-    { "key": "btn_start",                 "value": "Start!" },
-    { "key": "btn_parents",              "value": "Parents" },
-    { "key": "btn_characters",           "value": "Characters" },
-
-    { "key": "level_complete_title",      "value": "Great job!" },
-    { "key": "level_select_title",        "value": "Choose a Room" },
-    { "key": "characters_title",          "value": "Robot Team" },
-    { "key": "achievements_title",        "value": "Achievements" },
-
-    { "key": "level_1_name",              "value": "Dusty Bedroom" },
-    { "key": "level_2_name",              "value": "Cluttered Kitchen" },
-    { "key": "level_3_name",              "value": "Messy Living Room" },
-    { "key": "level_4_name",              "value": "Soggy Bathroom" },
-    { "key": "level_5_name",              "value": "Overflowing Garage" },
-    { "key": "level_6_name",              "value": "Tangled Hallway" },
-    { "key": "level_7_name",              "value": "Sunny Backyard" },
-    { "key": "level_8_name",              "value": "Attic Archives" },
-    { "key": "level_9_name",              "value": "Rooftop Garden" },
-    { "key": "level_10_name",             "value": "Grand Hall" },
-    { "key": "level_11_name",             "value": "Secret Lab" },
-
-    { "key": "room_bedroom",              "value": "Bedroom" },
-    { "key": "room_kitchen",              "value": "Kitchen" },
-    { "key": "room_livingroom",           "value": "Living Room" },
-    { "key": "room_bathroom",             "value": "Bathroom" },
-    { "key": "room_garage",               "value": "Garage" },
-    { "key": "room_hallway",              "value": "Hallway" },
-    { "key": "room_backyard",             "value": "Backyard" },
-    { "key": "room_attic",                "value": "Attic" },
-    { "key": "room_rooftop",              "value": "Rooftop" },
-    { "key": "room_grandhall",            "value": "Grand Hall" },
-    { "key": "room_secretlab",            "value": "Secret Lab" },
-
-    { "key": "q_how_many",               "value": "How many are there?" },
-    { "key": "q_addition",               "value": "How many altogether?" },
-    { "key": "q_subtraction",            "value": "How many are left?" },
-    { "key": "q_missing_addition",       "value": "What is missing?" },
-    { "key": "q_missing_subtraction",    "value": "What did we start with?" },
-    { "key": "q_multiplication",         "value": "How many in total?" },
-    { "key": "q_division",               "value": "How many does each get?" },
-    { "key": "q_ordering",               "value": "Which number is missing?" },
-    { "key": "q_count_shapes",           "value": "How many {0}s do you see?" },
-    { "key": "q_groups_total",           "value": "{0}× {1} — how many in total?" },
-
-    { "key": "feedback_try_again",        "value": "Almost! Try once more." },
-    { "key": "feedback_correct_was",      "value": "The correct answer was {0}." },
-    { "key": "streak_label",             "value": "Streak {0}!" },
-    { "key": "hint_button",              "value": "Hint" },
-    { "key": "hint_count",               "value": "({0} left)" },
-
-    { "key": "progress_label",           "value": "{0} / {1}" },
-    { "key": "minigame_unlocked",        "value": "Minigame Unlocked!" },
-
-    { "key": "next_number",              "value": "Find: {0}" },
-    { "key": "find_number",              "value": "Find number {0}!" },
-    { "key": "all_collected",            "value": "All collected!" },
-    { "key": "target_sum",              "value": "Sum: {0}" },
-    { "key": "saved_points",            "value": "Saved: {0} pts" },
-
-    { "key": "sequence_ascending",      "value": "Sort from smallest" },
-    { "key": "sequence_skip",           "value": "Count by {0}" },
-
-    { "key": "shape_triangle",          "value": "Triangle" },
-    { "key": "shape_square",            "value": "Square" },
-    { "key": "shape_circle",            "value": "Circle" },
-    { "key": "shape_rectangle",         "value": "Rectangle" },
-    { "key": "shape_pentagon",          "value": "Pentagon" },
-    { "key": "shape_hexagon",           "value": "Hexagon" },
-
-    { "key": "tap_region_triangle",     "value": "Tap the triangles!" },
-    { "key": "tap_region_square",       "value": "Tap the squares!" },
-    { "key": "tap_region_circle",       "value": "Tap the circles!" },
-    { "key": "tap_region_rectangle",    "value": "Tap the rectangles!" },
-    { "key": "tap_region_pentagon",     "value": "Tap the pentagons!" },
-    { "key": "tap_region_hexagon",      "value": "Tap the hexagons!" },
-
-    { "key": "sticker_collected",       "value": "You collected a sticker: {0}!" },
-    { "key": "parent_dashboard_title",  "value": "Parent Dashboard" },
-    { "key": "parent_pin_prompt",       "value": "Hold the number 7 for 3 seconds" },
-
-    { "key": "session_break_prompt",    "value": "Time for a little break?" },
-    { "key": "btn_keep_playing",        "value": "Keep Playing" },
-    { "key": "btn_take_break",          "value": "Take a Break" },
-
-    { "key": "reteach_Counting1To10",        "value": "Let's count objects together!" },
-    { "key": "reteach_Counting1To20",        "value": "Let's count bigger numbers together!" },
-    { "key": "reteach_AdditionTo10",         "value": "Let's try adding two groups." },
-    { "key": "reteach_SubtractionWithin10",  "value": "Subtracting — how many are left?" },
-    { "key": "reteach_AdditionTo20",         "value": "Let's add bigger numbers together." },
-    { "key": "reteach_SubtractionWithin20",  "value": "Subtracting from bigger numbers." },
-    { "key": "reteach_Multiplication2x5x",   "value": "Multiplication = fast group counting!" },
-    { "key": "reteach_DivisionBy2_3_5",      "value": "Division = sharing equally." },
-    { "key": "reteach_NumberOrdering",       "value": "Let's put numbers in order!" },
-    { "key": "reteach_ShapeCounting",        "value": "Let's count the shapes." },
-
-    { "key": "char_rumble_name",        "value": "Rumble" },
-    { "key": "char_rumble_catchphrase", "value": "Let's zoom through this!" },
-    { "key": "char_xixi_name",          "value": "Xixi" },
-    { "key": "char_xixi_catchphrase",   "value": "I have calculated the optimal path!" },
-    { "key": "char_rocky_name",         "value": "Rocky" },
-    { "key": "char_rocky_catchphrase",  "value": "I've handled tougher messes than this." },
-    { "key": "char_bubbles_name",       "value": "Bubbles" },
-    { "key": "char_bubbles_catchphrase","value": "Wheeeee! More bubbles!" },
-    { "key": "char_max_name",           "value": "Max" },
-    { "key": "char_max_catchphrase",    "value": "Beat your best time — let's go!" },
-    { "key": "char_zara_name",          "value": "Zara" },
-    { "key": "char_zara_catchphrase",   "value": "Every pattern tells a story!" },
-    { "key": "char_turbo_name",         "value": "Turbo" },
-    { "key": "char_turbo_catchphrase",  "value": "Group it, count it, done!" },
-    { "key": "char_pebble_name",        "value": "Professor Pebble" },
-    { "key": "char_pebble_catchphrase", "value": "Ah yes, now let us think about this carefully..." },
-    { "key": "char_luna_name",          "value": "Luna" },
-    { "key": "char_luna_catchphrase",   "value": "Step by step, everything falls into place." },
-
-    { "key": "char_rumble_skill",       "value": "Vacuums at the speed of light!" },
-    { "key": "char_xixi_skill",         "value": "Calculates every step of the route!" },
-    { "key": "char_rocky_skill",        "value": "Nothing can stop him!" },
-    { "key": "char_bubbles_skill",      "value": "Leaves everything sparkling clean!" },
-    { "key": "char_max_skill",          "value": "Beats every record!" },
-    { "key": "char_zara_skill",         "value": "Sees patterns others miss." },
-    { "key": "char_turbo_skill",        "value": "Turbo mode — full speed ahead!" },
-    { "key": "char_pebble_skill",       "value": "Explains every problem step by step." },
-    { "key": "char_luna_skill",         "value": "Step by step toward perfection." },
-
-    { "key": "minigame_instruction_socksortsweep",            "value": "Vacuum the socks in order 1, 2, 3... Watch the right order!" },
-    { "key": "minigame_instruction_crumbcollectcountdown",    "value": "Tap crumb piles in number order before they disappear!" },
-    { "key": "minigame_instruction_cushioncannoncatch",       "value": "Count the cushions and pick the correct sum before it lands!" },
-    { "key": "minigame_instruction_draindefense",             "value": "Stop the ducks from going down the drain! Move to block them." },
-    { "key": "minigame_instruction_boxtowerbuilder",          "value": "Tap two boxes whose numbers add up to the target sum!" },
-    { "key": "minigame_instruction_streameruntanglesprint",   "value": "Solve the subtraction problems before Zara hits the knot!" },
-    { "key": "minigame_instruction_flowerbedfrenzy",          "value": "Count the groups of flowers and pick the correct total!" },
-    { "key": "minigame_instruction_atticbinblitz",            "value": "Swipe items left or right into the correct bins!" },
-    { "key": "minigame_instruction_sequencesprinkler",        "value": "Tap the sprinkler heads in the correct order!" },
-    { "key": "minigame_instruction_grandhallrestoration",     "value": "Tap the correct mosaic region for each falling shape tile!" },
-    { "key": "minigame_instruction_scramblershutdown",        "value": "Solve all 5 panels to shut down the Scrambler machine!" },
-    { "key": "back_button",                                   "value": "← Back" },
-    { "key": "label_time_played",                             "value": "Time played:" },
-    { "key": "label_total_stars",                             "value": "Total stars:" },
-    { "key": "label_topic_accuracy",                          "value": "Accuracy by topic:" },
-    { "key": "topic_Counting1To10",                           "value": "Counting 1–10" },
-    { "key": "topic_Counting1To20",                           "value": "Counting 1–20" },
-    { "key": "topic_AdditionTo10",                            "value": "Addition to 10" },
-    { "key": "topic_SubtractionWithin10",                     "value": "Subtraction within 10" },
-    { "key": "topic_AdditionTo20",                            "value": "Addition to 20" },
-    { "key": "topic_SubtractionWithin20",                     "value": "Subtraction within 20" },
-    { "key": "topic_Multiplication2x5x",                      "value": "Multiplication 2× and 5×" },
-    { "key": "topic_DivisionBy2_3_5",                         "value": "Division by 2, 3, 5" },
-    { "key": "topic_NumberOrdering",                          "value": "Number sequences" },
-    { "key": "topic_ShapeCounting",                           "value": "Shape counting" },
-    { "key": "label_no_data",                                 "value": "No data yet." },
-    { "key": "reset_progress",                                "value": "Reset progress" }
-  ]
+    {
+      "key": "app_name",
+      "value": "Robot Academy"
+    },
+    {
+      "key": "select_language",
+      "value": "Select Language"
+    },
+    {
+      "key": "btn_play",
+      "value": "Play"
+    },
+    {
+      "key": "btn_next",
+      "value": "Next"
+    },
+    {
+      "key": "btn_back",
+      "value": "Back"
+    },
+    {
+      "key": "btn_home",
+      "value": "Home"
+    },
+    {
+      "key": "btn_replay",
+      "value": "Play Again"
+    },
+    {
+      "key": "btn_settings",
+      "value": "Settings"
+    },
+    {
+      "key": "btn_ready",
+      "value": "Ready?"
+    },
+    {
+      "key": "btn_start",
+      "value": "Start!"
+    },
+    {
+      "key": "btn_parents",
+      "value": "Parents"
+    },
+    {
+      "key": "btn_characters",
+      "value": "Characters"
+    },
+    {
+      "key": "level_complete_title",
+      "value": "Great job!"
+    },
+    {
+      "key": "level_select_title",
+      "value": "Choose a Room"
+    },
+    {
+      "key": "characters_title",
+      "value": "Robot Team"
+    },
+    {
+      "key": "achievements_title",
+      "value": "Achievements"
+    },
+    {
+      "key": "level_1_name",
+      "value": "Dusty Bedroom"
+    },
+    {
+      "key": "level_2_name",
+      "value": "Cluttered Kitchen"
+    },
+    {
+      "key": "level_3_name",
+      "value": "Messy Living Room"
+    },
+    {
+      "key": "level_4_name",
+      "value": "Soggy Bathroom"
+    },
+    {
+      "key": "level_5_name",
+      "value": "Overflowing Garage"
+    },
+    {
+      "key": "level_6_name",
+      "value": "Tangled Hallway"
+    },
+    {
+      "key": "level_7_name",
+      "value": "Sunny Backyard"
+    },
+    {
+      "key": "level_8_name",
+      "value": "Attic Archives"
+    },
+    {
+      "key": "level_9_name",
+      "value": "Rooftop Garden"
+    },
+    {
+      "key": "level_10_name",
+      "value": "Grand Hall"
+    },
+    {
+      "key": "level_11_name",
+      "value": "Secret Lab"
+    },
+    {
+      "key": "room_bedroom",
+      "value": "Bedroom"
+    },
+    {
+      "key": "room_kitchen",
+      "value": "Kitchen"
+    },
+    {
+      "key": "room_livingroom",
+      "value": "Living Room"
+    },
+    {
+      "key": "room_bathroom",
+      "value": "Bathroom"
+    },
+    {
+      "key": "room_garage",
+      "value": "Garage"
+    },
+    {
+      "key": "room_hallway",
+      "value": "Hallway"
+    },
+    {
+      "key": "room_backyard",
+      "value": "Backyard"
+    },
+    {
+      "key": "room_attic",
+      "value": "Attic"
+    },
+    {
+      "key": "room_rooftop",
+      "value": "Rooftop"
+    },
+    {
+      "key": "room_grandhall",
+      "value": "Grand Hall"
+    },
+    {
+      "key": "room_secretlab",
+      "value": "Secret Lab"
+    },
+    {
+      "key": "q_how_many",
+      "value": "How many are there?"
+    },
+    {
+      "key": "q_addition",
+      "value": "How many altogether?"
+    },
+    {
+      "key": "q_subtraction",
+      "value": "How many are left?"
+    },
+    {
+      "key": "q_missing_addition",
+      "value": "What is missing?"
+    },
+    {
+      "key": "q_missing_subtraction",
+      "value": "What did we start with?"
+    },
+    {
+      "key": "q_multiplication",
+      "value": "How many in total?"
+    },
+    {
+      "key": "q_division",
+      "value": "How many does each get?"
+    },
+    {
+      "key": "q_ordering",
+      "value": "Which number is missing?"
+    },
+    {
+      "key": "q_count_shapes",
+      "value": "How many {0}s do you see?"
+    },
+    {
+      "key": "q_groups_total",
+      "value": "{0}× {1} — how many in total?"
+    },
+    {
+      "key": "feedback_try_again",
+      "value": "Almost! Try once more."
+    },
+    {
+      "key": "feedback_correct_was",
+      "value": "The correct answer was {0}."
+    },
+    {
+      "key": "streak_label",
+      "value": "Streak {0}!"
+    },
+    {
+      "key": "hint_button",
+      "value": "Hint"
+    },
+    {
+      "key": "hint_count",
+      "value": "({0} left)"
+    },
+    {
+      "key": "progress_label",
+      "value": "{0} / {1}"
+    },
+    {
+      "key": "minigame_unlocked",
+      "value": "Minigame Unlocked!"
+    },
+    {
+      "key": "next_number",
+      "value": "Find: {0}"
+    },
+    {
+      "key": "find_number",
+      "value": "Find number {0}!"
+    },
+    {
+      "key": "all_collected",
+      "value": "All collected!"
+    },
+    {
+      "key": "target_sum",
+      "value": "Sum: {0}"
+    },
+    {
+      "key": "saved_points",
+      "value": "Saved: {0} pts"
+    },
+    {
+      "key": "sequence_ascending",
+      "value": "Sort from smallest"
+    },
+    {
+      "key": "sequence_skip",
+      "value": "Count by {0}"
+    },
+    {
+      "key": "shape_triangle",
+      "value": "Triangle"
+    },
+    {
+      "key": "shape_square",
+      "value": "Square"
+    },
+    {
+      "key": "shape_circle",
+      "value": "Circle"
+    },
+    {
+      "key": "shape_rectangle",
+      "value": "Rectangle"
+    },
+    {
+      "key": "shape_pentagon",
+      "value": "Pentagon"
+    },
+    {
+      "key": "shape_hexagon",
+      "value": "Hexagon"
+    },
+    {
+      "key": "tap_region_triangle",
+      "value": "Tap the triangles!"
+    },
+    {
+      "key": "tap_region_square",
+      "value": "Tap the squares!"
+    },
+    {
+      "key": "tap_region_circle",
+      "value": "Tap the circles!"
+    },
+    {
+      "key": "tap_region_rectangle",
+      "value": "Tap the rectangles!"
+    },
+    {
+      "key": "tap_region_pentagon",
+      "value": "Tap the pentagons!"
+    },
+    {
+      "key": "tap_region_hexagon",
+      "value": "Tap the hexagons!"
+    },
+    {
+      "key": "sticker_collected",
+      "value": "You collected a sticker: {0}!"
+    },
+    {
+      "key": "parent_dashboard_title",
+      "value": "Parent Dashboard"
+    },
+    {
+      "key": "parent_pin_prompt",
+      "value": "Hold the number 7 for 3 seconds"
+    },
+    {
+      "key": "session_break_prompt",
+      "value": "Time for a little break?"
+    },
+    {
+      "key": "btn_keep_playing",
+      "value": "Keep Playing"
+    },
+    {
+      "key": "btn_take_break",
+      "value": "Take a Break"
+    },
+    {
+      "key": "reteach_Counting1To10",
+      "value": "Let's count objects together!"
+    },
+    {
+      "key": "reteach_Counting1To20",
+      "value": "Let's count bigger numbers together!"
+    },
+    {
+      "key": "reteach_AdditionTo10",
+      "value": "Let's try adding two groups."
+    },
+    {
+      "key": "reteach_SubtractionWithin10",
+      "value": "Subtracting — how many are left?"
+    },
+    {
+      "key": "reteach_AdditionTo20",
+      "value": "Let's add bigger numbers together."
+    },
+    {
+      "key": "reteach_SubtractionWithin20",
+      "value": "Subtracting from bigger numbers."
+    },
+    {
+      "key": "reteach_Multiplication2x5x",
+      "value": "Multiplication = fast group counting!"
+    },
+    {
+      "key": "reteach_DivisionBy2_3_5",
+      "value": "Division = sharing equally."
+    },
+    {
+      "key": "reteach_NumberOrdering",
+      "value": "Let's put numbers in order!"
+    },
+    {
+      "key": "reteach_ShapeCounting",
+      "value": "Let's count the shapes."
+    },
+    {
+      "key": "char_rumble_name",
+      "value": "Rumble"
+    },
+    {
+      "key": "char_rumble_catchphrase",
+      "value": "Let's zoom through this!"
+    },
+    {
+      "key": "char_xixi_name",
+      "value": "Xixi"
+    },
+    {
+      "key": "char_xixi_catchphrase",
+      "value": "I have calculated the optimal path!"
+    },
+    {
+      "key": "char_rocky_name",
+      "value": "Rocky"
+    },
+    {
+      "key": "char_rocky_catchphrase",
+      "value": "I've handled tougher messes than this."
+    },
+    {
+      "key": "char_bubbles_name",
+      "value": "Bubbles"
+    },
+    {
+      "key": "char_bubbles_catchphrase",
+      "value": "Wheeeee! More bubbles!"
+    },
+    {
+      "key": "char_max_name",
+      "value": "Max"
+    },
+    {
+      "key": "char_max_catchphrase",
+      "value": "Beat your best time — let's go!"
+    },
+    {
+      "key": "char_zara_name",
+      "value": "Zara"
+    },
+    {
+      "key": "char_zara_catchphrase",
+      "value": "Every pattern tells a story!"
+    },
+    {
+      "key": "char_turbo_name",
+      "value": "Turbo"
+    },
+    {
+      "key": "char_turbo_catchphrase",
+      "value": "Group it, count it, done!"
+    },
+    {
+      "key": "char_pebble_name",
+      "value": "Professor Pebble"
+    },
+    {
+      "key": "char_pebble_catchphrase",
+      "value": "Ah yes, now let us think about this carefully..."
+    },
+    {
+      "key": "char_luna_name",
+      "value": "Luna"
+    },
+    {
+      "key": "char_luna_catchphrase",
+      "value": "Step by step, everything falls into place."
+    },
+    {
+      "key": "char_rumble_skill",
+      "value": "Vacuums at the speed of light!"
+    },
+    {
+      "key": "char_xixi_skill",
+      "value": "Calculates every step of the route!"
+    },
+    {
+      "key": "char_rocky_skill",
+      "value": "Nothing can stop him!"
+    },
+    {
+      "key": "char_bubbles_skill",
+      "value": "Leaves everything sparkling clean!"
+    },
+    {
+      "key": "char_max_skill",
+      "value": "Beats every record!"
+    },
+    {
+      "key": "char_zara_skill",
+      "value": "Sees patterns others miss."
+    },
+    {
+      "key": "char_turbo_skill",
+      "value": "Turbo mode — full speed ahead!"
+    },
+    {
+      "key": "char_pebble_skill",
+      "value": "Explains every problem step by step."
+    },
+    {
+      "key": "char_luna_skill",
+      "value": "Step by step toward perfection."
+    },
+    {
+      "key": "minigame_instruction_socksortsweep",
+      "value": "Vacuum the socks in order 1, 2, 3... Watch the right order!"
+    },
+    {
+      "key": "minigame_instruction_crumbcollectcountdown",
+      "value": "Tap crumb piles in number order before they disappear!"
+    },
+    {
+      "key": "minigame_instruction_cushioncannoncatch",
+      "value": "Count the cushions and pick the correct sum before it lands!"
+    },
+    {
+      "key": "minigame_instruction_draindefense",
+      "value": "Stop the ducks from going down the drain! Move to block them."
+    },
+    {
+      "key": "minigame_instruction_boxtowerbuilder",
+      "value": "Tap two boxes whose numbers add up to the target sum!"
+    },
+    {
+      "key": "minigame_instruction_streameruntanglesprint",
+      "value": "Solve the subtraction problems before Zara hits the knot!"
+    },
+    {
+      "key": "minigame_instruction_flowerbedfrenzy",
+      "value": "Count the groups of flowers and pick the correct total!"
+    },
+    {
+      "key": "minigame_instruction_atticbinblitz",
+      "value": "Swipe items left or right into the correct bins!"
+    },
+    {
+      "key": "minigame_instruction_sequencesprinkler",
+      "value": "Tap the sprinkler heads in the correct order!"
+    },
+    {
+      "key": "minigame_instruction_grandhallrestoration",
+      "value": "Tap the correct mosaic region for each falling shape tile!"
+    },
+    {
+      "key": "minigame_instruction_scramblershutdown",
+      "value": "Solve all 5 panels to shut down the Scrambler machine!"
+    },
+    {
+      "key": "back_button",
+      "value": "← Back"
+    },
+    {
+      "key": "label_time_played",
+      "value": "Time played:"
+    },
+    {
+      "key": "label_total_stars",
+      "value": "Total stars:"
+    },
+    {
+      "key": "label_topic_accuracy",
+      "value": "Accuracy by topic:"
+    },
+    {
+      "key": "topic_Counting1To10",
+      "value": "Counting 1–10"
+    },
+    {
+      "key": "topic_Counting1To20",
+      "value": "Counting 1–20"
+    },
+    {
+      "key": "topic_AdditionTo10",
+      "value": "Addition to 10"
+    },
+    {
+      "key": "topic_SubtractionWithin10",
+      "value": "Subtraction within 10"
+    },
+    {
+      "key": "topic_AdditionTo20",
+      "value": "Addition to 20"
+    },
+    {
+      "key": "topic_SubtractionWithin20",
+      "value": "Subtraction within 20"
+    },
+    {
+      "key": "topic_Multiplication2x5x",
+      "value": "Multiplication 2× and 5×"
+    },
+    {
+      "key": "topic_DivisionBy2_3_5",
+      "value": "Division by 2, 3, 5"
+    },
+    {
+      "key": "topic_NumberOrdering",
+      "value": "Number sequences"
+    },
+    {
+      "key": "topic_ShapeCounting",
+      "value": "Shape counting"
+    },
+    {
+      "key": "label_no_data",
+      "value": "No data yet."
+    },
+    {
+      "key": "reset_progress",
+      "value": "Reset progress"
+    }
+  ],
+  "target_sum": "Target: {0}",
+  "find_number": "Find: {0}",
+  "all_collected": "All collected!",
+  "saved_points": "Saved: {0}",
+  "next_number": "Next: {0}",
+  "back_button": "Back",
+  "session_break_prompt": "Time for a break! Come back soon."
 }
