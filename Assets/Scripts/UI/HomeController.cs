@@ -13,6 +13,7 @@ namespace VacuumVille.UI
         private void Start()
         {
             _breakMonitor = gameObject.AddComponent<SessionBreakMonitor>();
+            gameObject.AddComponent<HomeScreenDecor>();
 
             WireButton("PlayButton",       () => GameManager.Instance.TransitionTo(GameState.LevelSelect));
             WireButton("CharactersButton", () => GameManager.Instance.TransitionTo(GameState.Achievements));
