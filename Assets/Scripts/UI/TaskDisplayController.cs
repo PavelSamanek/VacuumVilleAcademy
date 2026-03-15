@@ -188,7 +188,17 @@ namespace VacuumVille.UI
             _current = MathTaskGenerator.Generate(gm.ActiveLevel.mathTopic, ta);
 
             DisplayProblem(_current);
-            AudioManager.Instance.PlayVoice(_current.voiceLineKey);
+
+            // For numerical equations (addition/subtraction/multiplication/division)
+            // voice the specific numbers: "kolik je 2 plus 2" / "what is 2 plus 2"
+            bool hasEquation = _current.operands != null
+                && _current.operands.Length >= 2
+                && !string.IsNullOrEmpty(_current.operatorSymbol)
+                && _current.format == ProblemFormat.MultipleChoice;
+            if (hasEquation)
+                AudioManager.Instance.PlayEquationVoice(_current.operands, _current.operatorSymbol);
+            else
+                AudioManager.Instance.PlayVoice(_current.voiceLineKey);
         }
 
         private void DisplayProblem(MathProblem p)
@@ -268,11 +278,23 @@ namespace VacuumVille.UI
             Sprite sprite = Resources.Load<Sprite>($"Sprites/{p.visualAssetKey}");
             if (sprite == null) return;
 
+            // Responsive cell size: fewer items → larger icons
+            float cell = p.visualCount <= 5 ? 110f : p.visualCount <= 10 ? 90f : 72f;
+            var grid = visualObjectContainer.GetComponent<GridLayoutGroup>()
+                    ?? visualObjectContainer.AddComponent<GridLayoutGroup>();
+            grid.cellSize       = new Vector2(cell, cell);
+            grid.spacing        = new Vector2(8f, 8f);
+            grid.childAlignment = TextAnchor.MiddleCenter;
+            grid.constraint     = GridLayoutGroup.Constraint.Flexible;
+
             for (int i = 0; i < p.visualCount; i++)
             {
                 var img = Instantiate(visualObjectPrefab, visualObjectContainer.transform);
                 img.gameObject.SetActive(true);
-                img.sprite = sprite;
+                img.sprite        = sprite;
+                img.preserveAspect = true;
+                // Reset any prefab-level scale that may flip the sprite
+                img.transform.localScale = Vector3.one;
             }
         }
 

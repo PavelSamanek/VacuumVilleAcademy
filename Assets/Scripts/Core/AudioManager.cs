@@ -214,6 +214,66 @@ namespace VacuumVille.Core
 
         public bool IsVoicePlaying => voiceSource.isPlaying;
 
+        // ── Equation voice sequence ──────────────────────────────────────────────
+        // Speaks the equation aloud, e.g. "kolik je dva plus dva" (cs-CZ)
+        // or "what is two plus two" (en-US).
+        // Requires clips: eq_prompt, num_0..num_55, op_plus/minus/times/divide
+        // in each locale folder.  Missing clips are silently skipped.
+        public void PlayEquationVoice(int[] operands, string opSymbol)
+        {
+            StopVoice();
+            StartCoroutine(EquationVoiceCoroutine(operands, opSymbol));
+        }
+
+        private IEnumerator EquationVoiceCoroutine(int[] operands, string opSymbol)
+        {
+            string locale = LocalizationManager.Instance?.CurrentLanguage == Data.Language.Czech
+                ? "cs-CZ" : "en-US";
+
+            yield return PlayVoiceClipAndWait($"Audio/Voice/{locale}/eq_prompt");
+            yield return new WaitForSeconds(0.1f);
+
+            if (operands != null && operands.Length >= 1)
+            {
+                yield return PlayVoiceClipAndWait($"Audio/Voice/{locale}/num_{operands[0]}");
+                yield return new WaitForSeconds(0.05f);
+            }
+
+            string opKey = null;
+            if      (opSymbol == "+")                          opKey = "op_plus";
+            else if (opSymbol == "-")                          opKey = "op_minus";
+            else if (opSymbol == "\u00D7" || opSymbol == "x") opKey = "op_times";
+            else if (opSymbol == "\u00F7" || opSymbol == "/") opKey = "op_divide";
+
+            if (opKey != null)
+            {
+                yield return PlayVoiceClipAndWait($"Audio/Voice/{locale}/{opKey}");
+                yield return new WaitForSeconds(0.05f);
+            }
+
+            if (operands != null && operands.Length >= 2)
+                yield return PlayVoiceClipAndWait($"Audio/Voice/{locale}/num_{operands[1]}");
+        }
+
+        private IEnumerator PlayVoiceClipAndWait(string path)
+        {
+            if (!_voiceCache.TryGetValue(path, out AudioClip clip) || clip == null)
+            {
+                clip = Resources.Load<AudioClip>(path);
+                if (clip != null)
+                    _voiceCache[path] = clip;
+                else
+                {
+                    Debug.LogWarning($"[AudioManager] Voice clip not found: {path}");
+                    yield break;
+                }
+            }
+            voiceSource.Stop();
+            voiceSource.clip = clip;
+            voiceSource.Play();
+            while (voiceSource.isPlaying) yield return null;
+        }
+
         // ── Mute All ────────────────────────────────────────────────────────────
 
         public void SetMuteAll(bool mute)
