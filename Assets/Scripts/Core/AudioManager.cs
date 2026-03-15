@@ -60,12 +60,23 @@ namespace VacuumVille.Core
 
         private void LoadSfxClips()
         {
-            if (correctSound       == null) correctSound       = Resources.Load<AudioClip>("Audio/SFX/correct");
-            if (wrongSound         == null) wrongSound         = Resources.Load<AudioClip>("Audio/SFX/wrong");
-            if (levelCompleteSound == null) levelCompleteSound = Resources.Load<AudioClip>("Audio/SFX/level_complete");
-            if (minigameUnlockSound== null) minigameUnlockSound= Resources.Load<AudioClip>("Audio/SFX/minigame_unlock");
-            if (coinSound          == null) coinSound          = Resources.Load<AudioClip>("Audio/SFX/coin");
-            if (buttonClickSound   == null) buttonClickSound   = Resources.Load<AudioClip>("Audio/SFX/button_click");
+            correctSound        = LoadClip("Audio/SFX/correct",         correctSound);
+            wrongSound          = LoadClip("Audio/SFX/wrong",           wrongSound);
+            levelCompleteSound  = LoadClip("Audio/SFX/level_complete",  levelCompleteSound);
+            minigameUnlockSound = LoadClip("Audio/SFX/minigame_unlock", minigameUnlockSound);
+            coinSound           = LoadClip("Audio/SFX/coin",            coinSound);
+            buttonClickSound    = LoadClip("Audio/SFX/button_click",    buttonClickSound);
+        }
+
+        private static AudioClip LoadClip(string path, AudioClip existing)
+        {
+            if (existing != null) return existing;
+            var clip = Resources.Load<AudioClip>(path);
+            if (clip != null)
+                clip.LoadAudioData();
+            else
+                Debug.LogWarning($"[AudioManager] Clip not found at Resources/{path}");
+            return clip;
         }
 
         private void EnsureAudioSources()
@@ -73,19 +84,30 @@ namespace VacuumVille.Core
             if (musicSource == null)
             {
                 musicSource = gameObject.AddComponent<AudioSource>();
-                musicSource.playOnAwake = false;
-                musicSource.loop = true;
+                musicSource.playOnAwake  = false;
+                musicSource.loop         = true;
+                musicSource.spatialBlend = 0f;   // 2D — no distance rolloff
             }
             if (sfxSource == null)
             {
                 sfxSource = gameObject.AddComponent<AudioSource>();
-                sfxSource.playOnAwake = false;
+                sfxSource.playOnAwake  = false;
+                sfxSource.spatialBlend = 0f;
             }
             if (voiceSource == null)
             {
                 voiceSource = gameObject.AddComponent<AudioSource>();
-                voiceSource.playOnAwake = false;
+                voiceSource.playOnAwake  = false;
+                voiceSource.spatialBlend = 0f;
             }
+        }
+
+        private void Start()
+        {
+            Debug.Log($"[AudioManager] Ready — sfxVol={sfxSource?.volume} " +
+                      $"musicVol={musicSource?.volume} voiceVol={voiceSource?.volume} " +
+                      $"correctClip={correctSound != null} wrongClip={wrongSound != null} " +
+                      $"btnClip={buttonClickSound != null} listenerPaused={AudioListener.pause}");
         }
 
         // ── Music ───────────────────────────────────────────────────────────────
@@ -135,13 +157,15 @@ namespace VacuumVille.Core
 
         public void PlaySFX(string resourcePath)
         {
-            // Always re-check: Unity may unload the native clip between scenes
-            // even though the C# wrapper stays in the cache (UnloadUnusedAssets).
+            // Always re-check: Unity may unload native clip between scenes (UnloadUnusedAssets).
             if (!_sfxCache.TryGetValue(resourcePath, out AudioClip clip) || clip == null)
             {
                 clip = Resources.Load<AudioClip>(resourcePath);
                 if (clip != null)
+                {
+                    clip.LoadAudioData();           // ensure PCM data is ready before PlayOneShot
                     _sfxCache[resourcePath] = clip;
+                }
                 else
                 {
                     Debug.LogWarning($"[AudioManager] SFX not found: {resourcePath}");
