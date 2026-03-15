@@ -48,8 +48,31 @@ namespace VacuumVille.Minigames
 
         protected override void OnMinigameBegin()
         {
+            if (targetSumLabel == null) targetSumLabel = CreateTargetLabel();
             NewTargetSum();
             _spawnCoroutine = StartCoroutine(SpawnLoop());
+        }
+
+        private TextMeshProUGUI CreateTargetLabel()
+        {
+            var go = new GameObject("TargetSumLabel");
+            go.transform.SetParent(transform, false);
+            var rt = go.AddComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0f, 0.89f);
+            rt.anchorMax = new Vector2(1f, 0.97f);
+            rt.offsetMin = rt.offsetMax = Vector2.zero;
+            var bg = go.AddComponent<UnityEngine.UI.Image>();
+            bg.color = new Color(0.1f, 0.2f, 0.5f, 0.85f);
+            var tmp = new GameObject("Text").AddComponent<TextMeshProUGUI>();
+            tmp.transform.SetParent(go.transform, false);
+            var trt = tmp.GetComponent<RectTransform>();
+            trt.anchorMin = Vector2.zero; trt.anchorMax = Vector2.one;
+            trt.offsetMin = trt.offsetMax = Vector2.zero;
+            tmp.fontSize = 58f;
+            tmp.fontStyle = FontStyles.Bold;
+            tmp.color = Color.white;
+            tmp.alignment = TextAlignmentOptions.Center;
+            return tmp;
         }
 
         private void NewTargetSum()

@@ -38,8 +38,49 @@ namespace VacuumVille.Minigames
 
         protected override void OnMinigameBegin()
         {
+            if (missesLabel == null) missesLabel = CreateHUDLabel("MissesLabel", new Vector2(0, 340), 42f);
+            if (knotAnswerButtons != null && knotAnswerButtons.Length < 3)
+                EnsureThirdAnswerButton();
             missesLabel.text = $"✗ 0/{MaxMisses}";
             StartCoroutine(RunLoop());
+        }
+
+        private TextMeshProUGUI CreateHUDLabel(string name, Vector2 anchoredPos, float fontSize)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(transform, false);
+            var rt = go.AddComponent<RectTransform>();
+            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.anchoredPosition = anchoredPos;
+            rt.sizeDelta = new Vector2(500, 60);
+            var tmp = go.AddComponent<TextMeshProUGUI>();
+            tmp.fontSize = fontSize;
+            tmp.fontStyle = FontStyles.Bold;
+            tmp.color = new Color(0.9f, 0.2f, 0.2f);
+            tmp.alignment = TextAlignmentOptions.Center;
+            return tmp;
+        }
+
+        private void EnsureThirdAnswerButton()
+        {
+            // Build a 3rd answer button programmatically next to the existing two
+            if (knotAnswerButtons == null || knotAnswerButtons.Length == 0) return;
+            var template = knotAnswerButtons[knotAnswerButtons.Length - 1];
+            var newBtn = Instantiate(template.gameObject, template.transform.parent);
+            newBtn.name = "AnswerBtn_3";
+            var rt = newBtn.GetComponent<RectTransform>();
+            var templateRt = template.GetComponent<RectTransform>();
+            float spacing = templateRt.sizeDelta.x + 20f;
+            rt.anchoredPosition = templateRt.anchoredPosition + new Vector2(spacing, 0);
+
+            var newBtnComp = newBtn.GetComponent<Button>();
+            var newLbl = newBtn.GetComponentInChildren<TextMeshProUGUI>();
+
+            // Grow arrays
+            var btns = new System.Collections.Generic.List<Button>(knotAnswerButtons) { newBtnComp };
+            var lbls = new System.Collections.Generic.List<TextMeshProUGUI>(knotAnswerLabels) { newLbl };
+            knotAnswerButtons = btns.ToArray();
+            knotAnswerLabels = lbls.ToArray();
         }
 
         private IEnumerator RunLoop()

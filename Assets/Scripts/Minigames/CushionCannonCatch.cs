@@ -39,7 +39,27 @@ namespace VacuumVille.Minigames
         protected override void OnMinigameBegin()
         {
             _currentSpeed = initialFallSpeed;
+            EnsurePositions();
             StartNextRound();
+        }
+
+        private void EnsurePositions()
+        {
+            if (cannonLeft  == null) cannonLeft  = CreateAnchor("CannonLeft",  new Vector2(-280,  380));
+            if (cannonRight == null) cannonRight = CreateAnchor("CannonRight", new Vector2( 280,  380));
+            if (mergePoint  == null) mergePoint  = CreateAnchor("MergePoint",  new Vector2(   0,  100));
+            if (landingPoint== null) landingPoint= CreateAnchor("LandingPoint",new Vector2(   0, -380));
+        }
+
+        private Transform CreateAnchor(string name, Vector2 anchoredPos)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(transform, false);
+            var rt = go.AddComponent<RectTransform>();
+            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.anchoredPosition = anchoredPos;
+            rt.sizeDelta = Vector2.zero;
+            return rt;
         }
 
         private void StartNextRound()

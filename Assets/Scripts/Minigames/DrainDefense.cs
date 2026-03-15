@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 using VacuumVille.Core;
 
@@ -43,7 +44,31 @@ namespace VacuumVille.Minigames
         protected override void OnMinigameBegin()
         {
             _cam = Camera.main;
+            if (savedPointsLabel == null) savedPointsLabel = CreateHUDLabel();
             StartCoroutine(SpawnDucks());
+        }
+
+        private TextMeshProUGUI CreateHUDLabel()
+        {
+            var go = new GameObject("SavedPointsLabel");
+            go.transform.SetParent(transform, false);
+            var rt = go.AddComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0f, 0.89f);
+            rt.anchorMax = new Vector2(1f, 0.97f);
+            rt.offsetMin = rt.offsetMax = Vector2.zero;
+            var bg = go.AddComponent<UnityEngine.UI.Image>();
+            bg.color = new Color(0f, 0.5f, 0.7f, 0.8f);
+            var txtGo = new GameObject("Text");
+            txtGo.transform.SetParent(go.transform, false);
+            var trt = txtGo.AddComponent<RectTransform>();
+            trt.anchorMin = Vector2.zero; trt.anchorMax = Vector2.one;
+            trt.offsetMin = trt.offsetMax = Vector2.zero;
+            var tmp = txtGo.AddComponent<TextMeshProUGUI>();
+            tmp.fontSize = 48f;
+            tmp.fontStyle = FontStyles.Bold;
+            tmp.color = Color.white;
+            tmp.alignment = TextAlignmentOptions.Center;
+            return tmp;
         }
 
         private IEnumerator SpawnDucks()

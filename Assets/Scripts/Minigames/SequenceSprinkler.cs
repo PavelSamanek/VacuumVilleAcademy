@@ -43,7 +43,31 @@ namespace VacuumVille.Minigames
 
         protected override void OnMinigameBegin()
         {
+            if (sequenceHintLabel == null) sequenceHintLabel = CreateHintLabel();
             StartCoroutine(RoundLoop());
+        }
+
+        private TextMeshProUGUI CreateHintLabel()
+        {
+            var go = new GameObject("SequenceHintLabel");
+            go.transform.SetParent(transform, false);
+            var rt = go.AddComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0f, 0.88f);
+            rt.anchorMax = new Vector2(1f, 0.96f);
+            rt.offsetMin = rt.offsetMax = Vector2.zero;
+            var bg = go.AddComponent<UnityEngine.UI.Image>();
+            bg.color = new Color(0.2f, 0.5f, 0.8f, 0.8f);
+            var txtGo = new GameObject("Text");
+            txtGo.transform.SetParent(go.transform, false);
+            var trt = txtGo.AddComponent<RectTransform>();
+            trt.anchorMin = Vector2.zero; trt.anchorMax = Vector2.one;
+            trt.offsetMin = trt.offsetMax = Vector2.zero;
+            var tmp = txtGo.AddComponent<TextMeshProUGUI>();
+            tmp.fontSize = 48f;
+            tmp.fontStyle = FontStyles.Bold;
+            tmp.color = Color.white;
+            tmp.alignment = TextAlignmentOptions.Center;
+            return tmp;
         }
 
         private IEnumerator RoundLoop()

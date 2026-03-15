@@ -54,8 +54,32 @@ namespace VacuumVille.Minigames
             _totalTiles = 0;
             foreach (var r in mosaicRegions) _totalTiles += r.totalSlots;
 
+            if (shapeNameLabel == null) shapeNameLabel = CreateHUDLabel("ShapeNameLabel", new Vector2(0, 260), 52f, new Color(0.15f, 0.15f, 0.35f));
             SetupRegionButtons();
             StartCoroutine(TileLoop());
+        }
+
+        private TextMeshProUGUI CreateHUDLabel(string name, Vector2 anchoredPos, float fontSize, Color color)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(transform, false);
+            var rt = go.AddComponent<RectTransform>();
+            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.anchoredPosition = anchoredPos;
+            rt.sizeDelta = new Vector2(600, 70);
+            var bg = go.AddComponent<UnityEngine.UI.Image>();
+            bg.color = new Color(1f, 1f, 1f, 0.85f);
+            var txtGo = new GameObject("Text");
+            txtGo.transform.SetParent(go.transform, false);
+            var trt = txtGo.AddComponent<RectTransform>();
+            trt.anchorMin = Vector2.zero; trt.anchorMax = Vector2.one;
+            trt.offsetMin = trt.offsetMax = Vector2.zero;
+            var tmp = txtGo.AddComponent<TextMeshProUGUI>();
+            tmp.fontSize = fontSize;
+            tmp.fontStyle = FontStyles.Bold;
+            tmp.color = color;
+            tmp.alignment = TextAlignmentOptions.Center;
+            return tmp;
         }
 
         private void SetupRegionButtons()
