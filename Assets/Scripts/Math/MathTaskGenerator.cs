@@ -112,7 +112,7 @@ namespace VacuumVille.Math
                 operatorSymbol = "+",
                 correctAnswer  = correct,
                 choices        = choices,
-                voiceLineKey   = "q_addition",
+                voiceLineKey   = isMissing ? "q_missing_addition" : "q_addition",
                 equationText   = isMissing ? $"? + {b} = {sum}" : $"{a} + {b} = ?"
             };
         }
@@ -134,20 +134,23 @@ namespace VacuumVille.Math
             var choices = GenerateChoices(answer, 0, maxNum);
 
             bool isMissing = diff == Difficulty.Hard && Rng.Next(2) == 0;
+            // Missing: "? - b = answer" (find the minuend)
+            int subCorrect = isMissing ? a : answer;
+            var subChoices = GenerateChoices(subCorrect, 0, maxNum);
 
             return new MathProblem
             {
                 topic          = maxNum <= 10 ? MathTopic.SubtractionWithin10 : MathTopic.SubtractionWithin20,
                 difficulty     = diff,
                 format         = isMissing ? ProblemFormat.FillBlank : ProblemFormat.MultipleChoice,
-                questionTextKey = "q_subtraction",
-                questionTextFallback = $"{a} - {b} = ?",
+                questionTextKey = isMissing ? "q_missing_subtraction" : "q_subtraction",
+                questionTextFallback = isMissing ? $"? - {b} = {answer}" : $"{a} - {b} = ?",
                 operands       = new[] { a, b },
                 operatorSymbol = "-",
-                correctAnswer  = answer,
-                choices        = choices,
-                voiceLineKey   = "q_subtraction",
-                equationText   = $"{a} - {b} = ?"
+                correctAnswer  = subCorrect,
+                choices        = subChoices,
+                voiceLineKey   = isMissing ? "q_missing_subtraction" : "q_subtraction",
+                equationText   = isMissing ? $"? - {b} = {answer}" : $"{a} - {b} = ?"
             };
         }
 

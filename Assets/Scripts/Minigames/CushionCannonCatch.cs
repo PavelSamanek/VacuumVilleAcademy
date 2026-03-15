@@ -79,12 +79,22 @@ namespace VacuumVille.Minigames
 
         private void SetupAnswerButtons()
         {
+            // Ensure the shared parent panel (if any) is active
+            if (answerButtons.Length > 0 && answerButtons[0] != null)
+            {
+                var panel = answerButtons[0].transform.parent;
+                if (panel != null && panel != transform)
+                    panel.gameObject.SetActive(true);
+            }
+
             var choices = GenerateChoices(_correct, 2, 10);
             for (int i = 0; i < answerButtons.Length; i++)
             {
                 int val = choices[i];
                 int idx = i;
+                answerButtons[i].gameObject.SetActive(true);
                 answerLabels[i].text = val.ToString();
+                answerLabels[i].color = new Color(0.1f, 0.1f, 0.2f);
                 answerButtons[i].interactable = true;
                 answerButtons[i].onClick.RemoveAllListeners();
                 answerButtons[i].onClick.AddListener(() => OnAnswerTapped(val));
@@ -101,14 +111,14 @@ namespace VacuumVille.Minigames
             var leftPile = Instantiate(cushionPrefab, transform);
             leftPile.transform.position = cannonLeft.position;
             var leftLbl  = leftPile.GetComponentInChildren<TextMeshProUGUI>();
-            if (leftLbl) leftLbl.text = _a.ToString();
+            if (leftLbl) { leftLbl.text = _a.ToString(); leftLbl.color = new Color(0.1f, 0.1f, 0.2f); }
             MinigameVFX.SpawnPop(this, leftPile.transform);
 
             // Spawn right group
             var rightPile = Instantiate(cushionPrefab, transform);
             rightPile.transform.position = cannonRight.position;
             var rightLbl  = rightPile.GetComponentInChildren<TextMeshProUGUI>();
-            if (rightLbl) rightLbl.text = _b.ToString();
+            if (rightLbl) { rightLbl.text = _b.ToString(); rightLbl.color = new Color(0.1f, 0.1f, 0.2f); }
             MinigameVFX.SpawnPop(this, rightPile.transform);
 
             AudioManager.Instance?.PlaySFX("Audio/SFX/cushioncannon/cannon_launch");
@@ -123,7 +133,7 @@ namespace VacuumVille.Minigames
             _flyingPile = Instantiate(cushionPrefab, transform);
             _flyingPile.transform.position = mergePoint.position;
             var mergeLbl = _flyingPile.GetComponentInChildren<TextMeshProUGUI>();
-            if (mergeLbl) mergeLbl.text = "?";
+            if (mergeLbl) { mergeLbl.text = "?"; mergeLbl.color = new Color(0.1f, 0.1f, 0.2f); }
             MinigameVFX.SpawnPop(this, _flyingPile.transform);
 
             _awaitingAnswer = true;

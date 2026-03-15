@@ -68,7 +68,7 @@ namespace VacuumVille.Minigames
             {
                 var go  = Instantiate(sockPrefab, positions[n - 1], Quaternion.identity, parent);
                 var lbl = go.GetComponentInChildren<TextMeshProUGUI>();
-                if (lbl) lbl.text = n.ToString();
+                if (lbl) { lbl.text = n.ToString(); lbl.color = new Color(0.1f, 0.1f, 0.2f); }
                 _socks.Add(new SockItem { Number = n, Go = go });
                 MinigameVFX.SpawnPop(this, go.transform);
             }

@@ -87,9 +87,13 @@ namespace VacuumVille.Minigames
             var problem = MathTaskGenerator.Generate(topic, ta);
 
             // Display problem
-            panel.problemLabel.text = string.IsNullOrEmpty(problem.questionTextFallback)
-                ? LocalizationManager.Instance.Get(problem.questionTextKey)
-                : problem.questionTextFallback;
+            if (panel.problemLabel != null)
+            {
+                panel.problemLabel.text = string.IsNullOrEmpty(problem.questionTextFallback)
+                    ? LocalizationManager.Instance.Get(problem.questionTextKey)
+                    : problem.questionTextFallback;
+                panel.problemLabel.color = Color.white;
+            }
 
             AudioManager.Instance?.PlaySFX("Audio/SFX/scrambler/panel_hum");
             AudioManager.Instance.PlayVoice(problem.voiceLineKey);
@@ -99,11 +103,21 @@ namespace VacuumVille.Minigames
             var choices = problem.choices;
             bool answered = false;
 
+            // Ensure the shared panel (if any) containing answer buttons is active
+            if (panel.answerButtons.Length > 0 && panel.answerButtons[0] != null)
+            {
+                var btnPanel = panel.answerButtons[0].transform.parent;
+                if (btnPanel != null && btnPanel.gameObject != panel.panelBackground?.gameObject)
+                    btnPanel.gameObject.SetActive(true);
+            }
+
             for (int i = 0; i < panel.answerButtons.Length && i < choices.Length; i++)
             {
                 int val = choices[i];
                 var btn = panel.answerButtons[i];
+                btn.gameObject.SetActive(true);
                 panel.answerLabels[i].text = val.ToString();
+                panel.answerLabels[i].color = new Color(0.1f, 0.1f, 0.2f);
                 btn.interactable = true;
                 btn.onClick.RemoveAllListeners();
                 btn.onClick.AddListener(() =>

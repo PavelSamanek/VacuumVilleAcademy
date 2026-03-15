@@ -130,7 +130,9 @@ namespace VacuumVille.Minigames
                 var head = sprinklerHeads[i];
                 head.assignedNumber = shuffled[i];
                 head.activated      = false;
+                head.button.gameObject.SetActive(true);
                 head.label.text     = shuffled[i].ToString();
+                head.label.color    = new Color(0.1f, 0.1f, 0.2f);
                 if (head.indicator) head.indicator.color = Color.white;
 
                 int idx = i;
@@ -167,7 +169,8 @@ namespace VacuumVille.Minigames
                 AudioManager.Instance?.PlaySFX("Audio/SFX/sprinkler/wrong_splash");
                 if (splashParticles)
                 {
-                    splashParticles.transform.position = vacuumTransform.position;
+                    if (vacuumTransform != null)
+                        splashParticles.transform.position = vacuumTransform.position;
                     splashParticles.Play();
                 }
                 MinigameVFX.ShakeRect(this, (RectTransform)head.button.transform);
@@ -178,6 +181,7 @@ namespace VacuumVille.Minigames
 
         private void MoveVacuumTo(Vector3 target)
         {
+            if (vacuumTransform == null) return;
             target.z = 0;
             StopCoroutine(nameof(SlideTo));
             StartCoroutine(SlideTo(target));
@@ -186,7 +190,7 @@ namespace VacuumVille.Minigames
         private IEnumerator SlideTo(Vector3 target)
         {
             float speed = 6f;
-            while (Vector3.Distance(vacuumTransform.position, target) > 0.1f)
+            while (vacuumTransform != null && Vector3.Distance(vacuumTransform.position, target) > 0.1f)
             {
                 vacuumTransform.position = Vector3.MoveTowards(
                     vacuumTransform.position, target, speed * Time.deltaTime);

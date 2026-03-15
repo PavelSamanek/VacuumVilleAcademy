@@ -126,7 +126,7 @@ namespace VacuumVille.Minigames
                 if (spr != null) img.sprite = spr;
             }
             var lbl = go.GetComponentInChildren<TextMeshProUGUI>();
-            if (lbl) lbl.text = LocalizationManager.Instance.Get($"shape_{region.shapeKey}");
+            if (lbl) { lbl.text = LocalizationManager.Instance.Get($"shape_{region.shapeKey}"); lbl.color = new Color(0.1f, 0.1f, 0.2f); }
 
             if (shapeNameLabel)
                 shapeNameLabel.text = LocalizationManager.Instance.Get($"tap_region_{region.shapeKey}");

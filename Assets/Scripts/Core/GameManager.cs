@@ -67,6 +67,12 @@ namespace VacuumVille.Core
             _sessionStart = DateTime.Now;
             _sessionTimerCoroutine = StartCoroutine(TrackSessionTime());
 
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            var debugGo = new GameObject("[DEBUG] MinigameLauncher");
+            DontDestroyOnLoad(debugGo);
+            debugGo.AddComponent<VacuumVille.DevTools.DebugMinigameLauncher>();
+#endif
+
             // IsBootstrapped = true when Bootstrapper created us mid-scene (editor testing).
             // In that case, stay in the current scene instead of redirecting to LanguageSelect.
             if (!IsBootstrapped)
@@ -244,5 +250,14 @@ namespace VacuumVille.Core
 
         public bool IsLevelUnlocked(int levelIndex)
             => Progress.IsLevelUnlocked(levelIndex, AllLevels);
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        /// <summary>Skip math tasks and jump directly to a minigame scene. Debug only.</summary>
+        public void DebugJumpToMinigame(LevelDefinition level)
+        {
+            ActiveLevel = level;
+            TransitionTo(GameState.Minigame);
+        }
+#endif
     }
 }

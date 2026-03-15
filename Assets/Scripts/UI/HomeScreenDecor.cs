@@ -46,11 +46,10 @@ namespace VacuumVille.UI
             if (_canvas == null) _canvas = FindObjectOfType<Canvas>();
             if (_canvas == null) return;
 
-            BuildBackground();
+            // PersistentBackground handles the gradient, stars, and dots for all scenes.
+            // HomeScreenDecor only adds the floating vacuum robots and logo polish.
             BuildFloatingVacuums();
             SetupLogo();
-            StartCoroutine(StarSpawnLoop());
-            StartCoroutine(DotSpawnLoop());
         }
 
         // ── Logo ─────────────────────────────────────────────────────────────

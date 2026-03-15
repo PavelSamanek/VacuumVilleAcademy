@@ -70,7 +70,9 @@ namespace VacuumVille.Minigames
                 bin.targetCount  = _correctPerBin;
                 bin.currentCount = 0;
                 bin.targetLabel.text  = _correctPerBin.ToString();
-                bin.currentLabel.text = "0";
+                bin.targetLabel.color = Color.white;
+                bin.currentLabel.text  = "0";
+                bin.currentLabel.color = Color.white;
             }
         }
 
@@ -187,7 +189,8 @@ namespace VacuumVille.Minigames
 
             var bin = bins[binIdx];
             bin.currentCount++;
-            bin.currentLabel.text = bin.currentCount.ToString();
+            bin.currentLabel.text  = bin.currentCount.ToString();
+            bin.currentLabel.color = Color.white;
 
             bool overflowed = bin.currentCount > bin.targetCount;
 
@@ -195,7 +198,8 @@ namespace VacuumVille.Minigames
             {
                 // Overflow: reset bin
                 bin.currentCount = 0;
-                bin.currentLabel.text = "0";
+                bin.currentLabel.text  = "0";
+                bin.currentLabel.color = Color.white;
                 AudioManager.Instance.PlayWrong();
                 AudioManager.Instance?.PlaySFX("Audio/SFX/atticbin/bin_overflow");
                 StartCoroutine(FlashBin(bin, Color.red));

@@ -39,10 +39,18 @@ namespace VacuumVille.Minigames
         protected override void OnMinigameBegin()
         {
             AudioManager.Instance?.PlaySFX("Audio/SFX/shared/vacuum_start");
-            if (missesLabel == null) missesLabel = CreateHUDLabel("MissesLabel", new Vector2(0, 340), 42f);
+
+            // Auto-create HUD labels if the scene doesn't have them wired up
+            if (missesLabel   == null) missesLabel   = CreateHUDLabel("MissesLabel",   new Vector2(0,  340), 42f);
+            if (knotProblemText == null) knotProblemText = CreateHUDLabel("KnotProblem", new Vector2(0,  140), 72f);
+
             if (knotAnswerButtons != null && knotAnswerButtons.Length < 3)
                 EnsureThirdAnswerButton();
-            missesLabel.text = $"✗ 0/{MaxMisses}";
+
+            // Ensure answer buttons start hidden until first knot
+            SetKnotPanelVisible(false);
+
+            missesLabel.text = $"X 0/{MaxMisses}";
             StartCoroutine(RunLoop());
         }
 
@@ -53,11 +61,12 @@ namespace VacuumVille.Minigames
             var rt = go.AddComponent<RectTransform>();
             rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
             rt.anchoredPosition = anchoredPos;
-            rt.sizeDelta = new Vector2(500, 60);
+            rt.sizeDelta = new Vector2(600, 80);
             var tmp = go.AddComponent<TextMeshProUGUI>();
             tmp.fontSize = fontSize;
             tmp.fontStyle = FontStyles.Bold;
-            tmp.color = new Color(0.9f, 0.2f, 0.2f);
+            // White for equation text, red for misses label
+            tmp.color = name == "KnotProblem" ? Color.white : new Color(1f, 0.35f, 0.35f);
             tmp.alignment = TextAlignmentOptions.Center;
             return tmp;
         }
@@ -110,10 +119,13 @@ namespace VacuumVille.Minigames
             while (elapsed < knotTimerDuration && !answered)
             {
                 float frac = 1f - (elapsed / knotTimerDuration);
-                knotTimerBar.value = frac;
-                MinigameVFX.TimerUrgencyUpdate(
-                    knotTimerBar.fillRect != null ? knotTimerBar.fillRect.GetComponent<Image>() : null,
-                    frac);
+                if (knotTimerBar != null)
+                {
+                    knotTimerBar.value = frac;
+                    MinigameVFX.TimerUrgencyUpdate(
+                        knotTimerBar.fillRect != null ? knotTimerBar.fillRect.GetComponent<Image>() : null,
+                        frac);
+                }
                 elapsed += Time.deltaTime;
                 yield return null;
 
@@ -149,7 +161,9 @@ namespace VacuumVille.Minigames
             for (int i = 0; i < knotAnswerButtons.Length; i++)
             {
                 int val = choices[i];
+                knotAnswerButtons[i].gameObject.SetActive(true);
                 knotAnswerLabels[i].text = val.ToString();
+                knotAnswerLabels[i].color = new Color(0.1f, 0.1f, 0.2f);
                 knotAnswerButtons[i].onClick.RemoveAllListeners();
                 knotAnswerButtons[i].onClick.AddListener(() => OnKnotAnswer(val));
                 knotAnswerButtons[i].interactable = true;
@@ -192,12 +206,34 @@ namespace VacuumVille.Minigames
         private void UpdateMissesLabel()
         {
             if (missesLabel)
-                missesLabel.text = $"✗ {_misses}/{MaxMisses}";
+                missesLabel.text = $"X {_misses}/{MaxMisses}";
         }
 
         private void SetKnotPanelVisible(bool visible)
         {
-            knotProblemText?.transform.parent.gameObject.SetActive(visible);
+            // Toggle the question text (or its panel, if it sits inside one)
+            if (knotProblemText != null)
+            {
+                var textParent = knotProblemText.transform.parent;
+                if (textParent != null && textParent != transform)
+                    textParent.gameObject.SetActive(visible);
+                else
+                    knotProblemText.gameObject.SetActive(visible);
+            }
+
+            if (knotAnswerButtons == null) return;
+
+            // Also activate the button panel if buttons share one that isn't the root
+            if (knotAnswerButtons.Length > 0 && knotAnswerButtons[0] != null)
+            {
+                var btnPanel = knotAnswerButtons[0].transform.parent;
+                if (btnPanel != null && btnPanel != transform)
+                    btnPanel.gameObject.SetActive(visible);
+            }
+
+            // Toggle each button individually
+            foreach (var btn in knotAnswerButtons)
+                if (btn != null) btn.gameObject.SetActive(visible);
         }
 
         private static int[] GenerateChoices(int correct, int min, int max)

@@ -46,20 +46,21 @@
     { "key": "q_addition",               "value": "Kolik je dohromady?" },
     { "key": "q_subtraction",            "value": "Kolik zbylo?" },
     { "key": "q_missing_addition",       "value": "Co chybí?" },
+    { "key": "q_missing_subtraction",    "value": "Kolik jsme měli na začátku?" },
     { "key": "q_multiplication",         "value": "Kolik je celkem?" },
     { "key": "q_division",               "value": "Kolik dostane každý?" },
     { "key": "q_ordering",               "value": "Které číslo chybí?" },
     { "key": "q_count_shapes",           "value": "Kolik {0} vidíš?" },
-    { "key": "q_groups_total",           "value": "{0} skupin po {1} — kolik celkem?" },
+    { "key": "q_groups_total",           "value": "{0}× {1} — kolik celkem?" },
 
     { "key": "feedback_try_again",        "value": "Skoro! Zkus znovu." },
     { "key": "feedback_correct_was",      "value": "Správná odpověď byla {0}." },
-    { "key": "streak_label",             "value": "Série {0}! 🔥" },
+    { "key": "streak_label",             "value": "Série {0}!" },
     { "key": "hint_button",              "value": "Nápověda" },
     { "key": "hint_count",               "value": "({0} zbývá)" },
 
     { "key": "progress_label",           "value": "{0} / {1}" },
-    { "key": "minigame_unlocked",        "value": "Minhra odemčena!" },
+    { "key": "minigame_unlocked",        "value": "Minihra odemčena!" },
 
     { "key": "next_number",              "value": "Najdi: {0}" },
     { "key": "find_number",              "value": "Najdi číslo {0}!" },
@@ -88,7 +89,7 @@
     { "key": "parent_dashboard_title",  "value": "Přehled pro rodiče" },
     { "key": "parent_pin_prompt",       "value": "Podrž číslo 7 po dobu 3 sekund" },
 
-    { "key": "session_break_prompt",    "value": "Mám vysvětlit přestávku?" },
+    { "key": "session_break_prompt",    "value": "Čas na přestávku?" },
     { "key": "btn_keep_playing",        "value": "Hrát dál" },
     { "key": "btn_take_break",          "value": "Udělat přestávku" },
 
@@ -132,7 +133,7 @@
     { "key": "char_pebble_skill",       "value": "Vysvětlí každý příklad krok za krokem." },
     { "key": "char_luna_skill",         "value": "Krok za krokem vede k dokonalosti." },
 
-    { "key": "minigame_instruction_socksortsweep",            "value": "Vysaj ponožky v pořadí 1, 2, 3... Dej pozor na správné pořadí!" },
+    { "key": "minigame_instruction_socksortsweep",            "value": "Vysaj ponožky ve správném pořadí: 1, 2, 3..." },
     { "key": "minigame_instruction_crumbcollectcountdown",    "value": "Klepni na hromádky v číselném pořadí než zmizí!" },
     { "key": "minigame_instruction_cushioncannoncatch",       "value": "Spočítej polštáře a vyber správný součet rychle!" },
     { "key": "minigame_instruction_draindefense",             "value": "Zabraň kachničkám odtéct do odpadu! Pohybuj se a blokuj odtoky." },
@@ -142,7 +143,7 @@
     { "key": "minigame_instruction_atticbinblitz",            "value": "Přesuň předměty do správných košů přejetím doleva nebo doprava!" },
     { "key": "minigame_instruction_sequencesprinkler",        "value": "Klepej na postřikovače ve správném pořadí!" },
     { "key": "minigame_instruction_grandhallrestoration",     "value": "Klepni na správnou část mozaiky pro každý padající tvar!" },
-    { "key": "minigame_instruction_scramblershutdown",        "value": "Vyřeš všech 5 panelů a vypni Matlač stroj!" },
+    { "key": "minigame_instruction_scramblershutdown",        "value": "Vyřeš všech 5 panelů a vypni Matlače!" },
     { "key": "back_button",                                   "value": "← Zpět" },
     { "key": "label_time_played",                             "value": "Čas hraní:" },
     { "key": "label_total_stars",                             "value": "Celkem hvězd:" },

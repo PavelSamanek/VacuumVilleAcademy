@@ -92,7 +92,7 @@ namespace VacuumVille.Minigames
             var go  = Instantiate(duckPrefab, transform); // must be child of Canvas to render
             go.transform.position = new Vector3(spawnX, spawnY, 0);
             var lbl = go.GetComponentInChildren<TextMeshProUGUI>();
-            if (lbl) lbl.text = points.ToString();
+            if (lbl) { lbl.text = points.ToString(); lbl.color = new Color(0.1f, 0.1f, 0.2f); }
             MinigameVFX.SpawnPop(this, go.transform);
 
             _activeDucks.Add(new DuckInstance { Go = go, Points = points, TargetDrain = drain });

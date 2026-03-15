@@ -90,6 +90,10 @@ namespace VacuumVille.UI
             svRt.anchorMin = Vector2.zero;
             svRt.anchorMax = Vector2.one;
             svRt.offsetMin = svRt.offsetMax = Vector2.zero;
+            // White card so dark text is readable on the dark themed background
+            var svBg = sv.AddComponent<Image>();
+            svBg.color = new Color(0.96f, 0.96f, 0.99f, 0.97f);
+            svBg.raycastTarget = false;
 
             var scrollRect = sv.AddComponent<ScrollRect>();
             scrollRect.horizontal = false;
@@ -143,7 +147,7 @@ namespace VacuumVille.UI
 
             string starsText = loc != null
                 ? loc.GetPlural("stars_total", progress.totalStars)
-                : $"{progress.totalStars} ★";
+                : $"{progress.totalStars} \u25CF";
             AddStatRow(content.transform,
                 loc?.Get("label_total_stars") ?? "Celkem hvězd:", starsText);
 

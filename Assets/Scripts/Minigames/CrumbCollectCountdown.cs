@@ -21,6 +21,8 @@ namespace VacuumVille.Minigames
 
         private int _targetNumber = 1;
         private readonly Dictionary<int, GameObject> _activeCrumbs = new();
+        private readonly Dictionary<int, int> _crumbSlotIndex = new(); // number → slot index
+        private readonly HashSet<int> _occupiedSlots = new();
         private Camera _cam;
 
         protected override float TimeLimit => 120f;
@@ -60,11 +62,21 @@ namespace VacuumVille.Minigames
         {
             if (_activeCrumbs.ContainsKey(number)) return;
 
-            var slot = gridSlots[Random.Range(0, gridSlots.Length)];
-            var go   = Instantiate(crumbPilePrefab, transform); // parent to Canvas so UI renders
-            go.transform.position = slot.position;
-            var lbl  = go.GetComponentInChildren<TextMeshProUGUI>();
-            if (lbl) lbl.text = number.ToString();
+            // Build list of free slot indices
+            var freeSlots = new List<int>();
+            for (int s = 0; s < gridSlots.Length; s++)
+                if (!_occupiedSlots.Contains(s)) freeSlots.Add(s);
+
+            if (freeSlots.Count == 0) return; // no room right now
+
+            int slotIdx = freeSlots[Random.Range(0, freeSlots.Count)];
+            _occupiedSlots.Add(slotIdx);
+            _crumbSlotIndex[number] = slotIdx;
+
+            var go = Instantiate(crumbPilePrefab, transform);
+            go.transform.position = gridSlots[slotIdx].position;
+            var lbl = go.GetComponentInChildren<TextMeshProUGUI>();
+            if (lbl) { lbl.text = number.ToString(); lbl.color = new Color(0.1f, 0.1f, 0.2f); }
 
             _activeCrumbs[number] = go;
             MinigameVFX.SpawnPop(this, go.transform);
@@ -78,10 +90,20 @@ namespace VacuumVille.Minigames
             {
                 Destroy(_activeCrumbs[number]);
                 _activeCrumbs.Remove(number);
+                FreeSlot(number);
                 AudioManager.Instance?.PlaySFX("Audio/SFX/crumbcollect/crumb_despawn");
                 // Respawn soon
                 yield return new WaitForSeconds(0.5f);
                 if (GameActive && number >= _targetNumber) SpawnCrumb(number);
+            }
+        }
+
+        private void FreeSlot(int number)
+        {
+            if (_crumbSlotIndex.TryGetValue(number, out int idx))
+            {
+                _occupiedSlots.Remove(idx);
+                _crumbSlotIndex.Remove(number);
             }
         }
 
@@ -150,6 +172,7 @@ namespace VacuumVille.Minigames
                 pos = go.transform.position;
                 MinigameVFX.CollectBurst(this, go, new Color(0.412f, 0.941f, 0.682f));
                 _activeCrumbs.Remove(number);
+                FreeSlot(number);
             }
 
             MinigameVFX.PulseRing(this, pos, new Color(0.412f, 0.941f, 0.682f));

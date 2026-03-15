@@ -46,15 +46,16 @@
     { "key": "q_addition",               "value": "How many altogether?" },
     { "key": "q_subtraction",            "value": "How many are left?" },
     { "key": "q_missing_addition",       "value": "What is missing?" },
+    { "key": "q_missing_subtraction",    "value": "What did we start with?" },
     { "key": "q_multiplication",         "value": "How many in total?" },
     { "key": "q_division",               "value": "How many does each get?" },
     { "key": "q_ordering",               "value": "Which number is missing?" },
     { "key": "q_count_shapes",           "value": "How many {0}s do you see?" },
-    { "key": "q_groups_total",           "value": "{0} groups of {1} — how many total?" },
+    { "key": "q_groups_total",           "value": "{0}× {1} — how many in total?" },
 
     { "key": "feedback_try_again",        "value": "Almost! Try once more." },
     { "key": "feedback_correct_was",      "value": "The correct answer was {0}." },
-    { "key": "streak_label",             "value": "Streak {0}! 🔥" },
+    { "key": "streak_label",             "value": "Streak {0}!" },
     { "key": "hint_button",              "value": "Hint" },
     { "key": "hint_count",               "value": "({0} left)" },
 

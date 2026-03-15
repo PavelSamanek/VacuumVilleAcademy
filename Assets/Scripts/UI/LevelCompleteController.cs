@@ -24,7 +24,10 @@ namespace VacuumVille.UI
             var gm  = GameManager.Instance;
             var lp  = gm.Progress.GetOrCreateLevel(gm.ActiveLevel.levelIndex);
 
-            titleText.text = LocalizationManager.Instance.Get("level_complete_title");
+            titleText.text  = LocalizationManager.Instance.Get("level_complete_title");
+            titleText.color = Color.white;
+            if (coinsEarnedText != null) coinsEarnedText.color = Color.white;
+            if (stickerPopup    != null) stickerPopup.color    = new Color(1f, 0.9f, 0.4f); // gold
 
             AudioManager.Instance.PlayLevelComplete();
             confettiAnimator?.SetTrigger("Play");

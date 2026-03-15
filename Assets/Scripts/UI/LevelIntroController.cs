@@ -32,9 +32,12 @@ namespace VacuumVille.UI
 
             // Set level name
             if (titleLabel != null && gm.ActiveLevel != null)
-                titleLabel.text = LocalizationManager.Instance != null
+            {
+                titleLabel.text  = LocalizationManager.Instance != null
                     ? LocalizationManager.Instance.Get(gm.ActiveLevel.levelNameKey)
                     : gm.ActiveLevel.levelNameKey;
+                titleLabel.color = Color.white;
+            }
 
             // Auto-find buttons
             if (startButton == null) startButton = FindButton("StartButton");

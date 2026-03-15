@@ -53,6 +53,9 @@ namespace VacuumVille.UI
         [SerializeField] private GameObject reteachPanel;
         [SerializeField] private TextMeshProUGUI reteachText;
 
+        // 3D badges — one per choice button, auto-created in Start
+        private NumberBadge3D[] _badges;
+
         // State
         private MathProblem _current;
         private int _attemptCount;
@@ -65,12 +68,20 @@ namespace VacuumVille.UI
         // Wrong answer exclusion for hint
         private readonly HashSet<int> _excludedChoices = new();
 
-        private static readonly Color ColorDefault  = new Color(0.13f, 0.59f, 0.95f);  // #2196F3 blue
+        private Color _colorDefault = new Color(0.13f, 0.59f, 0.95f); // updated per level theme
         private static readonly Color ColorCorrect  = new Color(0.41f, 0.94f, 0.67f);  // #69F0AE
         private static readonly Color ColorWrong    = new Color(1f,   0.57f, 0f);      // #FF9100
 
+        private void RefreshThemeColor()
+        {
+            var gm = GameManager.Instance;
+            if (gm != null && gm.ActiveLevel != null)
+                _colorDefault = PersistentBackground.GetButtonColorForTopic(gm.ActiveLevel.mathTopic);
+        }
+
         private void Start()
         {
+            RefreshThemeColor();
             if (backButton == null)
             {
                 var go = GameObject.Find("BackButton");
@@ -80,6 +91,17 @@ namespace VacuumVille.UI
             {
                 backButton.onClick.RemoveAllListeners();
                 backButton.onClick.AddListener(GoBack);
+            }
+
+            // Ensure text is readable on any background
+            EnsureTextReadability();
+
+            // Attach 3D badge component to each choice button
+            _badges = new NumberBadge3D[choiceButtons.Length];
+            for (int i = 0; i < choiceButtons.Length; i++)
+            {
+                _badges[i] = choiceButtons[i].GetComponent<NumberBadge3D>()
+                          ?? choiceButtons[i].gameObject.AddComponent<NumberBadge3D>();
             }
 
             UpdateProgressBar();
@@ -104,6 +126,7 @@ namespace VacuumVille.UI
         {
             if (_inputLocked) return;
 
+            RefreshThemeColor();
             _excludedChoices.Clear();
             _attemptCount = 0;
             _inputLocked  = false;
@@ -151,10 +174,15 @@ namespace VacuumVille.UI
                 int answer = p.choices[i];
                 int idx    = i;
                 choiceLabels[i].text = answer.ToString();
+                if (_badges != null && i < _badges.Length && _badges[i] != null)
+                {
+                    _badges[i].SetNumber(answer.ToString());
+                    _badges[i].SetColor(_colorDefault);
+                }
                 choiceButtons[i].onClick.RemoveAllListeners();
                 choiceButtons[i].onClick.AddListener(() => OnChoiceTapped(idx, answer));
                 choiceButtons[i].interactable = true;
-                SetButtonColor(i, ColorDefault);
+                SetButtonColor(i, _colorDefault);
             }
 
             feedbackText.text = "";
@@ -205,9 +233,14 @@ namespace VacuumVille.UI
             bool firstAttempt = _attemptCount == 1;
             SetButtonColor(buttonIndex, ColorCorrect);
 
-            AudioManager.Instance.PlayCorrect();
+            // Trigger 3D explosion on tapped badge
+            if (_badges != null && buttonIndex < _badges.Length && _badges[buttonIndex] != null)
+                _badges[buttonIndex].ExplodeCorrect();
+            else
+                AudioManager.Instance.PlayCorrect();
+
             if (correctParticles) correctParticles.SetActive(true);
-            characterAnimator?.SetTrigger("Cheer");
+            if (characterAnimator != null) characterAnimator.SetTrigger("Cheer");
 
             _streak++;
             UpdateStreakDisplay();
@@ -300,7 +333,7 @@ namespace VacuumVille.UI
             foreach (var btn in choiceButtons)
             {
                 btn.interactable = true;
-                SetButtonColor(Array.IndexOf(choiceButtons, btn), ColorDefault);
+                SetButtonColor(Array.IndexOf(choiceButtons, btn), _colorDefault);
             }
         }
 
@@ -308,6 +341,8 @@ namespace VacuumVille.UI
         {
             var img = choiceButtons[index].GetComponent<Image>();
             if (img) img.color = color;
+            if (_badges != null && index < _badges.Length && _badges[index] != null)
+                _badges[index].SetColor(color);
         }
 
         private void CheckAdaptiveDifficulty()
@@ -346,6 +381,54 @@ namespace VacuumVille.UI
                 yield return null;
             }
             t.localPosition = origin;
+        }
+
+        // ── Text readability ─────────────────────────────────────────────────────
+
+        private void EnsureTextReadability()
+        {
+            // Force white text so it reads clearly on all themed dark backgrounds.
+            SetReadable(questionText,  bold: true);
+            SetReadable(operandAText,  bold: true);
+            SetReadable(operatorText,  bold: true);
+            SetReadable(operandBText,  bold: false);
+            SetReadable(feedbackText,  bold: false);
+            SetReadable(progressLabel, bold: false);
+            SetReadable(streakLabel,   bold: true);
+
+            // Add a semi-transparent dark card behind the question area so text
+            // is legible on any background without touching TMP materials.
+            AddContentCard();
+        }
+
+        private void AddContentCard()
+        {
+            var canvas = GetComponentInParent<Canvas>();
+            if (canvas == null) return;
+
+            // Only add once
+            if (canvas.transform.Find("ContentCard") != null) return;
+
+            var go = new GameObject("ContentCard", typeof(RectTransform), typeof(UnityEngine.UI.Image));
+            go.transform.SetParent(canvas.transform, false);
+            go.transform.SetAsFirstSibling();   // behind all content
+
+            var rt = go.GetComponent<RectTransform>();
+            rt.anchorMin        = new Vector2(0f, 0.25f);   // covers top 75 % of screen
+            rt.anchorMax        = new Vector2(1f, 1.00f);
+            rt.offsetMin        = Vector2.zero;
+            rt.offsetMax        = Vector2.zero;
+
+            var img = go.GetComponent<UnityEngine.UI.Image>();
+            img.color           = new Color(0f, 0f, 0f, 0.45f);
+            img.raycastTarget   = false;
+        }
+
+        private static void SetReadable(TMP_Text t, bool bold)
+        {
+            if (t == null) return;
+            t.color = Color.white;
+            if (bold) t.fontStyle |= TMPro.FontStyles.Bold;
         }
 
         // Fix for Array.IndexOf in Unity (System.Array)

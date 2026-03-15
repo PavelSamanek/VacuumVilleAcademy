@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using VacuumVille.Core;
+using VacuumVille.Data;
 
 namespace VacuumVille.Minigames
 {
@@ -40,7 +41,87 @@ namespace VacuumVille.Minigames
         protected override void OnMinigameBegin()
         {
             AudioManager.Instance?.PlaySFX("Audio/SFX/shared/vacuum_start");
+            EnsureLayout();
             StartCoroutine(RowLoop());
+        }
+
+        private void EnsureLayout()
+        {
+            // Question label — top strip
+            if (rowQuestionLabel == null)
+            {
+                var go = new GameObject("RowQuestionLabel");
+                go.transform.SetParent(transform, false);
+                var rt = go.AddComponent<RectTransform>();
+                rt.anchorMin = new Vector2(0f, 0.78f);
+                rt.anchorMax = new Vector2(1f, 0.92f);
+                rt.offsetMin = rt.offsetMax = Vector2.zero;
+                var bg = go.AddComponent<Image>();
+                bg.color = new Color(0f, 0f, 0f, 0.45f);
+                bg.raycastTarget = false;
+                var txtGo = new GameObject("Text");
+                txtGo.transform.SetParent(go.transform, false);
+                var trt = txtGo.AddComponent<RectTransform>();
+                trt.anchorMin = Vector2.zero; trt.anchorMax = Vector2.one;
+                trt.offsetMin = trt.offsetMax = Vector2.zero;
+                rowQuestionLabel = txtGo.AddComponent<TextMeshProUGUI>();
+                rowQuestionLabel.fontSize = 52f;
+                rowQuestionLabel.fontStyle = FontStyles.Bold;
+                rowQuestionLabel.color = Color.white;
+                rowQuestionLabel.alignment = TextAlignmentOptions.Center;
+            }
+
+            // Garden grid — middle strip
+            if (gardenGrid == null)
+            {
+                var go = new GameObject("GardenGrid");
+                go.transform.SetParent(transform, false);
+                var rt = go.AddComponent<RectTransform>();
+                rt.anchorMin = new Vector2(0.03f, 0.22f);
+                rt.anchorMax = new Vector2(0.97f, 0.75f);
+                rt.offsetMin = rt.offsetMax = Vector2.zero;
+                gardenGrid = go.AddComponent<GridLayoutGroup>();
+                gardenGrid.constraint      = GridLayoutGroup.Constraint.FixedColumnCount;
+                gardenGrid.constraintCount = gridColumns;
+                gardenGrid.spacing         = new Vector2(10, 10);
+                gardenGrid.padding         = new RectOffset(10, 10, 10, 10);
+                gardenGrid.childAlignment  = TextAnchor.UpperCenter;
+                gardenGrid.cellSize        = new Vector2(70, 70);
+            }
+
+            // Answer buttons — bottom strip, positioned directly with anchors (no layout group)
+            if (answerButtons == null || answerButtons.Length == 0)
+            {
+                answerButtons = new Button[3];
+                answerLabels  = new TextMeshProUGUI[3];
+                float[] xMin = { 0.02f, 0.36f, 0.70f };
+                float[] xMax = { 0.32f, 0.66f, 0.98f };
+                for (int i = 0; i < 3; i++)
+                {
+                    var btn = new GameObject($"AnswerBtn_{i}");
+                    btn.transform.SetParent(transform, false);
+                    var brt = btn.AddComponent<RectTransform>();
+                    brt.anchorMin = new Vector2(xMin[i], 0.02f);
+                    brt.anchorMax = new Vector2(xMax[i], 0.19f);
+                    brt.offsetMin = brt.offsetMax = Vector2.zero;
+                    var img = btn.AddComponent<Image>();
+                    img.color = new Color(0.13f, 0.59f, 0.95f);
+                    var b = btn.AddComponent<Button>();
+                    b.targetGraphic = img;
+                    var lGo = new GameObject("Label");
+                    lGo.transform.SetParent(btn.transform, false);
+                    var lrt = lGo.AddComponent<RectTransform>();
+                    lrt.anchorMin = Vector2.zero; lrt.anchorMax = Vector2.one;
+                    lrt.offsetMin = lrt.offsetMax = Vector2.zero;
+                    var tmp = lGo.AddComponent<TextMeshProUGUI>();
+                    tmp.fontSize = 60f;
+                    tmp.fontStyle = FontStyles.Bold;
+                    tmp.color = Color.white;
+                    tmp.alignment = TextAlignmentOptions.Center;
+                    answerButtons[i] = b;
+                    answerLabels[i]  = tmp;
+                }
+            }
         }
 
         private IEnumerator RowLoop()
@@ -53,8 +134,17 @@ namespace VacuumVille.Minigames
             CompleteEarly();
         }
 
+        private void ClearGrid()
+        {
+            foreach (var cell in _gridCells)
+                if (cell != null) Destroy(cell);
+            _gridCells.Clear();
+        }
+
         private IEnumerator PresentRow()
         {
+            ClearGrid();
+
             // Pick multiplication fact from 2x or 5x table
             int multiplier = Random.Range(0, 2) == 0 ? 2 : 5;
             int groups      = Random.Range(1, 7);
@@ -73,8 +163,9 @@ namespace VacuumVille.Minigames
             }
 
             // Show question
-            rowQuestionLabel.text = LocalizationManager.Instance.Get(
-                "q_groups_total", _groupCount, _groupSize);
+            if (rowQuestionLabel != null)
+                rowQuestionLabel.text = LocalizationManager.Instance.Get(
+                    "q_groups_total", _groupCount, _groupSize);
             AudioManager.Instance.PlayVoice("q_multiplication");
 
             SetupAnswerButtons();
@@ -101,16 +192,28 @@ namespace VacuumVille.Minigames
 
         private void SetupAnswerButtons()
         {
+            // Pick a button color that contrasts with the current background.
+            // For green-heavy themes (Multiplication) the theme color blends in,
+            // so we use orange as a strong complement.
+            var topic = GameManager.Instance?.ActiveLevel?.mathTopic
+                        ?? VacuumVille.Data.MathTopic.Multiplication2x5x;
+            Color themeBtn = PersistentBackground.GetButtonColorForTopic(topic);
+            // Green theme → switch to orange for contrast on green background
+            bool isGreenTheme = topic == VacuumVille.Data.MathTopic.Multiplication2x5x;
+            Color btnColor = isGreenTheme ? new Color(1f, 0.55f, 0.10f) : themeBtn;
+
             var choices = GenerateChoices(_correctAnswer, 2, 50);
             for (int i = 0; i < answerButtons.Length; i++)
             {
                 int val = choices[i];
+                answerButtons[i].gameObject.SetActive(true);
                 answerLabels[i].text = val.ToString();
+                answerLabels[i].color = Color.white;
                 answerButtons[i].onClick.RemoveAllListeners();
                 answerButtons[i].onClick.AddListener(() => OnAnswerTapped(val));
                 answerButtons[i].interactable = true;
                 var img = answerButtons[i].GetComponent<Image>();
-                if (img) img.color = Color.white;
+                if (img) img.color = btnColor;
             }
         }
 

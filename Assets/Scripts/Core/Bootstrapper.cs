@@ -30,6 +30,11 @@ namespace VacuumVille.Core
             Object.DontDestroyOnLoad(audioGo);
             audioGo.AddComponent<AudioManager>();
 
+            // PersistentBackground — gradient + ambient particles behind every scene
+            var bgGo = new GameObject("[PersistentBackground]");
+            Object.DontDestroyOnLoad(bgGo);
+            bgGo.AddComponent<PersistentBackground>();
+
             // GameManager (last — it references the others)
             var gmGo = new GameObject("[GameManager]");
             Object.DontDestroyOnLoad(gmGo);

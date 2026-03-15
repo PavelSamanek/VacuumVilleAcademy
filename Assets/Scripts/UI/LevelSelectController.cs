@@ -202,7 +202,8 @@ namespace VacuumVille.UI
             sr.offsetMax = new Vector2(-16f,  0f);
 
             var t = sg.AddComponent<TextMeshProUGUI>();
-            t.SetText(new string('★', stars) + new string('☆', 3 - stars));
+            // Use ASCII-safe dots to avoid missing-glyph warnings with LiberationSans
+            t.SetText(new string('\u25CF', stars) + new string('\u25CB', 3 - stars));
             t.fontSize  = 28f;
             t.color     = new Color(1f, 0.85f, 0.1f);
             t.alignment = TextAlignmentOptions.MidlineRight;

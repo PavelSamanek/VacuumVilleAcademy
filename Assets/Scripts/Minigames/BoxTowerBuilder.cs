@@ -114,7 +114,7 @@ namespace VacuumVille.Minigames
             var go  = Instantiate(boxPrefab, transform); // parent to Canvas so UI renders
             go.transform.position = new Vector3(xPos, spawnLine.position.y, 0);
             var lbl = go.GetComponentInChildren<TextMeshProUGUI>();
-            if (lbl) lbl.text = num.ToString();
+            if (lbl) { lbl.text = num.ToString(); lbl.color = new Color(0.1f, 0.1f, 0.2f); }
 
             var btn = go.GetComponentInChildren<Button>();
             var item = new BoxItem { Number = num, Go = go };
@@ -219,7 +219,6 @@ namespace VacuumVille.Minigames
                 box.Go.transform.position.x,
                 stackLine.position.y + _stackHeight * 80f, 0);
             _stackHeight++;
-            AudioManager.Instance.PlaySFX(null);
 
             if (_stackHeight >= maxStackHeight)
             {
