@@ -29,6 +29,15 @@ namespace VacuumVille.UI
             if (coinsEarnedText != null) coinsEarnedText.color = Color.white;
             if (stickerPopup    != null) stickerPopup.color    = new Color(1f, 0.9f, 0.4f); // gold
 
+            // Set button labels via localization (strips any unsupported icon characters)
+            SetButtonLabel(replayButton,    "btn_replay");
+            SetButtonLabel(homeButton,      "btn_home");
+            SetButtonLabel(nextLevelButton, "btn_next");
+
+            // Generate star sprites procedurally if not assigned in Inspector
+            if (starFilled == null) starFilled = CreateStarSprite(filled: true);
+            if (starEmpty  == null) starEmpty  = CreateStarSprite(filled: false);
+
             AudioManager.Instance.PlayLevelComplete();
             confettiAnimator?.SetTrigger("Play");
 
@@ -36,7 +45,8 @@ namespace VacuumVille.UI
 
             int coins = 5 + lp.stars * 10;
             gm.Progress.coins += coins;
-            coinsEarnedText.text = LocalizationManager.Instance.GetPlural("coins_earned", coins);
+            if (coinsEarnedText != null)
+                coinsEarnedText.text = LocalizationManager.Instance.GetPlural("coins_earned", coins);
 
             if (lp.stickerCollected)
                 stickerPopup.text = LocalizationManager.Instance.Get(
@@ -102,6 +112,58 @@ namespace VacuumVille.UI
             const float c1 = 1.70158f;
             const float c3 = c1 + 1f;
             return 1f + c3 * Mathf.Pow(t - 1f, 3f) + c1 * Mathf.Pow(t - 1f, 2f);
+        }
+
+        private static void SetButtonLabel(Button btn, string locKey)
+        {
+            if (btn == null) return;
+            var lbl = btn.GetComponentInChildren<TextMeshProUGUI>();
+            if (lbl != null) lbl.text = LocalizationManager.Instance.Get(locKey);
+        }
+
+        /// <summary>Generates a 5-pointed star sprite procedurally.</summary>
+        private static Sprite CreateStarSprite(bool filled)
+        {
+            const int size = 128;
+            var tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+            var pixels = new Color32[size * size];
+
+            Color32 starColor = filled
+                ? new Color32(255, 210, 20, 255)   // gold
+                : new Color32(180, 180, 180, 255);  // gray
+            Color32 transparent = new Color32(0, 0, 0, 0);
+
+            float cx = size / 2f, cy = size / 2f;
+            float r1 = size / 2f - 4f;   // outer radius
+            float r2 = r1 * 0.42f;        // inner radius
+            float sectorRad = Mathf.PI / 5f; // 36° per sector (10 sectors total)
+
+            for (int y = 0; y < size; y++)
+            for (int x = 0; x < size; x++)
+            {
+                float dx = x + 0.5f - cx, dy = y + 0.5f - cy;
+                float dist = Mathf.Sqrt(dx * dx + dy * dy);
+
+                bool inside = false;
+                if (dist <= r1 + 1f)
+                {
+                    // Angle measured clockwise from top
+                    float angle = Mathf.Repeat(Mathf.PI / 2f - Mathf.Atan2(dy, dx), 2f * Mathf.PI);
+                    int sector = (int)(angle / sectorRad);
+                    float frac = (angle - sector * sectorRad) / sectorRad;
+                    // Even sectors: tip → inner corner; Odd: inner corner → tip
+                    float boundary = (sector % 2 == 0)
+                        ? Mathf.Lerp(r1, r2, frac)
+                        : Mathf.Lerp(r2, r1, frac);
+                    inside = dist <= boundary;
+                }
+
+                pixels[y * size + x] = inside ? starColor : transparent;
+            }
+
+            tex.SetPixels32(pixels);
+            tex.Apply();
+            return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), size);
         }
     }
 }
