@@ -42,6 +42,9 @@ namespace VacuumVille.UI
         [SerializeField] private Button hintButton;
         [SerializeField] private TextMeshProUGUI hintCountLabel;
 
+        [Header("Navigation")]
+        [SerializeField] private Button backButton;
+
         [Header("Streak")]
         [SerializeField] private GameObject streakIndicator;
         [SerializeField] private TextMeshProUGUI streakLabel;
@@ -68,8 +71,31 @@ namespace VacuumVille.UI
 
         private void Start()
         {
+            if (backButton == null)
+            {
+                var go = GameObject.Find("BackButton");
+                if (go != null) backButton = go.GetComponent<Button>();
+            }
+            if (backButton != null)
+            {
+                backButton.onClick.RemoveAllListeners();
+                backButton.onClick.AddListener(GoBack);
+            }
+
             UpdateProgressBar();
             GenerateNext();
+        }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+                GoBack();
+        }
+
+        private void GoBack()
+        {
+            AudioManager.Instance?.PlayButton();
+            GameManager.Instance?.TransitionTo(GameState.LevelIntro);
         }
 
         // ── Problem Flow ────────────────────────────────────────────────────────
@@ -98,15 +124,21 @@ namespace VacuumVille.UI
                 qText = LocalizationManager.Instance.Get(p.questionTextKey);
             questionText.text = qText;
 
-            // Operator display — always clear first so stale values don't linger
+            // Equation display — show equationText as a single string (e.g. "? + 1 = 20", "3,  ?,  7")
+            // This keeps the prompt (questionText) and the equation clearly separated.
             if (operandAText) operandAText.text = "";
             if (operatorText) operatorText.text = "";
             if (operandBText) operandBText.text = "";
-            if (p.operands != null && p.operands.Length >= 2)
+            if (!string.IsNullOrEmpty(p.equationText))
             {
-                operandAText.text  = p.operands[0].ToString();
-                operatorText.text  = p.operatorSymbol;
-                operandBText.text  = p.operands[1].ToString();
+                if (operandAText)
+                {
+                    operandAText.enableAutoSizing = false;
+                    operandAText.fontSize = choiceLabels.Length > 0 ? choiceLabels[0].fontSize : 72f;
+                    operandAText.enableWordWrapping = false;
+                    operandAText.overflowMode = TMPro.TextOverflowModes.Overflow;
+                    operandAText.text = p.equationText;
+                }
             }
 
             // Visual objects

@@ -130,6 +130,23 @@
     { "key": "minigame_instruction_atticbinblitz",            "value": "Swipe items left or right into the correct bins!" },
     { "key": "minigame_instruction_sequencesprinkler",        "value": "Tap the sprinkler heads in the correct order!" },
     { "key": "minigame_instruction_grandhallrestoration",     "value": "Tap the correct mosaic region for each falling shape tile!" },
-    { "key": "minigame_instruction_scramblershutdown",        "value": "Solve all 5 panels to shut down the Scrambler machine!" }
+    { "key": "minigame_instruction_scramblershutdown",        "value": "Solve all 5 panels to shut down the Scrambler machine!" },
+    { "key": "back_button",                                   "value": "← Back" },
+    { "key": "parent_dashboard_title",                        "value": "Parent Overview" },
+    { "key": "label_time_played",                             "value": "Time played:" },
+    { "key": "label_total_stars",                             "value": "Total stars:" },
+    { "key": "label_topic_accuracy",                          "value": "Accuracy by topic:" },
+    { "key": "topic_Counting1To10",                           "value": "Counting 1–10" },
+    { "key": "topic_Counting1To20",                           "value": "Counting 1–20" },
+    { "key": "topic_AdditionTo10",                            "value": "Addition to 10" },
+    { "key": "topic_SubtractionWithin10",                     "value": "Subtraction within 10" },
+    { "key": "topic_AdditionTo20",                            "value": "Addition to 20" },
+    { "key": "topic_SubtractionWithin20",                     "value": "Subtraction within 20" },
+    { "key": "topic_Multiplication2x5x",                      "value": "Multiplication 2× and 5×" },
+    { "key": "topic_DivisionBy2_3_5",                         "value": "Division by 2, 3, 5" },
+    { "key": "topic_NumberOrdering",                          "value": "Number sequences" },
+    { "key": "topic_ShapeCounting",                           "value": "Shape counting" },
+    { "key": "label_no_data",                                 "value": "No data yet." },
+    { "key": "reset_progress",                                "value": "Reset progress" }
   ]
 }

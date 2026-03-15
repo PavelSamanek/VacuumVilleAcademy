@@ -130,6 +130,23 @@
     { "key": "minigame_instruction_atticbinblitz",            "value": "Přesuň předměty do správných košů přejetím doleva nebo doprava!" },
     { "key": "minigame_instruction_sequencesprinkler",        "value": "Klepej na postřikovače ve správném pořadí!" },
     { "key": "minigame_instruction_grandhallrestoration",     "value": "Klepni na správnou část mozaiky pro každý padající tvar!" },
-    { "key": "minigame_instruction_scramblershutdown",        "value": "Vyřeš všech 5 panelů a vypni Matlač stroj!" }
+    { "key": "minigame_instruction_scramblershutdown",        "value": "Vyřeš všech 5 panelů a vypni Matlač stroj!" },
+    { "key": "back_button",                                   "value": "← Zpět" },
+    { "key": "parent_dashboard_title",                        "value": "Přehled pro rodiče" },
+    { "key": "label_time_played",                             "value": "Čas hraní:" },
+    { "key": "label_total_stars",                             "value": "Celkem hvězd:" },
+    { "key": "label_topic_accuracy",                          "value": "Přesnost podle témat:" },
+    { "key": "topic_Counting1To10",                           "value": "Počítání 1–10" },
+    { "key": "topic_Counting1To20",                           "value": "Počítání 1–20" },
+    { "key": "topic_AdditionTo10",                            "value": "Sčítání do 10" },
+    { "key": "topic_SubtractionWithin10",                     "value": "Odčítání do 10" },
+    { "key": "topic_AdditionTo20",                            "value": "Sčítání do 20" },
+    { "key": "topic_SubtractionWithin20",                     "value": "Odčítání do 20" },
+    { "key": "topic_Multiplication2x5x",                      "value": "Násobilka 2× a 5×" },
+    { "key": "topic_DivisionBy2_3_5",                         "value": "Dělení 2, 3, 5" },
+    { "key": "topic_NumberOrdering",                          "value": "Řady čísel" },
+    { "key": "topic_ShapeCounting",                           "value": "Počítání tvarů" },
+    { "key": "label_no_data",                                 "value": "Zatím žádná data." },
+    { "key": "reset_progress",                                "value": "Smazat postup" }
   ]
 }

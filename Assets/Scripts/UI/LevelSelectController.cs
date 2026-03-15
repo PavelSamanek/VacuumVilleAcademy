@@ -29,6 +29,7 @@ namespace VacuumVille.UI
             if (gm == null) { Debug.LogError("[LevelSelect] GameManager is null"); return; }
             if (gm.AllLevels == null || gm.AllLevels.Length == 0) { Debug.LogError("[LevelSelect] No levels"); return; }
 
+            BuildBackButton();
             var content = BuildScrollView();
 
             for (int i = 0; i < gm.AllLevels.Length; i++)
@@ -43,16 +44,61 @@ namespace VacuumVille.UI
             Debug.Log($"[LevelSelect] Built {gm.AllLevels.Length} buttons.");
         }
 
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+                GoBack();
+        }
+
+        private void GoBack()
+        {
+            AudioManager.Instance?.PlayButton();
+            GameManager.Instance?.TransitionTo(GameState.Home);
+        }
+
         // ── Layout ─────────────────────────────────────────────────────────────
+
+        private void BuildBackButton()
+        {
+            var go = new GameObject("BackButton");
+            go.transform.SetParent(transform, false);
+            var rt = go.AddComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0.02f, 0.91f);
+            rt.anchorMax = new Vector2(0.22f, 0.98f);
+            rt.offsetMin = rt.offsetMax = Vector2.zero;
+
+            var img = go.AddComponent<Image>();
+            img.color = new Color(0.13f, 0.59f, 0.95f);
+
+            var btn = go.AddComponent<Button>();
+            btn.targetGraphic = img;
+            btn.onClick.AddListener(GoBack);
+
+            var lGo = new GameObject("Label");
+            lGo.transform.SetParent(go.transform, false);
+            var lRt = lGo.AddComponent<RectTransform>();
+            lRt.anchorMin = Vector2.zero;
+            lRt.anchorMax = Vector2.one;
+            lRt.offsetMin = lRt.offsetMax = Vector2.zero;
+
+            var tmp = lGo.AddComponent<TextMeshProUGUI>();
+            tmp.text = LocalizationManager.Instance != null
+                ? LocalizationManager.Instance.Get("back_button")
+                : "← Zpět";
+            tmp.fontSize = 32f;
+            tmp.color = Color.white;
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.enableWordWrapping = false;
+        }
 
         private RectTransform BuildScrollView()
         {
-            // Scroll root — anchors fill the canvas
+            // Scroll root — anchors fill the canvas, top leaves room for back button
             var sv = new GameObject("ScrollView");
             sv.transform.SetParent(transform, false);
             var svRt = sv.AddComponent<RectTransform>();
             svRt.anchorMin = new Vector2(0.04f, 0.04f);
-            svRt.anchorMax = new Vector2(0.96f, 0.96f);
+            svRt.anchorMax = new Vector2(0.96f, 0.90f);
             svRt.offsetMin = svRt.offsetMax = Vector2.zero;
 
             var sr = sv.AddComponent<ScrollRect>();

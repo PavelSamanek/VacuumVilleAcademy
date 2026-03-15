@@ -21,6 +21,7 @@ namespace VacuumVille.Data
         // Display
         public string questionTextKey;          // localization key
         public string questionTextFallback;     // plain text fallback (no localization needed for pure math)
+        public string equationText;             // the math expression shown in the equation area (e.g. "? + 1 = 20")
         public int[] operands;                  // e.g. [3, 5] for 3+5
         public string operatorSymbol;           // "+", "-", "×", "÷"
         public int correctAnswer;

@@ -79,7 +79,8 @@ namespace VacuumVille.Math
                 choices        = choices,
                 visualAssetKey = visualKey,
                 visualCount    = count,
-                voiceLineKey   = "q_how_many"
+                voiceLineKey   = "q_how_many",
+                equationText   = ""
             };
         }
 
@@ -106,12 +107,13 @@ namespace VacuumVille.Math
                 difficulty     = diff,
                 format         = isMissing ? ProblemFormat.FillBlank : ProblemFormat.MultipleChoice,
                 questionTextKey = isMissing ? "q_missing_addition" : "q_addition",
-                questionTextFallback = isMissing ? $"___ + {b} = {sum}" : $"{a} + {b} = ___",
+                questionTextFallback = isMissing ? $"? + {b} = {sum}" : $"{a} + {b} = ?",
                 operands       = new[] { a, b },
                 operatorSymbol = "+",
                 correctAnswer  = correct,
                 choices        = choices,
-                voiceLineKey   = "q_addition"
+                voiceLineKey   = "q_addition",
+                equationText   = isMissing ? $"? + {b} = {sum}" : $"{a} + {b} = ?"
             };
         }
 
@@ -139,12 +141,13 @@ namespace VacuumVille.Math
                 difficulty     = diff,
                 format         = isMissing ? ProblemFormat.FillBlank : ProblemFormat.MultipleChoice,
                 questionTextKey = "q_subtraction",
-                questionTextFallback = $"{a} - {b} = ___",
+                questionTextFallback = $"{a} - {b} = ?",
                 operands       = new[] { a, b },
                 operatorSymbol = "-",
                 correctAnswer  = answer,
                 choices        = choices,
-                voiceLineKey   = "q_subtraction"
+                voiceLineKey   = "q_subtraction",
+                equationText   = $"{a} - {b} = ?"
             };
         }
 
@@ -167,12 +170,13 @@ namespace VacuumVille.Math
                 difficulty     = diff,
                 format         = ProblemFormat.MultipleChoice,
                 questionTextKey = "q_multiplication",
-                questionTextFallback = $"{n} skupin po {m} = ___",
+                questionTextFallback = $"{m} × {n} = ?",
                 operands       = new[] { m, n },
                 operatorSymbol = "×",
                 correctAnswer  = answer,
                 choices        = choices,
-                voiceLineKey   = "q_multiplication"
+                voiceLineKey   = "q_multiplication",
+                equationText   = $"{m} × {n} = ?"
             };
         }
 
@@ -195,12 +199,13 @@ namespace VacuumVille.Math
                 difficulty     = diff,
                 format         = ProblemFormat.MultipleChoice,
                 questionTextKey = "q_division",
-                questionTextFallback = $"{dividend} ÷ {d} = ___",
+                questionTextFallback = $"{dividend} ÷ {d} = ?",
                 operands       = new[] { dividend, d },
                 operatorSymbol = "÷",
                 correctAnswer  = quotient,
                 choices        = choices,
-                voiceLineKey   = "q_division"
+                voiceLineKey   = "q_division",
+                equationText   = $"{dividend} ÷ {d} = ?"
             };
         }
 
@@ -221,6 +226,10 @@ namespace VacuumVille.Math
 
             var choices = GenerateChoices(answer, seq[0], seq[seq.Count - 1] + skip);
 
+            var seqParts = new List<string>();
+            foreach (int v in seq) seqParts.Add(v == -1 ? "?" : v.ToString());
+            string seqDisplay = string.Join(",  ", seqParts);
+
             return new MathProblem
             {
                 topic          = MathTopic.NumberOrdering,
@@ -231,7 +240,8 @@ namespace VacuumVille.Math
                 missingIndex   = missingIdx,
                 correctAnswer  = answer,
                 choices        = choices,
-                voiceLineKey   = "q_ordering"
+                voiceLineKey   = "q_ordering",
+                equationText   = seqDisplay
             };
         }
 
@@ -258,7 +268,8 @@ namespace VacuumVille.Math
                 choices        = choices,
                 visualAssetKey = shapes[shapeIdx],
                 visualCount    = count,
-                voiceLineKey   = "q_count_shapes"
+                voiceLineKey   = "q_count_shapes",
+                equationText   = ""
             };
         }
 
