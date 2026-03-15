@@ -20,6 +20,7 @@ namespace VacuumVille.Minigames
         [SerializeField] private BinSlot[] bins;               // 2 or 3 bins
         [SerializeField] private float conveyorSpeed = 2.5f;
         [SerializeField] private float spawnInterval = 1.2f;
+        [SerializeField] private TextMeshProUGUI problemLabel;
 
         private int _totalItems;
         private int _sortedCorrectly;
@@ -54,24 +55,96 @@ namespace VacuumVille.Minigames
         protected override void OnMinigameBegin()
         {
             AudioManager.Instance?.PlaySFX("Audio/SFX/shared/vacuum_start");
+            EnsureLayout();
             SetupDivisionProblem();
             StartCoroutine(SpawnLoop());
         }
 
+        private void EnsureLayout()
+        {
+            // Division equation label — top strip
+            if (problemLabel == null)
+            {
+                var go = new GameObject("ProblemLabel");
+                go.transform.SetParent(transform, false);
+                var rt = go.AddComponent<RectTransform>();
+                rt.anchorMin = new Vector2(0f, 0.84f);
+                rt.anchorMax = new Vector2(1f, 0.94f);
+                rt.offsetMin = rt.offsetMax = Vector2.zero;
+                var bg = go.AddComponent<Image>();
+                bg.color = new Color(0f, 0f, 0f, 0.4f);
+                bg.raycastTarget = false;
+                var txtGo = new GameObject("Text");
+                txtGo.transform.SetParent(go.transform, false);
+                var trt = txtGo.AddComponent<RectTransform>();
+                trt.anchorMin = Vector2.zero; trt.anchorMax = Vector2.one;
+                trt.offsetMin = trt.offsetMax = Vector2.zero;
+                problemLabel = txtGo.AddComponent<TextMeshProUGUI>();
+                problemLabel.fontSize = 60f;
+                problemLabel.fontStyle = FontStyles.Bold;
+                problemLabel.color = Color.white;
+                problemLabel.alignment = TextAlignmentOptions.Center;
+            }
+
+            // Color the bins and add swipe-direction arrows if missing
+            Color[] binColors =
+            {
+                new Color(0.20f, 0.50f, 0.90f), // blue — left swipe
+                new Color(0.58f, 0.28f, 0.80f), // purple — no swipe / centre
+                new Color(0.18f, 0.72f, 0.40f)  // green — right swipe
+            };
+            string[] arrows = bins.Length >= 3
+                ? new[] { "←", "↕", "→" }
+                : new[] { "←", "→" };
+
+            for (int i = 0; i < bins.Length; i++)
+            {
+                var binT = bins[i].transform;
+                if (binT == null) continue;
+
+                // Colour the bin background
+                var img = binT.GetComponent<Image>();
+                if (img) img.color = binColors[Mathf.Min(i, binColors.Length - 1)];
+
+                // Add a swipe-direction arrow above the bin (once only)
+                if (binT.Find("DirectionArrow") == null)
+                {
+                    var arrowGo = new GameObject("DirectionArrow");
+                    arrowGo.transform.SetParent(binT, false);
+                    var rt = arrowGo.AddComponent<RectTransform>();
+                    rt.anchorMin = new Vector2(0f, 1f);
+                    rt.anchorMax = new Vector2(1f, 1f);
+                    rt.offsetMin = Vector2.zero;
+                    rt.offsetMax = new Vector2(0f, 60f);
+                    var tmp = arrowGo.AddComponent<TextMeshProUGUI>();
+                    tmp.text = arrows[Mathf.Min(i, arrows.Length - 1)];
+                    tmp.fontSize = 52f;
+                    tmp.fontStyle = FontStyles.Bold;
+                    tmp.color = Color.white;
+                    tmp.alignment = TextAlignmentOptions.Center;
+                }
+            }
+        }
+
         private void SetupDivisionProblem()
         {
-            _divisor   = bins.Length; // 2 or 3
+            _divisor   = Mathf.Max(1, bins.Length);
             int[] facts = { 2, 3, 4, 5, 6, 7, 8, 9, 10 };
             _correctPerBin = facts[Random.Range(0, facts.Length)];
             _dividend  = _divisor * _correctPerBin;
+
+            // Show division equation above the conveyor
+            if (problemLabel != null)
+                problemLabel.text = $"{_dividend} ÷ {_divisor} = ?";
 
             foreach (var bin in bins)
             {
                 bin.targetCount  = _correctPerBin;
                 bin.currentCount = 0;
-                bin.targetLabel.text  = _correctPerBin.ToString();
+                // Target label: show goal count — white text is readable on coloured bin
+                bin.targetLabel.text  = $"0 / {_correctPerBin}";
                 bin.targetLabel.color = Color.white;
-                bin.currentLabel.text  = "0";
+                bin.currentLabel.text  = "";
                 bin.currentLabel.color = Color.white;
             }
         }
@@ -91,6 +164,7 @@ namespace VacuumVille.Minigames
         {
             var go = Instantiate(itemPrefab, transform); // parent to Canvas so UI renders
             go.transform.position = conveyorSpawn.position;
+            go.transform.localRotation = Quaternion.Euler(0f, 0f, 180f); // sprite is inverted
             MinigameVFX.SpawnPop(this, go.transform);
             AudioManager.Instance?.PlaySFX("Audio/SFX/atticbin/item_swipe");
             _activeItems.Add(new ConveyorItem { Go = go });
@@ -189,7 +263,9 @@ namespace VacuumVille.Minigames
 
             var bin = bins[binIdx];
             bin.currentCount++;
-            bin.currentLabel.text  = bin.currentCount.ToString();
+            bin.targetLabel.text  = $"{bin.currentCount} / {bin.targetCount}";
+            bin.targetLabel.color = Color.white;
+            bin.currentLabel.text  = "";
             bin.currentLabel.color = Color.white;
 
             bool overflowed = bin.currentCount > bin.targetCount;
@@ -198,7 +274,9 @@ namespace VacuumVille.Minigames
             {
                 // Overflow: reset bin
                 bin.currentCount = 0;
-                bin.currentLabel.text  = "0";
+                bin.targetLabel.text  = $"0 / {bin.targetCount}";
+                bin.targetLabel.color = Color.white;
+                bin.currentLabel.text  = "";
                 bin.currentLabel.color = Color.white;
                 AudioManager.Instance.PlayWrong();
                 AudioManager.Instance?.PlaySFX("Audio/SFX/atticbin/bin_overflow");
