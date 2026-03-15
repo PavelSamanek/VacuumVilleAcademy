@@ -43,9 +43,9 @@ namespace VacuumVille.UI
             var progress = gm?.Progress;
 
             // ── Root scroll view ─────────────────────────────────────────────────
-            var root = new GameObject("AchievementsRoot");
+            var root = new GameObject("AchievementsRoot", typeof(RectTransform));
             root.transform.SetParent(canvas.transform, false);
-            var rootRt = root.AddComponent<RectTransform>();
+            var rootRt = (RectTransform)root.transform;
             rootRt.anchorMin = Vector2.zero;
             rootRt.anchorMax = Vector2.one;
             rootRt.offsetMin = rootRt.offsetMax = Vector2.zero;
@@ -265,9 +265,9 @@ namespace VacuumVille.UI
             bgImg.color = new Color(0.25f, 0.25f, 0.35f);
 
             // Bar fill
-            var fillGo = new GameObject("Fill");
+            var fillGo = new GameObject("Fill", typeof(RectTransform));
             fillGo.transform.SetParent(bgGo.transform, false);
-            var fillRt = fillGo.AddComponent<RectTransform>();
+            var fillRt = (RectTransform)fillGo.transform;
             fillRt.anchorMin = Vector2.zero;
             fillRt.anchorMax = new Vector2(Mathf.Clamp01(acc), 1f);
             fillRt.offsetMin = fillRt.offsetMax = Vector2.zero;
@@ -279,9 +279,9 @@ namespace VacuumVille.UI
 
         private static Transform MakeScrollView(Transform parent)
         {
-            var sv = new GameObject("ScrollView");
+            var sv = new GameObject("ScrollView", typeof(RectTransform));
             sv.transform.SetParent(parent, false);
-            var svRt = sv.AddComponent<RectTransform>();
+            var svRt = (RectTransform)sv.transform;
             svRt.anchorMin = Vector2.zero;
             svRt.anchorMax = Vector2.one;
             svRt.offsetMin = svRt.offsetMax = Vector2.zero;
@@ -292,18 +292,18 @@ namespace VacuumVille.UI
             scrollRect.decelerationRate = 0.135f;
             scrollRect.scrollSensitivity = 40f;
 
-            var vp = new GameObject("Viewport");
+            var vp = new GameObject("Viewport", typeof(RectTransform));
             vp.transform.SetParent(sv.transform, false);
-            var vpRt = vp.AddComponent<RectTransform>();
+            var vpRt = (RectTransform)vp.transform;
             vpRt.anchorMin = Vector2.zero;
             vpRt.anchorMax = Vector2.one;
             vpRt.offsetMin = vpRt.offsetMax = Vector2.zero;
             vp.AddComponent<RectMask2D>();
             scrollRect.viewport = vpRt;
 
-            var content = new GameObject("Content");
+            var content = new GameObject("Content", typeof(RectTransform));
             content.transform.SetParent(vp.transform, false);
-            var contentRt = content.AddComponent<RectTransform>();
+            var contentRt = (RectTransform)content.transform;
             contentRt.anchorMin = new Vector2(0, 1);
             contentRt.anchorMax = new Vector2(1, 1);
             contentRt.pivot    = new Vector2(0.5f, 1f);
@@ -343,9 +343,9 @@ namespace VacuumVille.UI
             le.preferredHeight = 48f;
             var bg = go.AddComponent<Image>();
             bg.color = new Color(color.r * 0.15f, color.g * 0.15f, color.b * 0.15f, 0.8f);
-            var goTxt = new GameObject("Text");
+            var goTxt = new GameObject("Text", typeof(RectTransform));
             goTxt.transform.SetParent(go.transform, false);
-            var rt = goTxt.AddComponent<RectTransform>();
+            var rt = (RectTransform)goTxt.transform;
             rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one;
             rt.offsetMin = new Vector2(12, 0); rt.offsetMax = Vector2.zero;
             var tmp = goTxt.AddComponent<TextMeshProUGUI>();
@@ -376,9 +376,9 @@ namespace VacuumVille.UI
             var btn = go.AddComponent<Button>();
             btn.targetGraphic = img;
             btn.onClick.AddListener(onClick);
-            var lblGo = new GameObject("Label");
+            var lblGo = new GameObject("Label", typeof(RectTransform));
             lblGo.transform.SetParent(go.transform, false);
-            var lRt = lblGo.AddComponent<RectTransform>();
+            var lRt = (RectTransform)lblGo.transform;
             lRt.anchorMin = Vector2.zero; lRt.anchorMax = Vector2.one;
             lRt.offsetMin = lRt.offsetMax = Vector2.zero;
             var tmp = lblGo.AddComponent<TextMeshProUGUI>();
