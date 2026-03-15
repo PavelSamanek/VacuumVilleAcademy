@@ -45,7 +45,39 @@ namespace VacuumVille.Minigames
         {
             AudioManager.Instance?.PlaySFX("Audio/SFX/shared/vacuum_start");
             if (sequenceHintLabel == null) sequenceHintLabel = CreateHintLabel();
+            RepositionHeads();
             StartCoroutine(RoundLoop());
+        }
+
+        /// <summary>
+        /// Scene heads use anchor (0.5,0) — bottom edge — with some at negative y,
+        /// placing them below the canvas. Redistribute all heads into a 2-row grid.
+        /// </summary>
+        private void RepositionHeads()
+        {
+            if (sprinklerHeads == null || sprinklerHeads.Length == 0) return;
+
+            const int cols   = 4;
+            // Two rows in the centre of the canvas, leaving room for the hint label at top
+            float[] rowYMin = { 0.53f, 0.30f }; // bottom edge of each row (fraction of canvas)
+            float[] rowYMax = { 0.74f, 0.51f }; // top edge of each row
+            float xStep = 1f / cols;
+            const float xPad = 0.01f;
+
+            for (int i = 0; i < sprinklerHeads.Length; i++)
+            {
+                var head = sprinklerHeads[i];
+                if (head.button == null) continue;
+
+                var rt  = (RectTransform)head.button.transform;
+                int row = i / cols;
+                int col = i % cols;
+                if (row >= rowYMin.Length) row = rowYMin.Length - 1;
+
+                rt.anchorMin = new Vector2(col * xStep + xPad, rowYMin[row]);
+                rt.anchorMax = new Vector2((col + 1) * xStep - xPad, rowYMax[row]);
+                rt.offsetMin = rt.offsetMax = Vector2.zero;
+            }
         }
 
         private TextMeshProUGUI CreateHintLabel()
