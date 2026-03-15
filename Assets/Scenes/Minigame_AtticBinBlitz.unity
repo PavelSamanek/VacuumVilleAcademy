@@ -1621,7 +1621,7 @@ MonoBehaviour:
     currentLabel: {fileID: 370000350}
     targetCount: 0
     currentCount: 0
-  conveyorSpeed: 2.5
+  conveyorSpeed: 250
   spawnInterval: 1.2
 --- !u!1 &898758525
 GameObject:

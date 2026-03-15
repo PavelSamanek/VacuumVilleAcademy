@@ -60,9 +60,11 @@ namespace VacuumVille.Minigames
             int drain    = Random.Range(0, drainPositions.Length);
             int points   = Random.Range(1, 6);
             float spawnX = drainPositions[drain].position.x;
-            float spawnY = drainPositions[drain].position.y + 5f;
+            // Spawn well above the screen (canvas is Screen Space Overlay, positions are in pixels)
+            float spawnY = drainPositions[drain].position.y + 1400f;
 
-            var go  = Instantiate(duckPrefab, new Vector3(spawnX, spawnY, 0), Quaternion.identity);
+            var go  = Instantiate(duckPrefab, transform); // must be child of Canvas to render
+            go.transform.position = new Vector3(spawnX, spawnY, 0);
             var lbl = go.GetComponentInChildren<TextMeshProUGUI>();
             if (lbl) lbl.text = points.ToString();
 
@@ -85,27 +87,25 @@ namespace VacuumVille.Minigames
 #if UNITY_EDITOR || UNITY_STANDALONE
             if (Input.GetMouseButton(0))
             {
-                target = _cam.ScreenToWorldPoint(Input.mousePosition);
-                target.z = 0;
-                target.y = vacuumTransform.position.y; // constrain to drain row
+                // Canvas is Screen Space Overlay — screen pixels == UI world position
+                target.x = Input.mousePosition.x;
+                target.y = vacuumTransform.position.y;
             }
 #else
             if (Input.touchCount > 0)
             {
-                target = _cam.ScreenToWorldPoint(Input.GetTouch(0).position);
-                target.z = 0;
+                target.x = Input.GetTouch(0).position.x;
                 target.y = vacuumTransform.position.y;
             }
             else
             {
-                // Tilt support
                 float tilt = Input.acceleration.x;
-                target.x += tilt * 5f * Time.deltaTime;
+                target.x += tilt * 400f * Time.deltaTime;
             }
 #endif
 
-            float minX = drainPositions[0].position.x - 0.5f;
-            float maxX = drainPositions[drainPositions.Length - 1].position.x + 0.5f;
+            float minX = drainPositions[0].position.x - 60f;
+            float maxX = drainPositions[drainPositions.Length - 1].position.x + 60f;
             target.x = Mathf.Clamp(target.x, minX, maxX);
             vacuumTransform.position = Vector3.Lerp(vacuumTransform.position, target, Time.deltaTime * 10f);
         }
@@ -136,7 +136,7 @@ namespace VacuumVille.Minigames
                 if (duck.Blocked) continue;
 
                 float dist = Vector3.Distance(vacuumTransform.position, duck.Go.transform.position);
-                if (dist < 0.8f)
+                if (dist < 80f)
                 {
                     DuckBlocked(duck);
                     _activeDucks.RemoveAt(i);

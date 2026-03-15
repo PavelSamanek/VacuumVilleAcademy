@@ -89,8 +89,10 @@ namespace VacuumVille.Minigames
 
             var region = incomplete[Random.Range(0, incomplete.Count)];
 
-            float xPos = Random.Range(-3f, 3f);
-            var go  = Instantiate(shapeTilePrefab, new Vector3(xPos, tileSpawnLine.position.y, 0), Quaternion.identity);
+            // Canvas is Screen Space Overlay — positions are in screen pixels
+            float xPos = Random.Range(tileSpawnLine.position.x - 280f, tileSpawnLine.position.x + 280f);
+            var go  = Instantiate(shapeTilePrefab, transform); // parent to Canvas so UI renders
+            go.transform.position = new Vector3(xPos, tileSpawnLine.position.y, 0);
             var lbl = go.GetComponentInChildren<TextMeshProUGUI>();
             if (lbl) lbl.text = LocalizationManager.Instance.Get($"shape_{region.shapeKey}");
 
@@ -111,7 +113,7 @@ namespace VacuumVille.Minigames
 
         private IEnumerator DropTile(FallingTile tile)
         {
-            float targetY = -2f; // hover level
+            float targetY = Screen.height * 0.35f; // hover level (screen pixels, ~35% from bottom)
             while (tile.Go != null && tile.Go.transform.position.y > targetY && tile.WaitingForPlacement)
             {
                 tile.Go.transform.position += Vector3.down * tileDropSpeed * Time.deltaTime;
@@ -175,7 +177,7 @@ namespace VacuumVille.Minigames
         {
             if (tile == null) yield break;
             Vector3 origin = tile.position;
-            Vector3 bounce = origin + new Vector3(Random.Range(-2f, 2f), 1f, 0);
+            Vector3 bounce = origin + new Vector3(Random.Range(-200f, 200f), 100f, 0);
             float   t      = 0f;
             while (t < 0.4f)
             {

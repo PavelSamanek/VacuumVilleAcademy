@@ -76,13 +76,15 @@ namespace VacuumVille.Minigames
         {
             _awaitingAnswer = false;
 
-            // Spawn left group
-            var leftPile = Instantiate(cushionPrefab, cannonLeft.position, Quaternion.identity);
+            // Spawn left group (parented to Canvas so UI elements render)
+            var leftPile = Instantiate(cushionPrefab, transform);
+            leftPile.transform.position = cannonLeft.position;
             var leftLbl  = leftPile.GetComponentInChildren<TextMeshProUGUI>();
             if (leftLbl) leftLbl.text = _a.ToString();
 
             // Spawn right group
-            var rightPile = Instantiate(cushionPrefab, cannonRight.position, Quaternion.identity);
+            var rightPile = Instantiate(cushionPrefab, transform);
+            rightPile.transform.position = cannonRight.position;
             var rightLbl  = rightPile.GetComponentInChildren<TextMeshProUGUI>();
             if (rightLbl) rightLbl.text = _b.ToString();
 
@@ -93,7 +95,8 @@ namespace VacuumVille.Minigames
             Destroy(rightPile);
 
             // Merged pile falls toward landing
-            _flyingPile = Instantiate(cushionPrefab, mergePoint.position, Quaternion.identity);
+            _flyingPile = Instantiate(cushionPrefab, transform);
+            _flyingPile.transform.position = mergePoint.position;
             var mergeLbl = _flyingPile.GetComponentInChildren<TextMeshProUGUI>();
             if (mergeLbl) mergeLbl.text = "?";
 

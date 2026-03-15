@@ -85,8 +85,10 @@ namespace VacuumVille.Minigames
                 num = Random.Range(1, _targetSum);
             }
 
-            float xPos = Random.Range(-3f, 3f);
-            var go  = Instantiate(boxPrefab, new Vector3(xPos, spawnLine.position.y, 0), Quaternion.identity);
+            // Canvas is Screen Space Overlay — positions are in screen pixels
+            float xPos = Random.Range(spawnLine.position.x - 280f, spawnLine.position.x + 280f);
+            var go  = Instantiate(boxPrefab, transform); // parent to Canvas so UI renders
+            go.transform.position = new Vector3(xPos, spawnLine.position.y, 0);
             var lbl = go.GetComponentInChildren<TextMeshProUGUI>();
             if (lbl) lbl.text = num.ToString();
 
@@ -108,7 +110,7 @@ namespace VacuumVille.Minigames
 
                 box.Go.transform.position += Vector3.down * fallSpeed * Time.deltaTime;
 
-                if (box.Go.transform.position.y <= stackLine.position.y + _stackHeight * 0.8f)
+                if (box.Go.transform.position.y <= stackLine.position.y + _stackHeight * 80f)
                 {
                     StackBox(box);
                     _fallingBoxes.RemoveAt(i);
@@ -181,7 +183,7 @@ namespace VacuumVille.Minigames
         {
             box.Go.transform.position = new Vector3(
                 box.Go.transform.position.x,
-                stackLine.position.y + _stackHeight * 0.8f, 0);
+                stackLine.position.y + _stackHeight * 80f, 0);
             _stackHeight++;
             AudioManager.Instance.PlaySFX(null);
 

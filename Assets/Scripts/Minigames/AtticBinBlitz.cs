@@ -86,7 +86,8 @@ namespace VacuumVille.Minigames
 
         private void SpawnItem()
         {
-            var go = Instantiate(itemPrefab, conveyorSpawn.position, Quaternion.identity);
+            var go = Instantiate(itemPrefab, transform); // parent to Canvas so UI renders
+            go.transform.position = conveyorSpawn.position;
             _activeItems.Add(new ConveyorItem { Go = go });
         }
 
@@ -109,7 +110,7 @@ namespace VacuumVille.Minigames
                     item.Go.transform.position, conveyorEnd.position,
                     conveyorSpeed * Time.deltaTime);
 
-                if (Vector3.Distance(item.Go.transform.position, conveyorEnd.position) < 0.1f)
+                if (Vector3.Distance(item.Go.transform.position, conveyorEnd.position) < 20f)
                 {
                     Destroy(item.Go);
                     _activeItems.RemoveAt(i);
@@ -125,8 +126,9 @@ namespace VacuumVille.Minigames
                 foreach (var item in _activeItems)
                 {
                     if (item.Swiped) continue;
-                    Vector3 wp = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                    if (Vector3.Distance(wp, item.Go.transform.position) < 0.5f)
+                    // Canvas is Screen Space Overlay — screen pixels match UI world position
+                    Vector3 sp = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0);
+                    if (Vector3.Distance(sp, item.Go.transform.position) < 60f)
                     {
                         item.TouchActive = true;
                         item.SwipeStart  = Input.mousePosition;
@@ -149,14 +151,13 @@ namespace VacuumVille.Minigames
 #else
             foreach (Touch touch in Input.touches)
             {
-                Vector3 wp = Camera.main.ScreenToWorldPoint(touch.position);
-                wp.z = 0;
+                Vector3 wp = new Vector3(touch.position.x, touch.position.y, 0);
 
                 if (touch.phase == TouchPhase.Began)
                 {
                     foreach (var item in _activeItems)
                     {
-                        if (!item.Swiped && Vector3.Distance(wp, item.Go.transform.position) < 0.5f)
+                        if (!item.Swiped && Vector3.Distance(wp, item.Go.transform.position) < 60f)
                         { item.TouchActive = true; item.SwipeStart = touch.position; }
                     }
                 }

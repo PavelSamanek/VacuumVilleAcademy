@@ -60,7 +60,8 @@ namespace VacuumVille.Minigames
             if (_activeCrumbs.ContainsKey(number)) return;
 
             var slot = gridSlots[Random.Range(0, gridSlots.Length)];
-            var go   = Instantiate(crumbPilePrefab, slot.position, Quaternion.identity);
+            var go   = Instantiate(crumbPilePrefab, transform); // parent to Canvas so UI renders
+            go.transform.position = slot.position;
             var lbl  = go.GetComponentInChildren<TextMeshProUGUI>();
             if (lbl) lbl.text = number.ToString();
 
@@ -90,10 +91,11 @@ namespace VacuumVille.Minigames
 
 #if UNITY_EDITOR || UNITY_STANDALONE
             if (Input.GetMouseButtonDown(0))
-            { tapPos = Camera.main.ScreenToWorldPoint(Input.mousePosition); tapPos.z = 0; tapped = true; }
+            // Canvas is Screen Space Overlay — screen pixels match UI world position
+            { tapPos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0); tapped = true; }
 #else
             if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
-            { tapPos = Camera.main.ScreenToWorldPoint(Input.GetTouch(0).position); tapPos.z = 0; tapped = true; }
+            { var t0 = Input.GetTouch(0); tapPos = new Vector3(t0.position.x, t0.position.y, 0); tapped = true; }
 #endif
 
             if (tapped)
@@ -108,8 +110,8 @@ namespace VacuumVille.Minigames
 
         private IEnumerator MoveVacuumTo(Vector3 target)
         {
-            float speed = 8f;
-            while (Vector3.Distance(vacuumTransform.position, target) > 0.05f)
+            float speed = 600f; // pixels/sec for Screen Space Overlay canvas
+            while (Vector3.Distance(vacuumTransform.position, target) > 5f)
             {
                 vacuumTransform.position = Vector3.MoveTowards(
                     vacuumTransform.position, target, speed * Time.deltaTime);
@@ -121,7 +123,7 @@ namespace VacuumVille.Minigames
         {
             foreach (var kvp in _activeCrumbs)
             {
-                if (Vector3.Distance(worldPos, kvp.Value.transform.position) < 0.7f)
+                if (Vector3.Distance(worldPos, kvp.Value.transform.position) < 60f)
                 {
                     if (kvp.Key == _targetNumber)
                     {

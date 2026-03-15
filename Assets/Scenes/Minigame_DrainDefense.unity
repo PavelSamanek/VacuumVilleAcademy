@@ -1778,8 +1778,8 @@ MonoBehaviour:
   - {fileID: 330000050}
   vacuumTransform: {fileID: 659212671}
   duckPrefab: {fileID: 100000, guid: c3d4e5f67890123456789012cccccccc, type: 3}
-  duckSpawnInterval: 1.5
-  duckSpeed: 1.5
+  duckSpawnInterval: 2
+  duckSpeed: 280
   savedPointsLabel: {fileID: 0}
 --- !u!1 &1902210330
 GameObject:
