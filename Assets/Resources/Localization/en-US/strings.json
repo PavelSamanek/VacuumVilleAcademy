@@ -575,6 +575,50 @@
     {
       "key": "reset_progress",
       "value": "Reset progress"
+    },
+    {
+      "key": "streak_warm",
+      "value": "Nice streak!"
+    },
+    {
+      "key": "streak_hot",
+      "value": "You're on fire!"
+    },
+    {
+      "key": "streak_fire",
+      "value": "INCREDIBLE!"
+    },
+    {
+      "key": "streak_unstoppable",
+      "value": "UNSTOPPABLE!!!"
+    },
+    {
+      "key": "feedback_comeback",
+      "value": "COMEBACK!"
+    },
+    {
+      "key": "feedback_lucky",
+      "value": "LUCKY BONUS!"
+    },
+    {
+      "key": "feedback_so_close",
+      "value": "SO CLOSE!"
+    },
+    {
+      "key": "feedback_well_done",
+      "value": "Well done!"
+    },
+    {
+      "key": "feedback_good_start",
+      "value": "Good start!"
+    },
+    {
+      "key": "feedback_new_best",
+      "value": "NEW PERSONAL BEST!"
+    },
+    {
+      "key": "coins_earned",
+      "value": "+{0} coins!"
     }
   ],
   "target_sum": "Target: {0}",

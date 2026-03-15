@@ -156,6 +156,10 @@ namespace VacuumVille.Core
         public void PlayLevelComplete()   { if (levelCompleteSound  != null) sfxSource.PlayOneShot(levelCompleteSound); }
         public void PlayMinigameUnlock()  { if (minigameUnlockSound != null) sfxSource.PlayOneShot(minigameUnlockSound); }
 
+        /// Plays streak-tier SFX. tierName: "warm" | "hot" | "fire" | "unstoppable"
+        /// Graceful no-op if the clip is not yet in Resources.
+        public void PlayStreakTier(string tierName) => PlaySFX($"Audio/SFX/streak_{tierName}");
+
         public void PlaySFX(AudioClip clip)
         {
             if (clip != null) sfxSource.PlayOneShot(clip);

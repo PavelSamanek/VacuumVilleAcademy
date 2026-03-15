@@ -575,6 +575,50 @@
     {
       "key": "reset_progress",
       "value": "Smazat postup"
+    },
+    {
+      "key": "streak_warm",
+      "value": "Pěkná série!"
+    },
+    {
+      "key": "streak_hot",
+      "value": "Hoříš!"
+    },
+    {
+      "key": "streak_fire",
+      "value": "NEUVĚŘITELNÉ!"
+    },
+    {
+      "key": "streak_unstoppable",
+      "value": "NEZASTAVITELNÝ!!!"
+    },
+    {
+      "key": "feedback_comeback",
+      "value": "COMEBACK!"
+    },
+    {
+      "key": "feedback_lucky",
+      "value": "ŠŤASTNÝ BONUS!"
+    },
+    {
+      "key": "feedback_so_close",
+      "value": "SKORO!"
+    },
+    {
+      "key": "feedback_well_done",
+      "value": "Výborně!"
+    },
+    {
+      "key": "feedback_good_start",
+      "value": "Dobrý začátek!"
+    },
+    {
+      "key": "feedback_new_best",
+      "value": "NOVÝ OSOBNÍ REKORD!"
+    },
+    {
+      "key": "coins_earned",
+      "value": "+{0} mincí!"
     }
   ],
   "target_sum": "Cíl: {0}",

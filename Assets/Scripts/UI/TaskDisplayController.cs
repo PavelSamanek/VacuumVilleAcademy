@@ -59,6 +59,14 @@ namespace VacuumVille.UI
         // Equation explosion VFX — auto-added in Start
         private EquationExplosionVFX _explosionVFX;
 
+        // Dopamine / engagement system — auto-added in Start
+        private DopamineController _dopamine;
+
+        // Canvas helpers (lazily resolved)
+        private Canvas        _canvas;
+        private RectTransform _canvasRt;
+        private Camera        _canvasCam;
+
         // State
         private MathProblem _current;
         private int _attemptCount;
@@ -111,6 +119,10 @@ namespace VacuumVille.UI
             _explosionVFX = GetComponent<EquationExplosionVFX>()
                          ?? gameObject.AddComponent<EquationExplosionVFX>();
 
+            // Dopamine controller
+            _dopamine = GetComponent<DopamineController>()
+                     ?? gameObject.AddComponent<DopamineController>();
+
             UpdateProgressBar();
             GenerateNext();
         }
@@ -129,6 +141,38 @@ namespace VacuumVille.UI
 
         // ── Problem Flow ────────────────────────────────────────────────────────
 
+        // ── Canvas helpers ───────────────────────────────────────────────────────
+
+        private Canvas GetCanvas()
+        {
+            if (_canvas != null) return _canvas;
+            _canvas = GetComponentInParent<Canvas>();
+            while (_canvas != null && _canvas.transform.parent != null)
+            {
+                var p = _canvas.transform.parent.GetComponentInParent<Canvas>();
+                if (p == null) break;
+                _canvas = p;
+            }
+            if (_canvas != null)
+            {
+                _canvasRt  = _canvas.GetComponent<RectTransform>();
+                _canvasCam = _canvas.renderMode == RenderMode.ScreenSpaceOverlay
+                             ? null : _canvas.worldCamera;
+            }
+            return _canvas;
+        }
+
+        private Vector2 ToCanvasPos(RectTransform rt)
+        {
+            var canvas = GetCanvas();
+            if (canvas == null || _canvasRt == null || rt == null) return Vector2.zero;
+            Vector2 sp = RectTransformUtility.WorldToScreenPoint(_canvasCam, rt.position);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(_canvasRt, sp, _canvasCam, out Vector2 lp);
+            return lp;
+        }
+
+        // ── Problem Flow ─────────────────────────────────────────────────────────
+
         private void GenerateNext()
         {
             if (_inputLocked) return;
@@ -137,6 +181,7 @@ namespace VacuumVille.UI
             _excludedChoices.Clear();
             _attemptCount = 0;
             _inputLocked  = false;
+            _dopamine?.ResetProblem();
 
             var gm  = GameManager.Instance;
             var ta  = gm.Progress.GetOrCreateTopicAccuracy(gm.ActiveLevel.mathTopic);
@@ -193,6 +238,13 @@ namespace VacuumVille.UI
             }
 
             feedbackText.text = "";
+
+            // Stagger buttons in for anticipation — locks input until animation completes
+            if (_dopamine != null)
+            {
+                _inputLocked = true;
+                _dopamine.BeginButtonStagger(choiceButtons, () => _inputLocked = false);
+            }
         }
 
         private void BuildVisualObjects(MathProblem p)
@@ -258,7 +310,33 @@ namespace VacuumVille.UI
             if (correctParticles) correctParticles.SetActive(true);
             if (characterAnimator != null) characterAnimator.SetTrigger("Cheer");
 
+            // ── Dopamine hooks ────────────────────────────────────────────────
+            var canvas = GetCanvas();
+            Vector2 eqCenter = ToCanvasPos(operandAText?.rectTransform ?? questionText?.rectTransform);
+
+            // Comeback — correct after wrong on this problem
+            if (_dopamine != null && _dopamine.ConsumeComeback() && canvas != null)
+                _dopamine.ShowComeback(canvas, eqCenter);
+
+            // Streak milestone — show banner when tier increases
+            var oldTier = DopamineController.GetTier(_streak);
             _streak++;
+            var newTier = DopamineController.GetTier(_streak);
+
+            if (newTier > oldTier && canvas != null)
+            {
+                _dopamine?.ShowStreakMilestone(_streak, canvas, eqCenter);
+                AudioManager.Instance?.PlayStreakTier(newTier.ToString().ToLower());
+            }
+
+            // Lucky bonus — variable ratio surprise reward
+            if (_dopamine != null && _dopamine.TryLucky(firstAttempt) && canvas != null)
+            {
+                _dopamine.ShowLuckyBonus(canvas, _canvasRt);
+                AudioManager.Instance?.PlaySFX("Audio/SFX/lucky_bonus");
+            }
+            // ── End dopamine hooks ────────────────────────────────────────────
+
             UpdateStreakDisplay();
 
             _tasksInSession++;
@@ -278,6 +356,7 @@ namespace VacuumVille.UI
 
             AudioManager.Instance.PlayWrong();
             StartCoroutine(ShakeButton(choiceButtons[buttonIndex].transform));
+            _dopamine?.RecordWrong();
 
             _streak = 0;
             UpdateStreakDisplay();
@@ -331,10 +410,23 @@ namespace VacuumVille.UI
 
         private void UpdateProgressBar()
         {
-            var gm = GameManager.Instance;
-            float ratio = (float)gm.TasksCompletedThisSession / gm.ActiveLevel.tasksRequiredToUnlockMinigame;
-            progressBar.value = Mathf.Clamp01(ratio);
-            progressLabel.text = $"{gm.TasksCompletedThisSession} / {gm.ActiveLevel.tasksRequiredToUnlockMinigame}";
+            var gm   = GameManager.Instance;
+            int done = gm.TasksCompletedThisSession;
+            int req  = gm.ActiveLevel.tasksRequiredToUnlockMinigame;
+
+            float ratio = (float)done / req;
+            progressBar.value  = Mathf.Clamp01(ratio);
+            progressLabel.text = $"{done} / {req}";
+
+            // Dopamine: near-completion urgency + fill burst
+            var canvas = GetCanvas();
+            if (canvas != null && _dopamine != null && progressBar != null)
+            {
+                Vector2 barPos = ToCanvasPos(progressBar.GetComponent<RectTransform>());
+                _dopamine.UpdateProgressUrgency(done, req, progressBar, canvas, barPos);
+                if (done > 0 && done <= req)
+                    _dopamine.ProgressSegmentFilled(canvas, barPos);
+            }
         }
 
         private void UpdateStreakDisplay()

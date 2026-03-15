@@ -21,6 +21,30 @@ namespace VacuumVille.UI
             WireButton("SettingsButton",   () => GameManager.Instance.TransitionTo(GameState.Settings));
 
             LocalizeUI();
+            StartPlayButtonAttract();
+        }
+
+        // ── Play button attract animation ────────────────────────────────────────
+        // A breathing pulse draws the child's eye to the primary action.
+        // Subconscious visual affordance: "I'm alive — tap me."
+
+        private void StartPlayButtonAttract()
+        {
+            var go = GameObject.Find("PlayButton");
+            if (go == null) return;
+            StartCoroutine(PlayButtonBreathing(go.transform));
+        }
+
+        private System.Collections.IEnumerator PlayButtonBreathing(Transform t)
+        {
+            Vector3 orig = t.localScale;
+            float   time = 0f;
+            while (t != null)
+            {
+                t.localScale = orig * (1f + Mathf.Sin(time * 1.85f * Mathf.PI) * 0.06f);
+                time        += Time.deltaTime;
+                yield return null;
+            }
         }
 
         private void LocalizeUI()

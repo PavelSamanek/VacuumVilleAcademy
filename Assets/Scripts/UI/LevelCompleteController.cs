@@ -42,6 +42,8 @@ namespace VacuumVille.UI
             confettiAnimator?.SetTrigger("Play");
 
             StartCoroutine(AnimateStars(lp.stars));
+            StartCoroutine(ShowStarRatingMessage(lp.stars));
+            StartCoroutine(PulseNextButtonDelayed());
 
             int coins = 5 + lp.stars * 10;
             gm.Progress.coins += coins;
@@ -72,6 +74,97 @@ namespace VacuumVille.UI
                 AudioManager.Instance.PlayButton();
                 gm.TransitionTo(Data.GameState.LevelSelect);
             });
+        }
+
+        // ── Star-rating message ──────────────────────────────────────────────────
+        // Shows a tier message after the stars settle — gives children a clear
+        // social-proof signal that validates their effort.
+
+        private IEnumerator ShowStarRatingMessage(int stars)
+        {
+            yield return new WaitForSeconds(0.9f);  // wait for stars to finish popping
+
+            string msg = stars switch
+            {
+                3 => LocalizationManager.Instance.Get("feedback_new_best"),
+                2 => LocalizationManager.Instance.Get("feedback_well_done"),
+                _ => LocalizationManager.Instance.Get("feedback_good_start")
+            };
+
+            Color col = stars == 3
+                ? new Color(1f, 0.85f, 0.1f)   // gold
+                : stars == 2
+                    ? new Color(0.75f, 0.75f, 0.75f)  // silver
+                    : new Color(0.80f, 0.55f, 0.2f);  // bronze
+
+            var canvas = GetComponentInParent<Canvas>();
+            if (canvas == null) yield break;
+
+            var go  = new GameObject("VFX_StarMsg");
+            go.transform.SetParent(canvas.transform, false);
+            go.transform.SetAsLastSibling();
+            var rt  = go.AddComponent<RectTransform>();
+            rt.sizeDelta        = new Vector2(520f, 110f);
+            rt.anchoredPosition = new Vector2(0f, -80f);
+            var tmp = go.AddComponent<TextMeshProUGUI>();
+            tmp.text              = msg;
+            tmp.fontSize          = stars == 3 ? 72f : 58f;
+            tmp.fontStyle         = FontStyles.Bold;
+            tmp.color             = col;
+            tmp.alignment         = TextAlignmentOptions.Center;
+            tmp.raycastTarget     = false;
+            go.transform.localScale = Vector3.zero;
+
+            float elapsed = 0f, duration = 2.2f;
+            const float c4 = (2f * UnityEngine.Mathf.PI) / 3f;
+
+            while (elapsed < duration && go != null)
+            {
+                float p  = elapsed / duration;
+                float sp = Mathf.Clamp01(p / 0.22f);
+                float s  = sp >= 1f ? 1f
+                    : Mathf.Pow(2f, -10f * sp) * Mathf.Sin((sp * 10f - 0.75f) * c4) + 1f;
+                go.transform.localScale = Vector3.one * s;
+
+                if (stars == 3)
+                {
+                    float hue = (Time.time * 0.9f) % 1f;
+                    var  rc   = Color.HSVToRGB(hue, 0.8f, 1f);
+                    tmp.color = new Color(rc.r, rc.g, rc.b,
+                                    p < 0.7f ? 1f : Mathf.Lerp(1f, 0f, (p - 0.7f) / 0.3f));
+                }
+                else
+                {
+                    float alpha = p < 0.7f ? 1f : Mathf.Lerp(1f, 0f, (p - 0.7f) / 0.3f);
+                    tmp.color   = new Color(col.r, col.g, col.b, alpha);
+                }
+
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+            if (go) Destroy(go);
+        }
+
+        // ── Next-level button pulse ──────────────────────────────────────────────
+        // Starts pulsing after 1.5 s — Zeigarnik pull toward the next level.
+
+        private IEnumerator PulseNextButtonDelayed()
+        {
+            if (nextLevelButton == null) yield break;
+            yield return new WaitForSeconds(1.5f);
+
+            var rt  = nextLevelButton.GetComponent<RectTransform>();
+            if (rt == null) yield break;
+
+            float time = 0f;
+            Vector3 orig = rt.localScale;
+            while (nextLevelButton != null)
+            {
+                float pulse = 1f + Mathf.Sin(time * 2.2f * Mathf.PI) * 0.07f;
+                rt.localScale = orig * pulse;
+                time += Time.deltaTime;
+                yield return null;
+            }
         }
 
         private IEnumerator AnimateStars(int count)
