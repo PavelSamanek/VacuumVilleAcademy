@@ -88,10 +88,10 @@ namespace VacuumVille.Minigames
         {
             while (GameActive && _knotsResolved < totalKnots && _misses < MaxMisses)
             {
-                vacuumAnimator?.SetBool("Running", true);
+                if (vacuumAnimator != null) vacuumAnimator.SetBool("Running", true);
                 AudioManager.Instance?.PlaySFX("Audio/SFX/streamer/running");
                 yield return new WaitForSeconds(Random.Range(1f, 2f)); // running between knots
-                vacuumAnimator?.SetBool("Running", false);
+                if (vacuumAnimator != null) vacuumAnimator.SetBool("Running", false);
                 yield return StartCoroutine(KnotEncounter());
             }
             if (_knotsResolved >= totalKnots)
@@ -128,7 +128,7 @@ namespace VacuumVille.Minigames
                 UpdateMissesLabel();
                 AudioManager.Instance.PlayWrong();
                 AudioManager.Instance?.PlaySFX("Audio/SFX/streamer/bump");
-                vacuumAnimator?.SetTrigger("Bump");
+                if (vacuumAnimator != null) vacuumAnimator.SetTrigger("Bump");
                 yield return new WaitForSeconds(0.5f);
             }
 
@@ -171,7 +171,7 @@ namespace VacuumVille.Minigames
                 AddScore(1);
                 AudioManager.Instance.PlayCorrect();
                 AudioManager.Instance?.PlaySFX("Audio/SFX/streamer/knot_snap");
-                vacuumAnimator?.SetTrigger("Cheer");
+                if (vacuumAnimator != null) vacuumAnimator.SetTrigger("Cheer");
                 Vector3 knotPos = knotProblemText != null ? knotProblemText.transform.position : transform.position;
                 MinigameVFX.PulseRing(this, knotPos, new Color(0.412f, 0.941f, 0.682f));
                 MinigameVFX.FloatingText(this, "+1", knotPos, new Color(0.412f, 0.941f, 0.682f));
@@ -182,7 +182,7 @@ namespace VacuumVille.Minigames
                 UpdateMissesLabel();
                 AudioManager.Instance.PlayWrong();
                 AudioManager.Instance?.PlaySFX("Audio/SFX/streamer/bump");
-                vacuumAnimator?.SetTrigger("Oops");
+                if (vacuumAnimator != null) vacuumAnimator.SetTrigger("Oops");
                 if (missesLabel != null) MinigameVFX.ShakeRect(this, (RectTransform)missesLabel.transform);
 
                 if (_misses >= MaxMisses) CompleteEarly();

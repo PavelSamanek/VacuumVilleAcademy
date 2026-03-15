@@ -143,7 +143,7 @@ namespace VacuumVille.Minigames
             {
                 // Pile landed — wrong by timeout
                 Destroy(_flyingPile);
-                vacuumAnimator?.SetTrigger("Dodge");
+                if (vacuumAnimator != null) vacuumAnimator.SetTrigger("Dodge");
                 AudioManager.Instance.PlayWrong();
                 yield return new WaitForSeconds(0.8f);
                 StartNextRound();
@@ -177,7 +177,7 @@ namespace VacuumVille.Minigames
                 AddScore(1);
                 AudioManager.Instance.PlayCorrect();
                 AudioManager.Instance?.PlaySFX("Audio/SFX/cushioncannon/cushion_land");
-                vacuumAnimator?.SetTrigger("Cheer");
+                if (vacuumAnimator != null) vacuumAnimator.SetTrigger("Cheer");
                 MinigameVFX.PulseRing(this, mergePoint.position, new Color(0.412f, 0.941f, 0.682f));
                 MinigameVFX.FloatingText(this, "+1", mergePoint.position, new Color(0.412f, 0.941f, 0.682f));
                 MinigameVFX.ScreenFlash(this, new Color(0.412f, 0.941f, 0.682f));
@@ -185,7 +185,7 @@ namespace VacuumVille.Minigames
             else
             {
                 AudioManager.Instance.PlayWrong();
-                vacuumAnimator?.SetTrigger("Oops");
+                if (vacuumAnimator != null) vacuumAnimator.SetTrigger("Oops");
                 MinigameVFX.ScreenFlash(this, new Color(1f, 0.569f, 0f));
             }
 

@@ -72,7 +72,7 @@ namespace VacuumVille.Minigames
 
             // All panels solved — shutdown!
             if (shutdownParticles) shutdownParticles.Play();
-            scramblerAnimator?.SetTrigger("Shutdown");
+            if (scramblerAnimator != null) scramblerAnimator.SetTrigger("Shutdown");
             AudioManager.Instance?.PlaySFX("Audio/SFX/scrambler/shutdown");
             AudioManager.Instance.PlayLevelComplete();
             MinigameVFX.ScreenFlash(this, new Color(0.412f, 0.941f, 0.682f), 0.5f, 0.6f);
@@ -135,7 +135,7 @@ namespace VacuumVille.Minigames
                 _panelActive = false;
                 AudioManager.Instance.PlayWrong();
                 AudioManager.Instance?.PlaySFX("Audio/SFX/scrambler/panel_wrong");
-                scramblerAnimator?.SetTrigger("Laugh");
+                if (scramblerAnimator != null) scramblerAnimator.SetTrigger("Laugh");
                 yield return new WaitForSeconds(0.8f);
             }
             else
@@ -161,7 +161,7 @@ namespace VacuumVille.Minigames
                 AddScore(1);
                 AudioManager.Instance.PlayCorrect();
                 AudioManager.Instance?.PlaySFX("Audio/SFX/scrambler/panel_solve");
-                scramblerAnimator?.SetTrigger("Shocked");
+                if (scramblerAnimator != null) scramblerAnimator.SetTrigger("Shocked");
                 MinigameVFX.PulseRing(this, pressedButton.transform.position, new Color(0.412f, 0.941f, 0.682f));
                 MinigameVFX.FloatingText(this, "+1", pressedButton.transform.position, new Color(0.412f, 0.941f, 0.682f));
             }
@@ -170,7 +170,7 @@ namespace VacuumVille.Minigames
                 if (img) img.color = new Color(1f, 0.57f, 0f);
                 AudioManager.Instance.PlayWrong();
                 AudioManager.Instance?.PlaySFX("Audio/SFX/scrambler/panel_wrong");
-                scramblerAnimator?.SetTrigger("Laugh");
+                if (scramblerAnimator != null) scramblerAnimator.SetTrigger("Laugh");
                 MinigameVFX.ShakeRect(this, (RectTransform)pressedButton.transform);
             }
         }
