@@ -273,6 +273,10 @@
       "value": "Šestiúhelník"
     },
     {
+      "key": "shape_star",
+      "value": "Hvězda"
+    },
+    {
       "key": "tap_region_triangle",
       "value": "Klepni na trojúhelníky!"
     },
@@ -295,6 +299,10 @@
     {
       "key": "tap_region_hexagon",
       "value": "Klepni na šestiúhelníky!"
+    },
+    {
+      "key": "tap_region_star",
+      "value": "Klepni na hvězdy!"
     },
     {
       "key": "sticker_collected",

@@ -273,6 +273,10 @@
       "value": "Hexagon"
     },
     {
+      "key": "shape_star",
+      "value": "Star"
+    },
+    {
       "key": "tap_region_triangle",
       "value": "Tap the triangles!"
     },
@@ -295,6 +299,10 @@
     {
       "key": "tap_region_hexagon",
       "value": "Tap the hexagons!"
+    },
+    {
+      "key": "tap_region_star",
+      "value": "Tap the stars!"
     },
     {
       "key": "sticker_collected",

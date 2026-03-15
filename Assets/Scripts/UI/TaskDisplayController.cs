@@ -196,7 +196,18 @@ namespace VacuumVille.UI
             // Question text
             string qText = p.questionTextFallback;
             if (!string.IsNullOrEmpty(p.questionTextKey))
-                qText = LocalizationManager.Instance.Get(p.questionTextKey);
+            {
+                // q_count_shapes needs the shape name as {0} argument
+                if (p.questionTextKey == "q_count_shapes" && !string.IsNullOrEmpty(p.visualAssetKey))
+                {
+                    string shapeName = LocalizationManager.Instance.Get($"shape_{p.visualAssetKey}");
+                    qText = LocalizationManager.Instance.Get(p.questionTextKey, shapeName);
+                }
+                else
+                {
+                    qText = LocalizationManager.Instance.Get(p.questionTextKey);
+                }
+            }
             questionText.text = qText;
 
             // Equation display — show equationText as a single string (e.g. "? + 1 = 20", "3,  ?,  7")

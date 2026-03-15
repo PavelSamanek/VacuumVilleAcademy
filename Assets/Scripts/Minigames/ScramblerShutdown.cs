@@ -124,8 +124,13 @@ namespace VacuumVille.Minigames
                 int val = choices[i];
                 var btn = panel.answerButtons[i];
                 btn.gameObject.SetActive(true);
-                panel.answerLabels[i].text = val.ToString();
-                panel.answerLabels[i].color = new Color(0.1f, 0.1f, 0.2f);
+
+                // Resolve label — use serialized ref, fall back to TMP child
+                TextMeshProUGUI lbl = (panel.answerLabels != null && i < panel.answerLabels.Length)
+                    ? panel.answerLabels[i]
+                    : btn.GetComponentInChildren<TextMeshProUGUI>();
+                if (lbl != null) { lbl.text = val.ToString(); lbl.color = Color.white; lbl.fontSize = 44f; lbl.fontStyle = FontStyles.Bold; }
+
                 btn.interactable = true;
                 btn.onClick.RemoveAllListeners();
                 btn.onClick.AddListener(() =>
@@ -137,7 +142,7 @@ namespace VacuumVille.Minigames
                     HandlePanelAnswer(panel, btn, correct2, topic);
                 });
                 var img = btn.GetComponent<Image>();
-                if (img) img.color = Color.white;
+                if (img) img.color = new Color(0.22f, 0.25f, 0.45f); // dark navy, matches panel theme
             }
 
             // Timer countdown
