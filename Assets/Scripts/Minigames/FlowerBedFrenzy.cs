@@ -192,6 +192,22 @@ namespace VacuumVille.Minigames
 
         private void SetupAnswerButtons()
         {
+            // Reposition scene-placed buttons to on-screen bottom strip
+            if (answerButtons != null)
+            {
+                float[] xMin = { 0.02f, 0.36f, 0.70f };
+                float[] xMax = { 0.32f, 0.66f, 0.98f };
+                for (int i = 0; i < answerButtons.Length && i < xMin.Length; i++)
+                {
+                    if (answerButtons[i] == null) continue;
+                    var rt = (RectTransform)answerButtons[i].transform;
+                    if (rt.parent != transform) rt.SetParent(transform, false);
+                    rt.anchorMin = new Vector2(xMin[i], 0.02f);
+                    rt.anchorMax = new Vector2(xMax[i], 0.19f);
+                    rt.offsetMin = rt.offsetMax = Vector2.zero;
+                }
+            }
+
             // Pick a button color that contrasts with the current background.
             // For green-heavy themes (Multiplication) the theme color blends in,
             // so we use orange as a strong complement.

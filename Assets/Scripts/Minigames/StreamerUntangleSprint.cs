@@ -149,6 +149,22 @@ namespace VacuumVille.Minigames
 
         private void GenerateKnotProblem()
         {
+            // Reposition scene-placed buttons to on-screen bottom strip
+            if (knotAnswerButtons != null)
+            {
+                float[] xMin = { 0.02f, 0.36f, 0.70f };
+                float[] xMax = { 0.32f, 0.66f, 0.98f };
+                for (int i = 0; i < knotAnswerButtons.Length && i < xMin.Length; i++)
+                {
+                    if (knotAnswerButtons[i] == null) continue;
+                    var rt = (RectTransform)knotAnswerButtons[i].transform;
+                    if (rt.parent != transform) rt.SetParent(transform, false);
+                    rt.anchorMin = new Vector2(xMin[i], 0.02f);
+                    rt.anchorMax = new Vector2(xMax[i], 0.13f);
+                    rt.offsetMin = rt.offsetMax = Vector2.zero;
+                }
+            }
+
             int maxNum = 20;
             int a = Random.Range(5, maxNum + 1);
             int b = Random.Range(1, a);

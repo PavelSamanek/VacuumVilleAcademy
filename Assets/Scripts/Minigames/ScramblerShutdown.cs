@@ -103,12 +103,20 @@ namespace VacuumVille.Minigames
             var choices = problem.choices;
             bool answered = false;
 
-            // Ensure the shared panel (if any) containing answer buttons is active
-            if (panel.answerButtons.Length > 0 && panel.answerButtons[0] != null)
+            // Reposition buttons to be visible within the panel (fix off-screen placement)
             {
-                var btnPanel = panel.answerButtons[0].transform.parent;
-                if (btnPanel != null && btnPanel.gameObject != panel.panelBackground?.gameObject)
-                    btnPanel.gameObject.SetActive(true);
+                float[] yMin = { 0.07f, 0.30f, 0.53f };
+                float[] yMax = { 0.25f, 0.48f, 0.71f };
+                var panelT = panel.panelBackground != null ? panel.panelBackground.transform : null;
+                for (int i = 0; i < panel.answerButtons.Length && i < yMin.Length; i++)
+                {
+                    if (panel.answerButtons[i] == null) continue;
+                    var rt = (RectTransform)panel.answerButtons[i].transform;
+                    if (panelT != null && rt.parent != panelT) rt.SetParent(panelT, false);
+                    rt.anchorMin = new Vector2(0.05f, yMin[i]);
+                    rt.anchorMax = new Vector2(0.95f, yMax[i]);
+                    rt.offsetMin = rt.offsetMax = Vector2.zero;
+                }
             }
 
             for (int i = 0; i < panel.answerButtons.Length && i < choices.Length; i++)
