@@ -93,6 +93,13 @@ namespace VacuumVille.Minigames
             float xPos = Random.Range(tileSpawnLine.position.x - 280f, tileSpawnLine.position.x + 280f);
             var go  = Instantiate(shapeTilePrefab, transform); // parent to Canvas so UI renders
             go.transform.position = new Vector3(xPos, tileSpawnLine.position.y, 0);
+            // Load the correct shape sprite (triangle, square, circle, etc.)
+            var img = go.GetComponent<UnityEngine.UI.Image>();
+            if (img != null)
+            {
+                var spr = Resources.Load<Sprite>($"Sprites/{region.shapeKey}");
+                if (spr != null) img.sprite = spr;
+            }
             var lbl = go.GetComponentInChildren<TextMeshProUGUI>();
             if (lbl) lbl.text = LocalizationManager.Instance.Get($"shape_{region.shapeKey}");
 
