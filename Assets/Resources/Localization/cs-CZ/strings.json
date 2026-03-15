@@ -625,8 +625,20 @@
       "value": "NOVÝ OSOBNÍ REKORD!"
     },
     {
-      "key": "coins_earned",
-      "value": "+{0} mincí!"
+      "key": "label_volume",
+      "value": "Hlasitost"
+    },
+    {
+      "key": "label_music",
+      "value": "Hudba"
+    },
+    {
+      "key": "label_sfx",
+      "value": "Zvuky"
+    },
+    {
+      "key": "label_voice",
+      "value": "Hlas"
     }
   ],
   "target_sum": "Cíl: {0}",

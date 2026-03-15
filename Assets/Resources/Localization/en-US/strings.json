@@ -625,8 +625,20 @@
       "value": "NEW PERSONAL BEST!"
     },
     {
-      "key": "coins_earned",
-      "value": "+{0} coins!"
+      "key": "label_volume",
+      "value": "Volume"
+    },
+    {
+      "key": "label_music",
+      "value": "Music"
+    },
+    {
+      "key": "label_sfx",
+      "value": "Sound FX"
+    },
+    {
+      "key": "label_voice",
+      "value": "Voice"
     }
   ],
   "target_sum": "Target: {0}",
