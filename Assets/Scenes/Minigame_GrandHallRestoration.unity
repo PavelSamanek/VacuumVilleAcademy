@@ -1621,7 +1621,7 @@ MonoBehaviour:
     fillImage: {fileID: 390000472}
     totalSlots: 5
     filledSlots: 0
-  shapeTilePrefab: {fileID: 100000, guid: 789012345678901234567890aaaabbbb, type: 3}
+  shapeTilePrefab: {fileID: 0}
   tileSpawnLine: {fileID: 390000010}
   tileDropSpeed: 250
   spawnInterval: 2
