@@ -40,6 +40,7 @@ namespace VacuumVille.Minigames
             public TextMeshProUGUI currentLabel;
             public int targetCount;
             public int currentCount;
+            [System.NonSerialized] public Color baseColor = Color.white;
         }
 
         private class ConveyorItem
@@ -86,11 +87,10 @@ namespace VacuumVille.Minigames
                 problemLabel.alignment = TextAlignmentOptions.Center;
             }
 
-            // Color the bins and add swipe-direction arrows if missing
             Color[] binColors =
             {
                 new Color(0.20f, 0.50f, 0.90f), // blue — left swipe
-                new Color(0.58f, 0.28f, 0.80f), // purple — no swipe / centre
+                new Color(0.58f, 0.28f, 0.80f), // purple — centre
                 new Color(0.18f, 0.72f, 0.40f)  // green — right swipe
             };
             string[] arrows = bins.Length >= 3
@@ -99,14 +99,40 @@ namespace VacuumVille.Minigames
 
             for (int i = 0; i < bins.Length; i++)
             {
-                var binT = bins[i].transform;
+                var bin  = bins[i];
+                var binT = bin.transform;
                 if (binT == null) continue;
 
-                // Colour the bin background
-                var img = binT.GetComponent<Image>();
-                if (img) img.color = binColors[Mathf.Min(i, binColors.Length - 1)];
+                Color col = binColors[Mathf.Min(i, binColors.Length - 1)];
+                bin.baseColor = col;
 
-                // Add a swipe-direction arrow above the bin (once only)
+                // Colour the bin's own Image (add one if somehow missing)
+                var img = binT.GetComponent<Image>();
+                if (img == null) img = binT.gameObject.AddComponent<Image>();
+                img.color = col;
+
+                // The scene places targetLabel / currentLabel as SIBLINGS of the bin,
+                // which means the bin's Image renders on top and hides them.
+                // Fix: reparent labels INTO the bin so they render above its Image.
+                if (bin.targetLabel != null && bin.targetLabel.transform.parent != binT)
+                {
+                    bin.targetLabel.transform.SetParent(binT, false);
+                    var lrt = bin.targetLabel.GetComponent<RectTransform>();
+                    lrt.anchorMin = new Vector2(0.05f, 0.1f);
+                    lrt.anchorMax = new Vector2(0.95f, 0.9f);
+                    lrt.offsetMin = lrt.offsetMax = Vector2.zero;
+                    bin.targetLabel.fontSize      = 52f;
+                    bin.targetLabel.fontStyle     = FontStyles.Bold;
+                    bin.targetLabel.color         = Color.white;
+                    bin.targetLabel.alignment     = TextAlignmentOptions.Center;
+                    bin.targetLabel.enableWordWrapping = false;
+                }
+
+                // currentLabel no longer needed — hide it
+                if (bin.currentLabel != null)
+                    bin.currentLabel.gameObject.SetActive(false);
+
+                // Direction arrow above the bin (created once)
                 if (binT.Find("DirectionArrow") == null)
                 {
                     var arrowGo = new GameObject("DirectionArrow");
@@ -115,12 +141,12 @@ namespace VacuumVille.Minigames
                     rt.anchorMin = new Vector2(0f, 1f);
                     rt.anchorMax = new Vector2(1f, 1f);
                     rt.offsetMin = Vector2.zero;
-                    rt.offsetMax = new Vector2(0f, 60f);
+                    rt.offsetMax = new Vector2(0f, 70f);
                     var tmp = arrowGo.AddComponent<TextMeshProUGUI>();
-                    tmp.text = arrows[Mathf.Min(i, arrows.Length - 1)];
-                    tmp.fontSize = 52f;
+                    tmp.text      = arrows[Mathf.Min(i, arrows.Length - 1)];
+                    tmp.fontSize  = 56f;
                     tmp.fontStyle = FontStyles.Bold;
-                    tmp.color = Color.white;
+                    tmp.color     = Color.white;
                     tmp.alignment = TextAlignmentOptions.Center;
                 }
             }
@@ -141,11 +167,11 @@ namespace VacuumVille.Minigames
             {
                 bin.targetCount  = _correctPerBin;
                 bin.currentCount = 0;
-                // Target label: show goal count — white text is readable on coloured bin
-                bin.targetLabel.text  = $"0 / {_correctPerBin}";
-                bin.targetLabel.color = Color.white;
-                bin.currentLabel.text  = "";
-                bin.currentLabel.color = Color.white;
+                if (bin.targetLabel != null)
+                {
+                    bin.targetLabel.text  = $"0 / {_correctPerBin}";
+                    bin.targetLabel.color = Color.white;
+                }
             }
         }
 
@@ -263,10 +289,11 @@ namespace VacuumVille.Minigames
 
             var bin = bins[binIdx];
             bin.currentCount++;
-            bin.targetLabel.text  = $"{bin.currentCount} / {bin.targetCount}";
-            bin.targetLabel.color = Color.white;
-            bin.currentLabel.text  = "";
-            bin.currentLabel.color = Color.white;
+            if (bin.targetLabel != null)
+            {
+                bin.targetLabel.text  = $"{bin.currentCount} / {bin.targetCount}";
+                bin.targetLabel.color = Color.white;
+            }
 
             bool overflowed = bin.currentCount > bin.targetCount;
 
@@ -274,10 +301,11 @@ namespace VacuumVille.Minigames
             {
                 // Overflow: reset bin
                 bin.currentCount = 0;
-                bin.targetLabel.text  = $"0 / {bin.targetCount}";
-                bin.targetLabel.color = Color.white;
-                bin.currentLabel.text  = "";
-                bin.currentLabel.color = Color.white;
+                if (bin.targetLabel != null)
+                {
+                    bin.targetLabel.text  = $"0 / {bin.targetCount}";
+                    bin.targetLabel.color = Color.white;
+                }
                 AudioManager.Instance.PlayWrong();
                 AudioManager.Instance?.PlaySFX("Audio/SFX/atticbin/bin_overflow");
                 StartCoroutine(FlashBin(bin, Color.red));
@@ -316,13 +344,13 @@ namespace VacuumVille.Minigames
             Destroy(item.gameObject);
         }
 
-        private IEnumerator FlashBin(BinSlot bin, Color color)
+        private IEnumerator FlashBin(BinSlot bin, Color flashColor)
         {
-            var img = bin.transform.GetComponent<Image>();
+            var img = bin.transform?.GetComponent<Image>();
             if (!img) yield break;
-            img.color = color;
+            img.color = flashColor;
             yield return new WaitForSeconds(0.3f);
-            img.color = Color.white;
+            img.color = bin.baseColor; // restore themed colour, not white
         }
     }
 }
