@@ -160,20 +160,46 @@ namespace VacuumVille.UI
             btn.targetGraphic = img;
             btn.interactable = unlocked;
 
-            // Label
+            // ── 3D number badge (left side) ──────────────────────────────────────
+            const float BadgeSize = 82f;
+            const float BadgeMargin = 10f;
+
+            var badgeGo = new GameObject("NumberBadge");
+            badgeGo.transform.SetParent(go.transform, false);
+            var badgeRt = badgeGo.AddComponent<RectTransform>();
+            badgeRt.anchorMin        = new Vector2(0f, 0.5f);
+            badgeRt.anchorMax        = new Vector2(0f, 0.5f);
+            badgeRt.pivot            = new Vector2(0f, 0.5f);
+            badgeRt.sizeDelta        = new Vector2(BadgeSize, BadgeSize);
+            badgeRt.anchoredPosition = new Vector2(BadgeMargin, 0f);
+
+            var badge = badgeGo.AddComponent<NumberBadge3D>();
+            badge.SetNumber((def.levelIndex + 1).ToString());
+            badge.SetColor(new Color(base_.r, base_.g, base_.b, 1f));
+
+            // Dim badge for locked levels
+            if (!unlocked)
+            {
+                var cg = badgeGo.AddComponent<CanvasGroup>();
+                cg.alpha = 0.4f;
+            }
+
+            // ── Level name label (shifted right to clear the badge) ──────────────
+            float labelLeft = BadgeMargin + BadgeSize + 8f;
+
             var lGo = new GameObject("Label");
             lGo.transform.SetParent(go.transform, false);
             var lRt = lGo.AddComponent<RectTransform>();
             lRt.anchorMin = Vector2.zero;
             lRt.anchorMax = Vector2.one;
-            lRt.offsetMin = new Vector2(24f, 0f);
+            lRt.offsetMin = new Vector2(labelLeft, 0f);
             lRt.offsetMax = new Vector2(-24f, 0f);
 
             var tmp = lGo.AddComponent<TextMeshProUGUI>();
             string levelName = LocalizationManager.Instance != null
                 ? LocalizationManager.Instance.Get(def.levelNameKey)
                 : def.levelNameKey;
-            tmp.SetText($"{def.levelIndex + 1}.  {levelName}");
+            tmp.SetText(levelName);
             tmp.fontSize = 38f;
             tmp.color = new Color(1f, 1f, 1f, unlocked ? 1f : 0.5f);
             tmp.alignment = TextAlignmentOptions.MidlineLeft;

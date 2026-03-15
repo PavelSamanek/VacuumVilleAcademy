@@ -56,6 +56,9 @@ namespace VacuumVille.UI
         // 3D badges — one per choice button, auto-created in Start
         private NumberBadge3D[] _badges;
 
+        // Equation explosion VFX — auto-added in Start
+        private EquationExplosionVFX _explosionVFX;
+
         // State
         private MathProblem _current;
         private int _attemptCount;
@@ -103,6 +106,10 @@ namespace VacuumVille.UI
                 _badges[i] = choiceButtons[i].GetComponent<NumberBadge3D>()
                           ?? choiceButtons[i].gameObject.AddComponent<NumberBadge3D>();
             }
+
+            // Equation explosion VFX
+            _explosionVFX = GetComponent<EquationExplosionVFX>()
+                         ?? gameObject.AddComponent<EquationExplosionVFX>();
 
             UpdateProgressBar();
             GenerateNext();
@@ -239,6 +246,15 @@ namespace VacuumVille.UI
             else
                 AudioManager.Instance.PlayCorrect();
 
+            // Reveal the solved equation ("5 + 5 = 10") then explode it
+            if (_current != null && !string.IsNullOrEmpty(_current.equationText)
+                && operandAText != null)
+            {
+                string solved = _current.equationText.Replace("?", _current.correctAnswer.ToString());
+                operandAText.text = solved;
+                _explosionVFX?.Explode(operandAText.rectTransform, solved, _streak);
+            }
+
             if (correctParticles) correctParticles.SetActive(true);
             if (characterAnimator != null) characterAnimator.SetTrigger("Cheer");
 
@@ -252,7 +268,7 @@ namespace VacuumVille.UI
             UpdateProgressBar();
             CheckAdaptiveDifficulty();
 
-            StartCoroutine(NextAfterDelay(0.8f));
+            StartCoroutine(NextAfterDelay(1.5f));
         }
 
         private void HandleWrong(int buttonIndex)
