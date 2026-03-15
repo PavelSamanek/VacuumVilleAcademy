@@ -81,6 +81,12 @@ namespace VacuumVille.Core
 
         private void EnsureAudioSources()
         {
+            // Permanent AudioListener on this DontDestroyOnLoad object so audio
+            // never drops during the frame(s) between scenes when the camera's
+            // AudioListener is destroyed before the next camera activates.
+            if (GetComponent<AudioListener>() == null)
+                gameObject.AddComponent<AudioListener>();
+
             if (musicSource == null)
             {
                 musicSource = gameObject.AddComponent<AudioSource>();
