@@ -366,7 +366,7 @@ namespace VacuumVille.UI
         {
             yield return new WaitForSeconds(3f);
             SaveSystem.Delete();
-            UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+            GameManager.Instance?.TransitionTo(VacuumVille.Data.GameState.LanguageSelect);
         }
     }
 }

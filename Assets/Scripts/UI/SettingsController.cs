@@ -50,9 +50,9 @@ namespace VacuumVille.UI
             var currentLang = loc?.CurrentLanguage ?? Language.Czech;
 
             // ── Root panel ───────────────────────────────────────────────────────
-            var root = new GameObject("SettingsRoot");
+            var root = new GameObject("SettingsRoot", typeof(RectTransform));
             root.transform.SetParent(canvas.transform, false);
-            var rootRt = root.AddComponent<RectTransform>();
+            var rootRt = (RectTransform)root.transform;
             rootRt.anchorMin = Vector2.zero;
             rootRt.anchorMax = Vector2.one;
             rootRt.offsetMin = rootRt.offsetMax = Vector2.zero;
@@ -70,7 +70,7 @@ namespace VacuumVille.UI
             AddLabel(sv, loc?.Get("select_language") ?? "Language",
                 34f, new Color(0.6f, 0.85f, 1f), 48f, FontStyles.Bold);
 
-            var langRow = new GameObject("LangRow");
+            var langRow = new GameObject("LangRow", typeof(RectTransform));
             langRow.transform.SetParent(sv, false);
             var lrLe = langRow.AddComponent<LayoutElement>();
             lrLe.preferredHeight = 80f;
@@ -146,7 +146,7 @@ namespace VacuumVille.UI
 
         private static Button MakeLangButton(Transform parent, string label, bool active)
         {
-            var go  = new GameObject("LangBtn");
+            var go  = new GameObject("LangBtn", typeof(RectTransform));
             go.transform.SetParent(parent, false);
             var le  = go.AddComponent<LayoutElement>();
             le.flexibleWidth = 1f;
@@ -158,9 +158,9 @@ namespace VacuumVille.UI
             var btn = go.AddComponent<Button>();
             btn.targetGraphic = img;
 
-            var lGo = new GameObject("Label");
+            var lGo = new GameObject("Label", typeof(RectTransform));
             lGo.transform.SetParent(go.transform, false);
-            var lRt = lGo.AddComponent<RectTransform>();
+            var lRt = (RectTransform)lGo.transform;
             lRt.anchorMin = Vector2.zero; lRt.anchorMax = Vector2.one;
             lRt.offsetMin = lRt.offsetMax = Vector2.zero;
             var tmp = lGo.AddComponent<TextMeshProUGUI>();
@@ -175,7 +175,8 @@ namespace VacuumVille.UI
         private static Slider AddVolumeRow(Transform parent, string label, float value,
             UnityEngine.Events.UnityAction<float> onChange)
         {
-            var row = new GameObject("VolumeRow");
+            // Row container — must be RectTransform from the start for LayoutGroup
+            var row = new GameObject("VolumeRow", typeof(RectTransform));
             row.transform.SetParent(parent, false);
             var le = row.AddComponent<LayoutElement>();
             le.preferredHeight = 72f;
@@ -187,7 +188,7 @@ namespace VacuumVille.UI
             vlg.childForceExpandHeight = false;
 
             // Label
-            var lGo = new GameObject("Label");
+            var lGo = new GameObject("Label", typeof(RectTransform));
             lGo.transform.SetParent(row.transform, false);
             var lLe = lGo.AddComponent<LayoutElement>();
             lLe.preferredHeight = 34f;
@@ -196,70 +197,70 @@ namespace VacuumVille.UI
             tmp.fontSize = 28f;
             tmp.color = Color.white;
 
-            // Slider
-            var sliderGo = new GameObject("Slider");
+            // Slider root — RectTransform from the start so AddComponent<Slider> works
+            var sliderGo = new GameObject("Slider", typeof(RectTransform));
             sliderGo.transform.SetParent(row.transform, false);
             var slLe = sliderGo.AddComponent<LayoutElement>();
             slLe.preferredHeight = 30f;
+            var sliderRt = (RectTransform)sliderGo.transform;
+            sliderRt.anchorMin = Vector2.zero;
+            sliderRt.anchorMax = Vector2.one;
+            sliderRt.offsetMin = sliderRt.offsetMax = Vector2.zero;
 
-            // Background
-            var bgGo = new GameObject("Background");
+            // Background track
+            var bgGo = new GameObject("Background", typeof(RectTransform));
             bgGo.transform.SetParent(sliderGo.transform, false);
-            var bgRt = bgGo.AddComponent<RectTransform>();
-            bgRt.anchorMin = new Vector2(0, 0.25f);
-            bgRt.anchorMax = new Vector2(1, 0.75f);
+            var bgRt = (RectTransform)bgGo.transform;
+            bgRt.anchorMin = new Vector2(0f, 0.25f);
+            bgRt.anchorMax = new Vector2(1f, 0.75f);
             bgRt.offsetMin = bgRt.offsetMax = Vector2.zero;
             var bgImg = bgGo.AddComponent<Image>();
             bgImg.color = new Color(0.25f, 0.25f, 0.35f);
 
             // Fill area
-            var fillArea = new GameObject("FillArea");
+            var fillArea = new GameObject("FillArea", typeof(RectTransform));
             fillArea.transform.SetParent(sliderGo.transform, false);
-            var faRt = fillArea.AddComponent<RectTransform>();
-            faRt.anchorMin = new Vector2(0, 0.25f);
-            faRt.anchorMax = new Vector2(1, 0.75f);
-            faRt.offsetMin = new Vector2(5, 0);
-            faRt.offsetMax = new Vector2(-15, 0);
+            var faRt = (RectTransform)fillArea.transform;
+            faRt.anchorMin = new Vector2(0f, 0.25f);
+            faRt.anchorMax = new Vector2(1f, 0.75f);
+            faRt.offsetMin = new Vector2(5f, 0f);
+            faRt.offsetMax = new Vector2(-15f, 0f);
 
-            // Fill
-            var fillGo = new GameObject("Fill");
+            // Fill image
+            var fillGo = new GameObject("Fill", typeof(RectTransform));
             fillGo.transform.SetParent(fillArea.transform, false);
-            var fillRt = fillGo.AddComponent<RectTransform>();
+            var fillRt = (RectTransform)fillGo.transform;
             fillRt.anchorMin = Vector2.zero;
             fillRt.anchorMax = Vector2.one;
             fillRt.offsetMin = fillRt.offsetMax = Vector2.zero;
             var fillImg = fillGo.AddComponent<Image>();
             fillImg.color = new Color(0.25f, 0.70f, 0.95f);
 
-            // Handle area
-            var handleArea = new GameObject("HandleArea");
+            // Handle sliding area
+            var handleArea = new GameObject("HandleSlideArea", typeof(RectTransform));
             handleArea.transform.SetParent(sliderGo.transform, false);
-            var haRt = handleArea.AddComponent<RectTransform>();
+            var haRt = (RectTransform)handleArea.transform;
             haRt.anchorMin = Vector2.zero;
             haRt.anchorMax = Vector2.one;
-            haRt.offsetMin = new Vector2(10, 0);
-            haRt.offsetMax = new Vector2(-10, 0);
+            haRt.offsetMin = new Vector2(10f, 0f);
+            haRt.offsetMax = new Vector2(-10f, 0f);
 
-            // Handle
-            var handleGo = new GameObject("Handle");
+            // Handle knob
+            var handleGo = new GameObject("Handle", typeof(RectTransform));
             handleGo.transform.SetParent(handleArea.transform, false);
-            var handleRt = handleGo.AddComponent<RectTransform>();
-            handleRt.sizeDelta = new Vector2(30, 30);
+            var handleRt = (RectTransform)handleGo.transform;
+            handleRt.sizeDelta = new Vector2(30f, 30f);
             var handleImg = handleGo.AddComponent<Image>();
             handleImg.color = Color.white;
 
             // Wire Slider component
-            var sliderRt = sliderGo.AddComponent<RectTransform>();
-            sliderRt.anchorMin = Vector2.zero;
-            sliderRt.anchorMax = Vector2.one;
-            sliderRt.offsetMin = sliderRt.offsetMax = Vector2.zero;
             var slider = sliderGo.AddComponent<Slider>();
-            slider.fillRect  = fillRt;
-            slider.handleRect = handleRt;
+            slider.fillRect      = fillRt;
+            slider.handleRect    = handleRt;
             slider.targetGraphic = handleImg;
-            slider.minValue = 0f;
-            slider.maxValue = 1f;
-            slider.value = value;
+            slider.minValue      = 0f;
+            slider.maxValue      = 1f;
+            slider.value         = value;
             slider.onValueChanged.AddListener(onChange);
 
             return slider;
@@ -267,9 +268,9 @@ namespace VacuumVille.UI
 
         private static Transform MakeScrollView(Transform parent)
         {
-            var sv = new GameObject("ScrollView");
+            var sv = new GameObject("ScrollView", typeof(RectTransform));
             sv.transform.SetParent(parent, false);
-            var svRt = sv.AddComponent<RectTransform>();
+            var svRt = (RectTransform)sv.transform;
             svRt.anchorMin = Vector2.zero;
             svRt.anchorMax = Vector2.one;
             svRt.offsetMin = svRt.offsetMax = Vector2.zero;
@@ -280,18 +281,18 @@ namespace VacuumVille.UI
             scrollRect.decelerationRate = 0.135f;
             scrollRect.scrollSensitivity = 40f;
 
-            var vp = new GameObject("Viewport");
+            var vp = new GameObject("Viewport", typeof(RectTransform));
             vp.transform.SetParent(sv.transform, false);
-            var vpRt = vp.AddComponent<RectTransform>();
+            var vpRt = (RectTransform)vp.transform;
             vpRt.anchorMin = Vector2.zero;
             vpRt.anchorMax = Vector2.one;
             vpRt.offsetMin = vpRt.offsetMax = Vector2.zero;
             vp.AddComponent<RectMask2D>();
             scrollRect.viewport = vpRt;
 
-            var content = new GameObject("Content");
+            var content = new GameObject("Content", typeof(RectTransform));
             content.transform.SetParent(vp.transform, false);
-            var contentRt = content.AddComponent<RectTransform>();
+            var contentRt = (RectTransform)content.transform;
             contentRt.anchorMin = new Vector2(0, 1);
             contentRt.anchorMax = new Vector2(1, 1);
             contentRt.pivot     = new Vector2(0.5f, 1f);
@@ -336,7 +337,7 @@ namespace VacuumVille.UI
         private static void AddActionButton(Transform parent, string text,
             Color color, float height, UnityEngine.Events.UnityAction onClick)
         {
-            var go = new GameObject("ActionButton");
+            var go = new GameObject("ActionButton", typeof(RectTransform));
             go.transform.SetParent(parent, false);
             var le = go.AddComponent<LayoutElement>();
             le.preferredHeight = height;
@@ -345,9 +346,9 @@ namespace VacuumVille.UI
             var btn = go.AddComponent<Button>();
             btn.targetGraphic = img;
             btn.onClick.AddListener(onClick);
-            var lGo = new GameObject("Label");
+            var lGo = new GameObject("Label", typeof(RectTransform));
             lGo.transform.SetParent(go.transform, false);
-            var lRt = lGo.AddComponent<RectTransform>();
+            var lRt = (RectTransform)lGo.transform;
             lRt.anchorMin = Vector2.zero; lRt.anchorMax = Vector2.one;
             lRt.offsetMin = lRt.offsetMax = Vector2.zero;
             var tmp = lGo.AddComponent<TextMeshProUGUI>();
