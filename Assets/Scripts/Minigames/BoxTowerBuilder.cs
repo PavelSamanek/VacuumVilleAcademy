@@ -21,7 +21,7 @@ namespace VacuumVille.Minigames
         [SerializeField] private Transform spawnLine;
         [SerializeField] private Transform stackLine;
         [SerializeField] private int maxStackHeight = 6;
-        [SerializeField] private float fallSpeed = 150f;
+        [SerializeField] private float fallSpeed = 450f;
         [SerializeField] private ParticleSystem vacuumParticles;
 
         private int _targetSum;
