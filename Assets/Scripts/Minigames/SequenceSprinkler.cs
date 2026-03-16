@@ -164,8 +164,8 @@ namespace VacuumVille.Minigames
                 head.activated      = false;
                 head.button.gameObject.SetActive(true);
                 head.label.text     = shuffled[i].ToString();
-                head.label.color    = new Color(0.1f, 0.1f, 0.2f);
-                if (head.indicator) head.indicator.color = Color.white;
+                head.label.color    = Color.white;
+                if (head.indicator) head.indicator.color = new Color(0.18f, 0.52f, 0.88f);
 
                 int idx = i;
                 head.button.onClick.RemoveAllListeners();
@@ -236,7 +236,7 @@ namespace VacuumVille.Minigames
             {
                 head.indicator.color = new Color(1f, 0.57f, 0f);
                 yield return new WaitForSeconds(0.3f);
-                head.indicator.color = Color.white;
+                head.indicator.color = new Color(0.18f, 0.52f, 0.88f);
             }
         }
 
