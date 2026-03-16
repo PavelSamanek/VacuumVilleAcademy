@@ -163,6 +163,7 @@ namespace VacuumVille.Minigames
                 Destroy(_flyingPile);
                 if (vacuumAnimator != null) vacuumAnimator.SetTrigger("Dodge");
                 AudioManager.Instance.PlayWrong();
+                NotifyWrong();
                 yield return new WaitForSeconds(0.8f);
                 StartNextRound();
             }
@@ -196,6 +197,7 @@ namespace VacuumVille.Minigames
                 AudioManager.Instance.PlayCorrect();
                 AudioManager.Instance?.PlaySFX("Audio/SFX/cushioncannon/cushion_land");
                 if (vacuumAnimator != null) vacuumAnimator.SetTrigger("Cheer");
+                NotifyCorrect();
                 MinigameVFX.PulseRing(this, mergePoint.position, new Color(0.412f, 0.941f, 0.682f));
                 MinigameVFX.FloatingText(this, "+1", mergePoint.position, new Color(0.412f, 0.941f, 0.682f));
                 MinigameVFX.ScreenFlash(this, new Color(0.412f, 0.941f, 0.682f));
@@ -205,6 +207,7 @@ namespace VacuumVille.Minigames
                 AudioManager.Instance.PlayWrong();
                 if (vacuumAnimator != null) vacuumAnimator.SetTrigger("Oops");
                 MinigameVFX.ScreenFlash(this, new Color(1f, 0.569f, 0f));
+                NotifyWrong();
             }
 
             StartCoroutine(DelayedNextRound(0.6f));

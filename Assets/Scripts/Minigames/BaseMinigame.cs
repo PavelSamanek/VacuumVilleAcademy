@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using VacuumVille.Core;
+using VacuumVille.UI;
 
 namespace VacuumVille.Minigames
 {
@@ -26,6 +27,11 @@ namespace VacuumVille.Minigames
         protected int Score;
         protected bool GameActive;
 
+        protected DopamineController Dopamine { get; private set; }
+        protected Canvas MinigameCanvas        { get; private set; }
+        protected RectTransform CanvasRt       { get; private set; }
+        private int _streak;
+
         protected virtual float TimeLimit => 60f;
         protected virtual int MaxScore   => 100;
 
@@ -43,6 +49,15 @@ namespace VacuumVille.Minigames
 
             startButton?.onClick.AddListener(BeginMinigame);
             UpdateScoreUI();
+
+            MinigameCanvas = GetComponentInParent<Canvas>()
+                          ?? GetComponentInChildren<Canvas>()
+                          ?? FindObjectOfType<Canvas>();
+            CanvasRt = MinigameCanvas?.GetComponent<RectTransform>();
+
+            var dcGo = new GameObject("DopamineController");
+            dcGo.transform.SetParent(transform);
+            Dopamine = dcGo.AddComponent<DopamineController>();
         }
 
         protected void BeginMinigame()
@@ -124,5 +139,24 @@ namespace VacuumVille.Minigames
         }
 
         protected void CompleteEarly() => FinishMinigame();
+
+        /// Call after every correct answer to trigger streak/comeback/lucky feedback.
+        protected void NotifyCorrect(bool firstAttempt = true)
+        {
+            _streak++;
+            if (Dopamine == null || MinigameCanvas == null) return;
+            if (Dopamine.ConsumeComeback())
+                Dopamine.ShowComeback(MinigameCanvas, Vector2.zero);
+            Dopamine.ShowStreakMilestone(_streak, MinigameCanvas, Vector2.zero);
+            if (Dopamine.TryLucky(firstAttempt))
+                Dopamine.ShowLuckyBonus(MinigameCanvas, CanvasRt);
+        }
+
+        /// Call after every wrong answer to reset streak and arm the comeback flag.
+        protected void NotifyWrong()
+        {
+            _streak = 0;
+            Dopamine?.RecordWrong();
+        }
     }
 }

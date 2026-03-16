@@ -191,6 +191,7 @@ namespace VacuumVille.Minigames
 
                 AudioManager.Instance.PlayCorrect();
                 AudioManager.Instance?.PlaySFX("Audio/SFX/sprinkler/water_burst");
+                NotifyCorrect();
                 MoveVacuumTo(head.button.transform.position);
                 MinigameVFX.PulseRing(this, head.button.transform.position, new Color(0.412f, 0.941f, 0.682f));
                 _nextIndex++;
@@ -199,6 +200,7 @@ namespace VacuumVille.Minigames
             {
                 AudioManager.Instance.PlayWrong();
                 AudioManager.Instance?.PlaySFX("Audio/SFX/sprinkler/wrong_splash");
+                NotifyWrong();
                 if (splashParticles)
                 {
                     if (vacuumTransform != null)

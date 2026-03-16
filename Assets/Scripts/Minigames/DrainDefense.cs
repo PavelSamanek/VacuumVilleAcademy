@@ -178,6 +178,7 @@ namespace VacuumVille.Minigames
             AddScore(duck.Points);
             AudioManager.Instance.PlayCorrect();
             AudioManager.Instance?.PlaySFX("Audio/SFX/draindefense/duck_splash");
+            NotifyCorrect();
             if (savedPointsLabel)
                 savedPointsLabel.text = LocalizationManager.Instance.Get("saved_points", _savedPoints);
 
@@ -187,6 +188,7 @@ namespace VacuumVille.Minigames
                 MinigameVFX.PulseRing(this, pos, new Color(0.412f, 0.941f, 0.682f));
                 MinigameVFX.FloatingText(this, "+" + duck.Points, pos, new Color(0.412f, 0.941f, 0.682f));
                 MinigameVFX.CollectBurst(this, duck.Go, new Color(0.412f, 0.941f, 0.682f));
+                MinigameVFX.ScreenFlash(this, new Color(0.412f, 0.941f, 0.682f));
                 duck.Go = null;
             }
         }
@@ -196,6 +198,7 @@ namespace VacuumVille.Minigames
             _drainedPoints += duck.Points;
             AudioManager.Instance.PlayWrong();
             AudioManager.Instance?.PlaySFX("Audio/SFX/draindefense/duck_drain");
+            NotifyWrong();
             if (duck.Go != null)
             {
                 MinigameVFX.PulseRing(this, duck.Go.transform.position, new Color(1f, 0.569f, 0f));

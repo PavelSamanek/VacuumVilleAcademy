@@ -141,6 +141,7 @@ namespace VacuumVille.Minigames
                 AudioManager.Instance.PlayWrong();
                 AudioManager.Instance?.PlaySFX("Audio/SFX/streamer/bump");
                 if (vacuumAnimator != null) vacuumAnimator.SetTrigger("Bump");
+                NotifyWrong();
                 yield return new WaitForSeconds(0.5f);
             }
 
@@ -202,6 +203,8 @@ namespace VacuumVille.Minigames
                 AudioManager.Instance.PlayCorrect();
                 AudioManager.Instance?.PlaySFX("Audio/SFX/streamer/knot_snap");
                 if (vacuumAnimator != null) vacuumAnimator.SetTrigger("Cheer");
+                MinigameVFX.ScreenFlash(this, new Color(0.412f, 0.941f, 0.682f));
+                NotifyCorrect();
                 Vector3 knotPos = knotProblemText != null ? knotProblemText.transform.position : transform.position;
                 MinigameVFX.PulseRing(this, knotPos, new Color(0.412f, 0.941f, 0.682f));
                 MinigameVFX.FloatingText(this, "+1", knotPos, new Color(0.412f, 0.941f, 0.682f));
@@ -214,6 +217,7 @@ namespace VacuumVille.Minigames
                 AudioManager.Instance?.PlaySFX("Audio/SFX/streamer/bump");
                 if (vacuumAnimator != null) vacuumAnimator.SetTrigger("Oops");
                 if (missesLabel != null) MinigameVFX.ShakeRect(this, (RectTransform)missesLabel.transform);
+                NotifyWrong();
 
                 if (_misses >= MaxMisses) CompleteEarly();
             }

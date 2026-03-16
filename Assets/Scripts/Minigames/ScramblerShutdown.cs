@@ -282,6 +282,7 @@ namespace VacuumVille.Minigames
                 AudioManager.Instance.PlayWrong();
                 AudioManager.Instance?.PlaySFX("Audio/SFX/scrambler/panel_wrong");
                 if (scramblerAnimator != null) scramblerAnimator.SetTrigger("Laugh");
+                NotifyWrong();
                 panel.background.color = new Color(0.28f, 0.10f, 0.10f, 1f); // dim red = timed out
                 yield return new WaitForSeconds(0.8f);
             }
@@ -311,6 +312,8 @@ namespace VacuumVille.Minigames
                 AddScore(1);
                 AudioManager.Instance.PlayCorrect();
                 AudioManager.Instance?.PlaySFX("Audio/SFX/scrambler/panel_solve");
+                MinigameVFX.ScreenFlash(this, new Color(0.412f, 0.941f, 0.682f));
+                NotifyCorrect();
                 if (scramblerAnimator != null) scramblerAnimator.SetTrigger("Shocked");
                 MinigameVFX.PulseRing(this, pressedButton.transform.position, new Color(0.412f, 0.941f, 0.682f));
                 MinigameVFX.FloatingText(this, "+1", pressedButton.transform.position, new Color(0.412f, 0.941f, 0.682f));
@@ -321,6 +324,7 @@ namespace VacuumVille.Minigames
                 AudioManager.Instance.PlayWrong();
                 AudioManager.Instance?.PlaySFX("Audio/SFX/scrambler/panel_wrong");
                 if (scramblerAnimator != null) scramblerAnimator.SetTrigger("Laugh");
+                NotifyWrong();
                 MinigameVFX.ShakeRect(this, (RectTransform)pressedButton.transform);
             }
         }

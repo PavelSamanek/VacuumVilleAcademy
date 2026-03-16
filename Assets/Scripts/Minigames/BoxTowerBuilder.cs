@@ -176,6 +176,7 @@ namespace VacuumVille.Minigames
                     AudioManager.Instance.PlayWrong();
                     AudioManager.Instance?.PlaySFX("Audio/SFX/boxtower/box_fall_land");
                     if (box.Go != null) MinigameVFX.ShakeRect(this, (RectTransform)box.Go.transform);
+                    NotifyWrong();
                     HighlightBox(_firstSelectedBox, false);
                     _firstSelectedBox.Selected = false;
                     _firstSelectedBox = null;
@@ -206,6 +207,8 @@ namespace VacuumVille.Minigames
 
             AudioManager.Instance.PlayCorrect();
             AudioManager.Instance?.PlaySFX("Audio/SFX/boxtower/box_vacuum");
+            MinigameVFX.ScreenFlash(this, new Color(0.412f, 0.941f, 0.682f));
+            NotifyCorrect();
             AddScore(1);
             _correctPairs++;
             _firstSelectedBox = null;

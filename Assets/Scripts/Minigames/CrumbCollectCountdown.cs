@@ -158,6 +158,7 @@ namespace VacuumVille.Minigames
                     {
                         MinigameVFX.ShakeRect(this, (RectTransform)vacuumTransform);
                         AudioManager.Instance.PlayWrong();
+                        NotifyWrong();
                     }
                     return;
                 }
@@ -179,6 +180,8 @@ namespace VacuumVille.Minigames
             MinigameVFX.FloatingText(this, "+1", pos, new Color(0.412f, 0.941f, 0.682f));
             AudioManager.Instance.PlayCorrect();
             AudioManager.Instance?.PlaySFX("Audio/SFX/crumbcollect/crumb_collect");
+            MinigameVFX.ScreenFlash(this, new Color(0.412f, 0.941f, 0.682f));
+            NotifyCorrect();
             AddScore(1);
             _targetNumber++;
             UpdateTargetLabel();

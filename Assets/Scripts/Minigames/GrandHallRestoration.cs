@@ -235,6 +235,7 @@ namespace VacuumVille.Minigames
             {
                 AudioManager.Instance.PlayWrong();
                 AudioManager.Instance?.PlaySFX("Audio/SFX/grandhall/tile_bounce");
+                NotifyWrong();
                 MinigameVFX.ShakeRect(this, (RectTransform)region.button.transform);
                 StartCoroutine(BounceAway(_currentTile.Go.transform));
             }
@@ -250,6 +251,7 @@ namespace VacuumVille.Minigames
 
             AudioManager.Instance.PlayCorrect();
             AudioManager.Instance?.PlaySFX("Audio/SFX/grandhall/tile_snap");
+            NotifyCorrect();
             AddScore(1);
             _tilesPlaced++;
 

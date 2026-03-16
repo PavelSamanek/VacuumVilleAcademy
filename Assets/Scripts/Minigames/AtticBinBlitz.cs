@@ -202,6 +202,8 @@ namespace VacuumVille.Minigames
                 AddScore(1);
                 AudioManager.Instance.PlayCorrect();
                 AudioManager.Instance?.PlaySFX("Audio/SFX/atticbin/bin_land");
+                MinigameVFX.ScreenFlash(this, new Color(0.412f, 0.941f, 0.682f));
+                NotifyCorrect();
                 StartCoroutine(FlashBin(bin, new Color(0.4f, 0.9f, 0.4f)));
                 MinigameVFX.PulseRing(this, bin.button.transform.position, new Color(0.412f, 0.941f, 0.682f));
                 MinigameVFX.FloatingText(this, "+1", bin.button.transform.position, new Color(0.412f, 0.941f, 0.682f));
@@ -210,6 +212,7 @@ namespace VacuumVille.Minigames
             {
                 AudioManager.Instance.PlayWrong();
                 AudioManager.Instance?.PlaySFX("Audio/SFX/atticbin/bin_overflow");
+                NotifyWrong();
                 StartCoroutine(FlashBin(bin, new Color(1f, 0.57f, 0f)));
                 MinigameVFX.ShakeRect(this, (RectTransform)bin.button.transform);
             }

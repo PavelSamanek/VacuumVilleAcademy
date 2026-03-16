@@ -122,6 +122,7 @@ namespace VacuumVille.Minigames
                         StartCoroutine(BounceSock(sock.Go.transform));
                         AudioManager.Instance.PlayWrong();
                         AudioManager.Instance?.PlaySFX("Audio/SFX/socksortsweep/sock_wrong");
+                        NotifyWrong();
                     }
                 }
             }
@@ -145,6 +146,8 @@ namespace VacuumVille.Minigames
 
             AudioManager.Instance.PlayCorrect();
             AudioManager.Instance?.PlaySFX("Audio/SFX/socksortsweep/sock_collect");
+            MinigameVFX.ScreenFlash(this, new Color(0.412f, 0.941f, 0.682f));
+            NotifyCorrect();
             AddScore(1);
             _nextExpected++;
             UpdateNextLabel();

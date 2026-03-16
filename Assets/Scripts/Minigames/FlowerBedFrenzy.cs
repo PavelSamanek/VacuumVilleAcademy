@@ -244,6 +244,7 @@ namespace VacuumVille.Minigames
                 AddScore(1);
                 AudioManager.Instance.PlayCorrect();
                 AudioManager.Instance?.PlaySFX("Audio/SFX/flowerbed/water_spray");
+                NotifyCorrect();
                 if (waterParticles) waterParticles.Play();
                 TintGrid(new Color(0.4f, 0.9f, 0.4f));
                 Vector3 gridPos = gardenGrid != null ? gardenGrid.transform.position : transform.position;
@@ -255,6 +256,7 @@ namespace VacuumVille.Minigames
             {
                 AudioManager.Instance.PlayWrong();
                 AudioManager.Instance?.PlaySFX("Audio/SFX/flowerbed/wilt");
+                NotifyWrong();
                 ShowWilted();
                 if (answerButtons != null && answerButtons.Length > 0)
                     MinigameVFX.ShakeRect(this, (RectTransform)answerButtons[0].transform);
