@@ -1,8 +1,11 @@
 """
 Generates individual number + operator voice clips for equation voicing.
+Uses Microsoft Edge Neural TTS (edge-tts) for natural-sounding voices.
+
 Usage:
-  pip install gtts
-  python gen_equation_voice.py
+  pip install edge-tts
+  python gen_equation_voice.py            # skip existing files
+  python gen_equation_voice.py --force    # overwrite all files
 
 Outputs MP3s to:
   Assets/Resources/Audio/Voice/cs-CZ/  (eq_prompt, num_0..55, op_*)
@@ -12,15 +15,22 @@ The AudioManager.PlayEquationVoice() chains these clips at runtime to say
 e.g. "kolik je dva plus dva" / "what is two plus two".
 """
 
+import asyncio
 import os
+import sys
 
 try:
-    from gtts import gTTS
+    import edge_tts
 except ImportError:
-    print("ERROR: gtts is not installed. Run:  pip install gtts")
+    print("ERROR: edge-tts is not installed. Run:  pip install edge-tts")
     raise
 
 VOICE_ROOT = "Assets/Resources/Audio/Voice"
+FORCE      = "--force" in sys.argv
+
+# Neural voices — natural, child-friendly
+CZ_VOICE = "cs-CZ-VlastaNeural"   # female Czech
+EN_VOICE = "en-US-JennyNeural"    # female English (warm, clear)
 
 # ── Czech ────────────────────────────────────────────────────────────────────
 
@@ -164,31 +174,38 @@ EN_PROMPT = "What is"
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
-def gen(text, lang, out_path):
-    if os.path.exists(out_path):
+async def gen(text, voice, out_path):
+    if not FORCE and os.path.exists(out_path):
         print(f"  skip (exists) {out_path}")
         return
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
-    tts = gTTS(text=text, lang=lang, slow=True)   # slow=True → clearer for children
-    tts.save(out_path)
+    communicate = edge_tts.Communicate(text, voice)
+    await communicate.save(out_path)
     print(f"  wrote {out_path}")
 
-# ── Main ─────────────────────────────────────────────────────────────────────
+async def main():
+    tasks = []
+
+    print("Queuing Czech equation voice clips...")
+    tasks.append(gen(CZ_PROMPT, CZ_VOICE, f"{VOICE_ROOT}/cs-CZ/eq_prompt.mp3"))
+    for n, word in CZ_NUMBERS.items():
+        tasks.append(gen(word, CZ_VOICE, f"{VOICE_ROOT}/cs-CZ/num_{n}.mp3"))
+    for key, word in CZ_OPS.items():
+        tasks.append(gen(word, CZ_VOICE, f"{VOICE_ROOT}/cs-CZ/{key}.mp3"))
+
+    print("Queuing English equation voice clips...")
+    tasks.append(gen(EN_PROMPT, EN_VOICE, f"{VOICE_ROOT}/en-US/eq_prompt.mp3"))
+    for n, word in EN_NUMBERS.items():
+        tasks.append(gen(word, EN_VOICE, f"{VOICE_ROOT}/en-US/num_{n}.mp3"))
+    for key, word in EN_OPS.items():
+        tasks.append(gen(word, EN_VOICE, f"{VOICE_ROOT}/en-US/{key}.mp3"))
+
+    print(f"\nGenerating {len(tasks)} clips (parallel)...")
+    await asyncio.gather(*tasks)
+    print("\nDone! Refresh Unity (Assets > Refresh) to import the new clips.")
+    print("Total clips: 2 x (56 numbers + 4 operators + 1 prompt) = 122 MP3s")
+
+# ── Entry point ───────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    print("Generating Czech equation voice clips...")
-    gen(CZ_PROMPT, "cs", f"{VOICE_ROOT}/cs-CZ/eq_prompt.mp3")
-    for n, word in CZ_NUMBERS.items():
-        gen(word, "cs", f"{VOICE_ROOT}/cs-CZ/num_{n}.mp3")
-    for key, word in CZ_OPS.items():
-        gen(word, "cs", f"{VOICE_ROOT}/cs-CZ/{key}.mp3")
-
-    print("Generating English equation voice clips...")
-    gen(EN_PROMPT, "en", f"{VOICE_ROOT}/en-US/eq_prompt.mp3")
-    for n, word in EN_NUMBERS.items():
-        gen(word, "en", f"{VOICE_ROOT}/en-US/num_{n}.mp3")
-    for key, word in EN_OPS.items():
-        gen(word, "en", f"{VOICE_ROOT}/en-US/{key}.mp3")
-
-    print("\nDone! Refresh Unity (Assets > Refresh) to import the new clips.")
-    print("Total clips generated: 2 x (56 numbers + 4 operators + 1 prompt) = 122 MP3s")
+    asyncio.run(main())
